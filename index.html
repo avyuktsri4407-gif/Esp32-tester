@@ -918,7 +918,7 @@ body.has-rec{padding-bottom:96px}
 .linkdemo{display:block;margin:10px auto 0}
 .swipe{display:none}
 @media (max-width:760px){.swipe{display:block}}
-.trwrap{width:100%;max-width:560px;margin-inline:auto}
+.trwrap{width:100%;max-width:820px;margin-inline:auto}
 .conn .srch kbd{display:none}
 .jump{width:max-content;max-width:100%;margin-inline:auto;border-radius:999px;top:max(60px,env(safe-area-inset-top,0px));background:#272A31;border-color:var(--ctl);box-shadow:0 18px 36px -10px rgba(0,0,0,.98),0 0 0 6px rgba(12,13,16,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 @media (max-width:700px){.jump{top:max(14px,env(safe-area-inset-top,0px))}}
@@ -942,6 +942,25 @@ body.has-rec #toast{bottom:104px}
 .stage .linkp{display:none}
 .sec{scroll-margin-top:130px}
 @media (max-width:700px){.sec{scroll-margin-top:84px}}
+.isoc .iso-face-text[data-tone="hi"]{fill:var(--anatomy-hi)}
+.isoc .hm-pl .iso-face-text{paint-order:stroke;stroke:#0C0D10;stroke-width:.6;stroke-linejoin:round;font-weight:600}
+#navQ{transition:border-color .15s,box-shadow .15s}
+#navQ:hover{border-color:#868b95}
+#navQ:focus,#navQ:focus-visible{outline:none;border-color:#9a9fa9;box-shadow:0 0 0 3px rgba(255,255,255,.05)}
+.srch:hover{border-color:var(--ctl)}
+.hm-fab{border-color:var(--hair2);color:var(--fg)}
+.hm-fab:hover{background:var(--raise);border-color:var(--ctl)}
+.navrec{position:absolute;left:0;right:0;top:calc(100% - 6px);z-index:8;background:var(--raise);border:1px solid var(--hair2);border-radius:var(--r-md);padding:6px;box-shadow:0 18px 36px -12px rgba(0,0,0,.9)}
+.navrec[hidden]{display:none}
+.navrec-h{display:flex;justify-content:space-between;align-items:center;padding:4px 8px 6px;font:500 12.5px var(--f-body);color:var(--muted)}
+.navrec-x{background:none;border:0;color:var(--muted);font:500 12.5px var(--f-body);cursor:pointer;padding:2px 6px;border-radius:6px}
+.navrec-x:hover{color:var(--fg);background:var(--hover)}
+.navrec-i{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;text-align:left;background:transparent;border:0;border-radius:var(--r-sm);padding:9px 10px;color:var(--fg);font:500 14px var(--f-body);cursor:pointer}
+.navrec-i small{color:var(--faint);font:400 12px var(--f-body);white-space:nowrap}
+.navrec-i:hover,.navrec-i:focus-visible{background:var(--hover);outline:none}
+/* demo-only rows: quiet card instead of a dashed outline */
+.sim{border:0;background:var(--surface);border-radius:12px;padding:10px 14px}
+.hm-step .btn{min-height:44px}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1665,7 +1684,7 @@ function stage({reads=[],visual,caption,controls=[],title='Controls'}){
 /* rolling line trace. push(v) adds a sample */
 function trace({w=560,h=170,max=120,unit='',dec=1,step=false,label='Trace',minSpan=1}){
   const s=svgEl(`0 0 ${w} ${h}`,'trace',label);
-  const data=[];const L=46,T=10,B=22,R=8;let rl=null,rh=null;
+  const data=[];const L=step?46:60,T=12,B=26,R=12;let rl=null,rh=null;
   function draw(){
     let g='';
     if(!data.length){s.innerHTML=`<text class="tl" x="${w/2}" y="${h/2}" text-anchor="middle">No samples yet</text>`;return}
@@ -2905,7 +2924,7 @@ function analogPart(b,p){
   const S=AN[p.id],ctx=S.ctx?S.ctx():{};let pin=S.pin,alive=true,lastS=null,simV=S.sim.val;
   const reg=()=>{if(Link.mode==='demo')Demo.adcFn[pin]=()=>S.sim.mv(simV,ctx)};
   cleanups.push(()=>{alive=false;delete Demo.adcFn[pin]});reg();
-  const gg=gaugeSVG(S.min,S.max,S.unit,S.dec),tr=trace({w:560,h:120,max:80,unit:S.unit,dec:S.dec,label:S.name+' over time',minSpan:S.span||5});
+  const gg=gaugeSVG(S.min,S.max,S.unit,S.dec),tr=trace({w:560,h:210,max:80,unit:S.unit,dec:S.dec,label:S.name+' over time',minSpan:S.span||5});
   const vR=readout(S.name,{accent:true}),mR=readout('Pin voltage',{right:true,note:'GPIO'+pin});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   async function read(){
@@ -2941,7 +2960,7 @@ function digitalInPart(b,p){
   const active=v=>S.low?v===0:v===1;
   const setDemo=on=>{if(Link.mode==='demo')Demo.din[pin]=active(0)===on?0:1};
   cleanups.push(()=>{alive=false;delete Demo.din[pin]});if(Link.mode==='demo')Demo.din[pin]=S.low?1:0;
-  const lamp=lampSVG(),tr=trace({w:560,h:110,max:100,step:true,label:S.name+' over time'});
+  const lamp=lampSVG(),tr=trace({w:560,h:150,max:100,step:true,label:S.name+' over time'});
   const sR=readout(S.name,{accent:true,init:S.off}),lR=readout('Pin level',{right:true,note:'GPIO'+pin}),cR=readout('Changes',{right:true,init:'0'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   const seen=new Set();
@@ -3283,7 +3302,7 @@ function pDht(b){
   let pin=15,alive=true;
   if(Link.mode==='demo'){Demo.sim.t=24.6;Demo.sim.h=48}
   cleanups.push(()=>{alive=false});
-  const tT=trace({w:560,h:110,max:60,unit:'°C',dec:1,label:'Temperature',minSpan:2}),hT=trace({w:560,h:110,max:60,unit:'%',dec:0,label:'Humidity',minSpan:6});
+  const tT=trace({w:560,h:190,max:60,unit:'°C',dec:1,label:'Temperature',minSpan:2}),hT=trace({w:560,h:190,max:60,unit:'%',dec:0,label:'Humidity',minSpan:6});
   const tR=readout('Temperature',{accent:true}),hR=readout('Humidity',{accent:true}),kR=readout('Sensor',{right:true,init:'n/a',note:'detected from the data'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   async function read(){
@@ -3587,7 +3606,7 @@ const defI2cEx=(S)=>({cmd:{'Find it':'SCAN\n',['Read '+S.n.split(' ')[0]]:`I2C $
 function multiGraph(id,series,max=80){
   const hist={};let gk=store.get('cts.g.'+id,null),cur=null;if(!series.some(s=>s.k===gk))gk=series[0].k;
   const wrap=el('div',{class:'trwrap'}),fig=el('div',{class:'gfig'});
-  const mk=s=>trace({w:560,h:130,max,unit:s.u||'',dec:s.d??1,label:s.label+' over time',minSpan:s.span||1});
+  const mk=s=>trace({w:640,h:250,max,unit:s.u||'',dec:s.d??1,label:s.label+' over time',minSpan:s.span||1});
   const chips=null;
   function select(k){const s=series.find(x=>x.k===k);if(!s)return;gk=k;store.set('cts.g.'+id,k);cur=mk(s);for(const v of hist[k]||[])cur.push(v);fig.replaceChildren(cur.el);
     if(chips)for(const c of chips.children)c.setAttribute('aria-pressed',String(c.dataset.k===k));if(h.onSelect)h.onSelect(k)}
@@ -4397,7 +4416,7 @@ function ioCont(kind){return function(b){
   if(Link.mode==='demo')Demo.adcFn[35]=()=>{tick++;const r=(sm.flaky&&tick%4===0)?1e6:sm.r;return 3300*r/(r+10000)};
   cleanups.push(()=>{alive=false;delete Demo.adcFn[35]});
   const rR=readout('Resistance between the probes',{accent:true,init:'n/a'}),sR=readout('State',{right:true,init:'n/a'});
-  const tr=trace({w:560,h:100,max:80,unit:'Ω',dec:0,label:'Resistance over time',minSpan:50});
+  const tr=trace({w:560,h:190,max:80,unit:'Ω',dec:0,label:'Resistance over time',minSpan:50});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   const state=r=>r<=100?'closed':r<=1000?'high resistance':'open';
   async function read(){const o=await adcRead(35),v=clamp(o.mv,1,3299),r=10000*v/(3300-v);rR.set(r<=1000?r.toFixed(0)+' Ω':fmtR(r),'about, from the divider');sR.set(state(r),o.mv+' mV');tr.push(Math.min(r,5000));return r}
@@ -4819,7 +4838,7 @@ function mvCounter(cfg){return function(b){
   if(Link.mode==='demo')Demo.cnt[pin]=()=>sm.hz*(1+(Math.random()-.5)*.04);
   cleanups.push(()=>{alive=false;delete Demo.cnt[pin]});
   const fR=readout('Pulse rate',{accent:true,init:'n/a',note:'rising edges per second'}),dR=readout(cfg.dLbl,{accent:true,init:'n/a'}),tR=readout(cfg.tLbl,{right:true,init:cfg.tInit});
-  const tr=trace({w:560,h:110,max:80,unit:'Hz',dec:1,label:'Pulse rate over time',minSpan:5});
+  const tr=trace({w:560,h:190,max:80,unit:'Hz',dec:1,label:'Pulse rate over time',minSpan:5});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   async function read(){const o=await dev(`CNT ${pin} ${win} 0`,win+3000),hz=o.hz;hzMax=Math.max(hzMax,hz);total+=o.n;
     fR.set(hz.toFixed(1)+' Hz',o.n+' pulses in '+o.ms+' ms');const d=cfg.conv(hz,slots);dR.set(d.text,d.note);tR.set(cfg.total(total,slots),'since the page opened');tr.push(hz);return hz}
@@ -6943,13 +6962,6 @@ add('pcb','board','b',BO,[-55,-28,0,55,28,T],(P,c)=>{
     s+=K.faceTextSvg(K.topMatrix([-48.5,-10.4],T,P,'x'),'BOOT',{size:2.3,tone:'lo'});
     s+=K.faceTextSvg(K.topMatrix([-34,-9],T,P,'x'),'ESP32',{size:3,tone:'lo'});
     s+=K.faceTextSvg(K.topMatrix([-34,-12.6],T,P,'x'),'DEVKIT V1',{size:2.2,tone:'faint'});
-    if(K.cameraOf(P).k>1.1){
-      PIN_X.forEach((x,i)=>{
-        const l=LAB_L[NP-1-i],r=LAB_R[NP-1-i];
-        s+=K.faceTextSvg(K.topMatrix([x-.7,22.2],T,P,'y'),l,{size:2.2,tone:'mid'});
-        s+=K.faceTextSvg(K.topMatrix([x-.7,-18.7],T,P,'y'),r,{size:2.2,tone:'mid'});
-      });
-    }
     /* vias, test pads and a silkscreen outline */
     const vias=[[-8,15],[-6,-15.5],[-18,-15],[-24,16],[2,-14],[2,14],[-38,3],[-38,-3],[-14,-1.5],[-1,0]];
     s+=K.faceTextSvg(K.topMatrix([-33.5,16.6],T,P,'x'),'PWR',{size:1.6,tone:'faint'})+K.faceTextSvg(K.topMatrix([-33.5,-17.6],T,P,'x'),'IO2',{size:1.6,tone:'faint'})+K.faceTextSvg(K.topMatrix([-24,1.4],T,P,'x'),'DOIT',{size:1.6,tone:'faint'});
@@ -7109,6 +7121,17 @@ function seen(ob,P,W,H){
   for(const x of [b[0],b[3]])for(const y of [b[1],b[4]])for(const z of [b[2],b[5]]){const p=K.iso([x,y,z],P);if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
   return x1>-30&&x0<W+30&&y1>-30&&y0<H+30;
 }
+/* pin numbers are drawn last so no part ever hides them, with a dark halo so they read over the board */
+function pinLabels(P,o){
+  if(o.lite||K.cameraOf(P).k<=1.1)return '';
+  const Pl=Object.assign({},P,{origin:K.iso(BO,P)});let s='';
+  PIN_X.forEach((x,i)=>{
+    const l=LAB_L[NP-1-i],r=LAB_R[NP-1-i];
+    s+=K.faceTextSvg(K.topMatrix([x-.7,22.2],T,Pl,'y'),l,{size:2.3,tone:'hi'});
+    s+=K.faceTextSvg(K.topMatrix([x-.7,-18.7],T,Pl,'y'),r,{size:2.3,tone:'hi'});
+  });
+  return `<g class="hm-pl">${s}</g>`;
+}
 function draw(P,o={}){
   const cam=K.cameraOf(P),sx=cam.cosA>=0?1:-1,sy=cam.sinA>=0?1:-1;
   const ctx={litPins:o.lit==='pins',lite:!!o.lite,t:o.t||0,plugged:(o.ex||0)>.5,W:o.W,H:o.H};
@@ -7121,7 +7144,7 @@ function draw(P,o={}){
     const html=ob.draw(Pl,Object.assign({},ctx,{lit:!!o.lit&&ob.tag===o.lit}));
     s+=ex<.98?`<g opacity="${ex.toFixed(2)}">${html}</g>`:html;
   }
-  return s;
+  return s+pinLabels(P,o);
 }
 /* camera: a world focus point at the middle of the view, zoom on top of a base scale that fits the board */
 const bc=K.cameraOf({scale:1,azimuth:45,elevation:30});void bc;
@@ -7149,7 +7172,7 @@ const HM_CH=[
   {az:440,el:40,zoom:1.5,f:'pins',ex:0,lit:'pins',a:'pins',t:'Header pins',d:'Power, ground and signal. The Circuit tab lists every pin.'},
   {az:500,el:40,zoom:1.9,f:'reg',ex:0,lit:'reg',a:'reg',t:'3.3 V regulator',d:'Powers the chip from USB. The pins are 3.3 V only, so never feed them 5 V signals.'},
   {az:560,el:42,zoom:1.6,f:'bridge',ex:0,lit:'bridge',a:'bridge',t:'USB to serial chip',d:'CP2102 or CH340. Without its driver no port shows up.'},
-  {az:650,el:34,zoom:1,f:'hero',ex:0,lit:'',a:'module',t:'Pick a part',d:'Every part has its own page: circuit, live test and code.'}
+  {az:650,el:34,zoom:1,f:'hero',ex:0,lit:'',a:'module',t:'One page per part',d:'Every part has its own page: circuit, live test and code.'}
 ];
 function homeGo(id){
   const m=matchMedia('(prefers-reduced-motion: reduce)').matches,t=document.getElementById(id);
@@ -7211,10 +7234,8 @@ function homePage(b){
       el('p',{},'The installer is built into this page. It uses Web Serial to write the tester firmware to a classic ESP32 (ESP32-WROOM, DevKit V1 and similar). Other chips, such as the S2, S3 and C3, need the Arduino IDE route below it.'),
       el('div',{class:'hm-fw'},firmwareBlock())),
     sec(8,'hm-pick','',
-      kick('Pick a part'),
       el('h3',{class:'hm-h'},'Everything the tester covers.'),
-      el('p',{},'Search the list below or open a group. Each page has the circuit, a live test and your own code.'),
-      el('div',{class:'hm-cta'},btn('Jump to the list',()=>homeGo('hm-index'),'primary'))));
+      el('p',{},'Each page has the circuit, a live test and your own code. Search the list below or open a group.')));
   const stage=homeStage();
   const root=el('div',{class:'hm'},stage.node,flow,...stage.extra);
   b.append(root,homeIndex());
@@ -7231,7 +7252,7 @@ function homeStage(){
   const corner=(c,t,x)=>el('span',{class:'hm-c '+c,...(x||{})},t);
   const plate=el('div',{class:'hm-plate isoc'},svg,ov,call);
   const hit=el('div',{class:'hm-hit',tabindex:'0','aria-label':'Board view. Left and right arrow keys turn the board.'});
-  const node=el('figure',{class:'hm-stage'},plate,hit,corner('tl','Fig 1'),corner('tr','ESP32 DevKit V1'),corner('bl','Scroll to turn it. Drag to spin it.'),corner('br','',{'data-readout':''}));
+  const node=el('figure',{class:'hm-stage'},plate,hit,corner('bl','Scroll to turn it. Drag to spin it.'),corner('br','',{'data-readout':''}));
   const letters=[...'ESP32'].map((c,i)=>el('span',{style:'--i:'+i},c));
   const intro=el('div',{class:'hm-intro','aria-hidden':'true'},
     el('p',{class:'hm-big'},...letters),
@@ -7255,7 +7276,7 @@ function homeIndex(){
     none.hidden=any;
   });
   return el('section',{class:'hm-index',id:'hm-index'},
-    el('div',{class:'hm-ih'},el('div',{},kick0('All parts'),el('h3',{class:'hm-h'},'Pick a part to test.')),q),none,
+    el('div',{class:'hm-ih'},el('div',{},el('h3',{class:'hm-h'},'Pick a part to test.')),q),none,
     el('div',{class:'hm-grid'},cards),
     el('div',{class:'hm-foot'},btn('Pin map and parts table',()=>{show('overview');window.scrollTo(0,0)}),btn('Back to the top',()=>{window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})})));
 }
@@ -7419,6 +7440,29 @@ function palInit(){
   });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',palInit);else palInit();
+
+/* sidebar search: a list of recently opened parts shows under the box while it is empty and focused */
+function navRecentInit(){
+  const q=document.getElementById('navQ');if(!q||q.dataset.rec)return;q.dataset.rec='1';
+  const wrap=q.parentElement;wrap.style.position='sticky';
+  const pan=el('div',{class:'navrec',hidden:true,role:'listbox','aria-label':'Recent searches'});wrap.append(pan);
+  const gOf={};for(const g of GROUPS)for(const id of g.ids)gOf[id]=g.n;
+  function paint(){
+    const ids=palRecent().slice(0,6);
+    if(!ids.length||q.value.trim()){pan.hidden=true;return}
+    pan.replaceChildren(
+      el('div',{class:'navrec-h'},el('span',{},'Recent'),el('button',{type:'button',class:'navrec-x',onclick:()=>{store.set(PAL_KEY,[]);pan.hidden=true}},'Clear')),
+      ...ids.map(id=>{const p=PARTS.find(x=>x.id===id);const b=el('button',{type:'button',class:'navrec-i',role:'option',onclick:()=>{pan.hidden=true;q.blur();show(id);window.scrollTo(0,0)}},el('span',{},p.n),el('small',{},gOf[id]||''));return b}));
+    pan.hidden=false;
+  }
+  q.addEventListener('focus',paint);q.addEventListener('input',paint);
+  q.addEventListener('keydown',e=>{if(e.key==='Escape')pan.hidden=true;if(e.key==='ArrowDown'&&!pan.hidden){const f=pan.querySelector('.navrec-i');if(f){e.preventDefault();f.focus()}}});
+  pan.addEventListener('mousedown',e=>e.preventDefault());
+  pan.addEventListener('keydown',e=>{const it=[...pan.querySelectorAll('.navrec-i')],i=it.indexOf(document.activeElement);if(e.key==='ArrowDown'&&i<it.length-1){e.preventDefault();it[i+1].focus()}else if(e.key==='ArrowUp'){e.preventDefault();(i>0?it[i-1]:q).focus()}else if(e.key==='Escape'){pan.hidden=true;q.focus()}});
+  document.addEventListener('mousedown',e=>{if(!wrap.contains(e.target))pan.hidden=true});
+  q.addEventListener('blur',()=>setTimeout(()=>{if(!pan.contains(document.activeElement))pan.hidden=true},120));
+}
+navRecentInit();
 /* ---- Recorder: the raw serial traffic and the polished readings of a live test, saved as a report, CSV, text log or JSON. ---- */
 const Rec={
   who:'',on:false,ready:false,unsaved:false,t0:0,ms0:0,at:null,end:null,mode:'',fw:'',
