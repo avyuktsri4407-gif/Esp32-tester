@@ -961,6 +961,8 @@ body.has-rec #toast{bottom:104px}
 /* demo-only rows: quiet card instead of a dashed outline */
 .sim{border:0;background:var(--surface);border-radius:12px;padding:10px 14px}
 .hm-step .btn{min-height:44px}
+.hm-sec.hm-end{min-height:14vh;padding:0}
+.hm-index{margin-top:2vh}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -7251,9 +7253,7 @@ function homePage(b){
       el('h3',{class:'hm-h'},'Install the tester from this page.'),
       el('p',{},'The installer is built into this page. It uses Web Serial to write the tester firmware to a classic ESP32 (ESP32-WROOM, DevKit V1 and similar). Other chips, such as the S2, S3 and C3, need the Arduino IDE route below it.'),
       el('div',{class:'hm-fw'},firmwareBlock())),
-    sec(8,'hm-pick','',
-      el('h3',{class:'hm-h'},'Everything the tester covers.'),
-      el('p',{},'Each page has the circuit, a live test and your own code. Search the list below or open a group.')));
+    sec(8,'hm-pick','hm-end'));
   const stage=homeStage();
   const root=el('div',{class:'hm'},stage.node,flow,...stage.extra);
   b.append(root,homeIndex());
