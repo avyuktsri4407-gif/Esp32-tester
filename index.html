@@ -905,7 +905,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @media (prefers-reduced-motion:reduce){.rec-dot,.rec-btn.on::before{animation:none}}
 @media print{.rec,.rec-btn{display:none}}
 body.has-rec{padding-bottom:96px}
-.read.pick{cursor:pointer;border-radius:12px;transition:background .15s,box-shadow .15s}
+.read.pick{cursor:pointer;border-radius:14px;padding:10px 14px;margin:-10px -14px;transition:background .15s,box-shadow .15s}
 .read.pick:hover{background:var(--hover)}
 .read.pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .read.pick .v.accent{color:inherit}
@@ -920,7 +920,8 @@ body.has-rec{padding-bottom:96px}
 @media (max-width:760px){.swipe{display:block}}
 .trwrap{width:100%;max-width:560px;margin-inline:auto}
 .conn .srch kbd{display:none}
-.jump{width:max-content;max-width:100%;margin-inline:auto;border-radius:999px;top:max(24px,env(safe-area-inset-top,0px));background:var(--raise);border-color:var(--hair2);box-shadow:0 14px 30px -12px rgba(0,0,0,.95),0 0 0 1px rgba(0,0,0,.35)}
+.jump{width:max-content;max-width:100%;margin-inline:auto;border-radius:999px;top:max(60px,env(safe-area-inset-top,0px));background:#272A31;border-color:var(--ctl);box-shadow:0 18px 36px -10px rgba(0,0,0,.98),0 0 0 6px rgba(12,13,16,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+@media (max-width:700px){.jump{top:max(14px,env(safe-area-inset-top,0px))}}
 .rec-tab{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:6px 16px;margin-left:6px;border-radius:999px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent-hi);font:600 13.5px var(--f-body);cursor:pointer}
 .rec-tab:hover{background:var(--accent);color:var(--on-accent)}
 .rec-tab[hidden]{display:none}
@@ -937,6 +938,10 @@ body.has-rec #toast{bottom:104px}
 .gchip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tip{position:fixed;z-index:90;max-width:280px;padding:9px 12px;border-radius:10px;background:var(--raise);border:1px solid var(--accent-line);color:var(--fg);font:400 13px/1.45 var(--f-body);box-shadow:0 12px 36px rgba(0,0,0,.55);pointer-events:none}
 .tip[hidden]{display:none}
+
+.stage .linkp{display:none}
+.sec{scroll-margin-top:130px}
+@media (max-width:700px){.sec{scroll-margin-top:84px}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1644,6 +1649,7 @@ function linkText(){return Link.mode==='serial'?'Live from the ESP32':Link.mode=
 function readout(label,opts={}){
   const v=el('div',{class:'v'+(opts.accent?' accent':'')},opts.init??'n/a'),s=el('div',{class:'s'},opts.note||'');
   const e=el('div',{class:'read'+(opts.right?' r':'')},el('div',{class:'k'},label),v,s);
+  try{const t=typeof readTip==='function'?readTip(label):'';if(t){e.dataset.tip=t;e.dataset.tipDelay='1200'}}catch(_){}
   return {el:e,set(val,note){v.textContent=val;if(note!=null)s.textContent=note;if(typeof Rec!=='undefined'&&Rec.on)Rec.read(label,val,s.textContent)}};
 }
 /* the instrument plate: readouts on top, the drawing in the middle, a caption, then the control card */
@@ -1651,7 +1657,7 @@ function stage({reads=[],visual,caption,controls=[],title='Controls'}){
   const pill=el('span',{class:'linkp '+Link.mode},linkText());
   const plate=el('div',{class:'stage'},
     el('div',{class:'reads',style:'--n:'+Math.max(1,Math.min(4,reads.length))},...reads.map(r=>r.el)),
-    visual,caption?el('p',{class:'cap'},caption):null,pill,Link.mode==='none'?el('button',{type:'button',class:'btn linkdemo',onclick:()=>$('#bDemo').click()},'No board? Turn on Demo mode'):null);
+    (caption&&visual&&visual.dataset&&!visual.dataset.tip&&(visual.dataset.tip=caption,visual.dataset.tipDelay='1500'),visual),pill,Link.mode==='none'?el('button',{type:'button',class:'btn linkdemo',onclick:()=>$('#bDemo').click()},'No board? Turn on Demo mode'):null);
   const ctl=controls.length?el('div',{class:'ctl'},el('h4',{},title),...controls):null;
   const gl=typeof glossaryFor==='function'?glossaryFor(reads):null;
   return el('div',{class:'stagewrap'},plate,gl,ctl);
@@ -1879,7 +1885,7 @@ function pBaro(b,kind){
   const alt=(p,ref)=>44330*(1-Math.pow(p/ref,0.190294957));
   const aR=readout('Altitude',{accent:true}),pR=readout('Pressure',{right:true}),tR=readout('Temperature',{right:true});
   const G=multiGraph('baro.'+kind,[{k:'alt',label:'Altitude',u:'metres',d:2,span:1},{k:'p',label:'Pressure',u:'hPa',d:2,span:1},{k:'t',label:'Temperature',u:'°C',d:1,span:1}],150);
-  [[aR,'alt'],[pR,'p'],[tR,'t']].forEach(([r,k])=>{const e=r.el;e.classList.add('pick');e.setAttribute('role','button');e.setAttribute('tabindex','0');e.dataset.tip='Show this value on the graph.';e.addEventListener('click',()=>G.select(k));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();G.select(k)}})});
+  [[aR,'alt'],[pR,'p'],[tR,'t']].forEach(([r,k])=>{const e=r.el;e.classList.add('pick');e.setAttribute('role','button');e.setAttribute('tabindex','0');e.dataset.tip=(e.dataset.tip?e.dataset.tip+' ':'')+'Click to draw it on the graph.';e.addEventListener('click',()=>G.select(k));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();G.select(k)}})});
   const paintB=()=>{aR.el.classList.toggle('graphed',G.key==='alt');pR.el.classList.toggle('graphed',G.key==='p');tR.el.classList.toggle('graphed',G.key==='t')};G.onSelect=paintB;paintB();
   const kv=kvTable(),prog=el('span',{class:'mono'},'');
   async function sample(){
@@ -3582,7 +3588,7 @@ function multiGraph(id,series,max=80){
   const hist={};let gk=store.get('cts.g.'+id,null),cur=null;if(!series.some(s=>s.k===gk))gk=series[0].k;
   const wrap=el('div',{class:'trwrap'}),fig=el('div',{class:'gfig'});
   const mk=s=>trace({w:560,h:130,max,unit:s.u||'',dec:s.d??1,label:s.label+' over time',minSpan:s.span||1});
-  const chips=series.length>1?el('div',{class:'gchips',role:'group','aria-label':'Value shown on the graph'},...series.map(s=>{const b=el('button',{type:'button',class:'gchip','aria-pressed':'false'},s.label);b.dataset.k=s.k;b.dataset.tip='Draw '+s.label+' on the graph.';b.addEventListener('click',()=>select(s.k));return b})):null;
+  const chips=null;
   function select(k){const s=series.find(x=>x.k===k);if(!s)return;gk=k;store.set('cts.g.'+id,k);cur=mk(s);for(const v of hist[k]||[])cur.push(v);fig.replaceChildren(cur.el);
     if(chips)for(const c of chips.children)c.setAttribute('aria-pressed',String(c.dataset.k===k));if(h.onSelect)h.onSelect(k)}
   function push(k,v){if(!Number.isFinite(v))return;const a=hist[k]=hist[k]||[];a.push(v);if(a.length>max)a.shift();if(k===gk&&cur)cur.push(v)}
@@ -3615,7 +3621,7 @@ function busPart(b,p){
   const G=multiGraph(p.id,(NUMF.length?NUMF:[main]).map(f=>({k:f.k,label:f.label,u:f.u,d:f.d,span:f.span})),80);
   function paintPick(){F.forEach((f,i)=>R_[i].el.classList.toggle('graphed',NUMF.length>1&&f.k===G.key))}
   G.onSelect=paintPick;
-  if(NUMF.length>1)F.forEach((f,i)=>{if(f.text)return;const e=R_[i].el;e.classList.add('pick');e.setAttribute('role','button');e.setAttribute('tabindex','0');e.dataset.tip='Show '+f.label+' on the graph.';
+  if(NUMF.length>1)F.forEach((f,i)=>{if(f.text)return;const e=R_[i].el;e.classList.add('pick');e.setAttribute('role','button');e.setAttribute('tabindex','0');e.dataset.tip=(e.dataset.tip?e.dataset.tip+' ':'')+'Click to draw '+f.label+' on the graph.';
     e.addEventListener('click',()=>G.select(f.k));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();G.select(f.k)}})});
   paintPick();
   const aR=readout('Chip',{right:true,init:'not checked',note:S.addrs?hex(addr):(S.chipNote||'')});
@@ -7798,6 +7804,95 @@ function tipInit(){
 }
 tipInit.cand=null;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tipInit);else tipInit();
+
+/* hover descriptions for readout labels (plain language, one or two sentences) */
+const RDTIPS=[
+  [/^altitude$/i,'Height worked out from air pressure. Press Set ground ref here to measure height from where you are, not from sea level.'],
+  [/^pressure$/i,'Air pressure in hectopascals (hPa). Sea level is about 1013 hPa and it falls about 12 hPa for every 100 m you climb.'],
+  [/^(temperature|sensor temperature)$/i,'Temperature measured by the sensor, in degrees Celsius. It reads a little high if the board around it is warm.'],
+  [/^chip temperature$/i,'Temperature of the chip itself, not the room. A quick check that the chip is alive.'],
+  [/^humidity$/i,'Relative humidity: how much water vapour the air holds compared with the most it could hold. A normal room is 30 to 60 %.'],
+  [/^chip$/i,'Which sensor chip answered, read from its ID register.'],
+  [/^(chip hardware|chip version|model id|module type|boot status|software version|firmware|regversion|status byte|status register|ioin register|setup_aw|rf_setup|mode1)$/i,'A value read straight from the chip. It proves the chip answers and tells you which version it is.'],
+  [/accel x, y, z|^acceleration$/i,'Acceleration on each axis in m/s². Lying still, one axis reads about 9.8 (gravity).'],
+  [/^total acceleration$/i,'All three axes combined. About 9.8 m/s² when the board is still.'],
+  [/gyro/i,'How fast the board is turning around each axis, in degrees per second. Close to 0 when it is still.'],
+  [/magnetic field|field strength/i,'Strength of the magnetic field around the sensor. Earth\'s own field is about 0.25 to 0.65 gauss.'],
+  [/^heading$/i,'Compass direction the board points to. 0° is north. Keep the board flat and away from magnets and steel.'],
+  [/^pitch$/i,'How far the nose tilts up or down, in degrees, worked out from gravity.'],
+  [/^roll$/i,'How far the board tilts sideways, in degrees, worked out from gravity.'],
+  [/^round trip$/i,'Time for a PING to reach the board and the reply to come back over USB.'],
+  [/^free heap$/i,'Memory the ESP32 has left for the running program. A number that keeps falling means a memory leak.'],
+  [/^uptime$/i,'Time since the board last restarted.'],
+  [/^commanded( angle)?$/i,'What this page told the board to do.'],
+  [/^reported by esp32$/i,'What the board says the pin is really doing. It should match the command.'],
+  [/^selected angle$/i,'The angle you picked on the horn drawing.'],
+  [/^applied angle$/i,'The angle the board says it sent to the servo.'],
+  [/^pin level$/i,'Logic level the ESP32 sees on the pin. HIGH is about 3.3 V, LOW is about 0 V.'],
+  [/^pin voltage$/i,'Voltage measured on the ESP32 pin, between 0 and 3.3 V.'],
+  [/^changes$/i,'How many times the pin switched level since you opened this page.'],
+  [/^(i2c )?address$/i,'The device\'s I2C address, in hex. Two devices on one bus cannot share an address.'],
+  [/^devices found$/i,'How many I2C devices answered the bus scan.'],
+  [/^stability$/i,'Whether repeated scans find the same devices. A loose wire or a missing pull-up shows up here.'],
+  [/^frequency$/i,'Pulses per second, in hertz (Hz).'],
+  [/read back/i,'Value the chip reports after the page wrote it. It should equal what was written.'],
+  [/^pwm$/i,'PWM switches the pin on and off very fast. The share of time it is on (duty) sets the average power.'],
+  [/^speed$/i,'Motor speed as a share of full power.'],
+  [/^direction$/i,'Which way the motor is driven.'],
+  [/^distance$/i,'Distance to the nearest object, worked out from how long a pulse takes to come back.'],
+  [/^echo time$/i,'Time the sound pulse took to go out and bounce back. Distance is this times the speed of sound, halved.'],
+  [/^bus voltage$/i,'Voltage on the load side of the sensor.'],
+  [/^shunt voltage$/i,'Tiny voltage across the sensor\'s shunt resistor. Current is this divided by the resistor value.'],
+  [/^current$/i,'Current flowing through the sensor, in milliamps.'],
+  [/^power$/i,'Power used by the load: bus voltage times current.'],
+  [/^battery$/i,'Battery voltage, measured through a 2:1 divider so it fits the 3.3 V pin.'],
+  [/^charge estimate$/i,'Rough charge from the voltage. A LiPo reads about 4.2 V full and 3.0 V empty.'],
+  [/^(co2|eco2)$/i,'Carbon dioxide in parts per million (ppm). Fresh air is about 420 ppm, a stuffy room 1000 or more. eCO2 is an estimate, not a true CO2 measurement.'],
+  [/^tvoc$/i,'Total volatile organic compounds: a rough measure of gases from paint, cleaners and people, in parts per billion.'],
+  [/^pm\s?(1\.0|2\.5|10)$/i,'Dust particles of that size, in micrograms per cubic metre. Lower is cleaner air.'],
+  [/particles over/i,'Number of particles larger than this size in 0.1 litre of air.'],
+  [/signal at ao|^signal$/i,'Raw analog level from the sensor. It rises with more gas, light or sound. Compare it with clean air, not with a fixed number.'],
+  [/^illuminance$|^light$/i,'How bright it is, in lux. A lit room is about 100 to 500 lux, daylight over 10 000.'],
+  [/broadband|infrared|^clear$|nm$/i,'Raw light count from one colour channel of the sensor. Larger means more light in that band.'],
+  [/^colour \(r, g, b\)$/i,'Red, green and blue amounts the sensor sees.'],
+  [/^colour sent$|^hex$/i,'The colour the page told the LED to show.'],
+  [/^capacitance$/i,'Measured capacitance, found from how long the capacitor takes to charge through a known resistor.'],
+  [/^charge time constant$/i,'Time for the capacitor to reach 63 % of its final voltage. Equals resistance times capacitance.'],
+  [/^against printed$/i,'How far the measured value is from the value printed on the part.'],
+  [/^(measured|resistance between the probes)$/i,'Resistance found from the voltage on the pin and a known divider resistor.'],
+  [/^nearest e24 value$/i,'Closest standard 5 % resistor value to your measurement.'],
+  [/^forward voltage$/i,'Voltage across a diode or LED when it conducts. About 0.6 V for silicon, 1.8 to 3.3 V for LEDs.'],
+  [/^looks like$/i,'What kind of part the measured forward voltage points to.'],
+  [/^reverse$/i,'Whether the part blocks current the other way round. It should.'],
+  [/^fix$/i,'Whether the GPS has locked onto enough satellites to know where it is.'],
+  [/^satellites used$/i,'Satellites the GPS uses for its position. Four or more are needed for a fix.'],
+  [/^hdop$/i,'Horizontal dilution of precision: how well the satellites are spread. Lower is better, under 2 is good.'],
+  [/^time to first fix$/i,'How long the GPS took to find its position after starting. A cold start can take minutes.'],
+  [/^position$/i,'Where the part is: a knob position, or latitude and longitude for GPS.'],
+  [/^heart rate|^pulse rate$/i,'Beats or pulses per minute. For a demo, not medical use.'],
+  [/^spo2/i,'Blood oxygen estimate. Indicative only, not medical use.'],
+  [/^(rms level|peak level|ac level \(rms\)|signal swing|sound swing.*|mean level|idle level|non-zero samples)$/i,'Size of the audio or analog signal. RMS is its average strength, peak is its highest point, swing is peak to peak.'],
+  [/^(touch|touched now|seen touched so far|electrodes?)$/i,'Which touch pads the chip senses a finger on.'],
+  [/^(pressed now|keys seen|raw mask)$/i,'Which keys are down now, and which have been seen since you opened the page.'],
+  [/^(motion|movement|obstacle|reflection|vibration|flow|water level|moisture|liquid)$/i,'Whether the sensor sees what it is made to detect right now.'],
+  [/^(pulses counted|pulse rate|turned|steps sent|half steps sent)$/i,'How many pulses or steps the page has counted or sent since you opened it.'],
+  [/^(card|card uid|card type|card answer \(atqa\)|antenna|finger|glass|stored fingerprints|template capacity)$/i,'What the reader reports about the card or finger it sees.'],
+  [/^(sim card|network|module|storage|files on card|playback|volume|tone|display|pattern|showing|frames|frame rate)$/i,'What the module reports about itself right now.'],
+  [/^(rate|resolution|picture|capture)$/i,'Camera or sensor setting reported by the board.'],
+  [/^(time|date|seconds|oscillator stop flag|write counter \(ifcnt\))$/i,'Value read from the clock or counter chip.'],
+  [/^verdict$/i,'Pass or fail from the rule on the Pass criteria list.'],
+  [/^(state|mode|op mode)$/i,'Current setting or state of the part.'],
+  [/^(x|y)$/i,'Joystick position on this axis. About the middle when released.'],
+  [/^(button|contact)$/i,'Whether the switch is pressed or its contact has closed.'],
+  [/^(channel 0 pulse)$/i,'Pulse width on channel 0. Servos read 1 to 2 ms.'],
+  [/^(output voltage|supply.*)$/i,'Measured voltage at the output or supply pin.'],
+  [/^(collector|drain|gate).*/i,'Voltage measured at that pin with the control pin driven high or low.'],
+  [/^(ph|tcrt|brightest band)$/i,'Value reported by the sensor.'],
+  [/^(bytes sent|bytes read|messages received|radio port|name|sensor baud|stored uart setting|as text|first non-zero byte|battery pin b\+|status flags \(gstat\)|rom code|receiver noise|water level|level|selected)$/i,'A value the module reports over its serial or radio link.'],
+  [/^(red|blue|green|violet|orange|yellow) /i,'Raw light count in that colour band. Larger means more light.'],
+  [/^(channel \d.*)$/i,'Whether the level shifter passed the signal in that direction.']
+];
+function readTip(label){const l=String(label||'').trim();for(const [r,t] of RDTIPS)if(r.test(l))return t;return ''}
 /* ---- hook every new part into the page. Must be the last file of the NEW block. ---- */
 const NEWFN={};
 function specSource(sp){
