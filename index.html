@@ -904,6 +904,10 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @media (prefers-reduced-motion:reduce){.rec-dot,.rec-btn.on::before{animation:none}}
 @media print{.rec,.rec-btn{display:none}}
 body.has-rec{padding-bottom:96px}
+.read.pick{cursor:pointer;border-radius:12px;transition:background .15s,box-shadow .15s}
+.read.pick:hover{background:var(--hover)}
+.read.pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.read.graphed{box-shadow:inset 0 -2px 0 var(--accent)}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -3563,7 +3567,20 @@ function busPart(b,p){
   cleanups.push(()=>{alive=false;unreg();if(S.done)return S.done(ctx)});
   const F=S.fields,main=F.find(f=>f.main)||F[0];
   const R_=F.map((f,i)=>readout(f.label,{accent:i===0,right:i>0,init:'n/a',note:f.note||''}));
-  const tr=trace({w:560,h:130,max:80,unit:main.u||'',dec:main.d??1,label:main.label+' over time',minSpan:main.span||1});
+  const NUMF=F.filter(f=>!f.text),hist={};let gSel=null;
+  let gk=store.get('cts.g.'+p.id,null);if(!NUMF.some(f=>f.k===gk))gk=main.k;
+  const mkTrace=f=>trace({w:560,h:130,max:80,unit:f.u||'',dec:f.d??1,label:f.label+' over time',minSpan:f.span||1});
+  let tr=mkTrace(NUMF.find(f=>f.k===gk)||main);
+  const trWrap=el('div',{class:'trwrap'},tr.el);
+  function paintPick(){F.forEach((f,i)=>R_[i].el.classList.toggle('graphed',NUMF.length>1&&f.k===gk))}
+  function graphOn(k){
+    const f=NUMF.find(x=>x.k===k);if(!f)return;gk=k;store.set('cts.g.'+p.id,k);
+    tr=mkTrace(f);for(const x of hist[k]||[])tr.push(x);trWrap.replaceChildren(tr.el);
+    if(gSel)gSel.value=k;paintPick();
+  }
+  if(NUMF.length>1)F.forEach((f,i)=>{if(f.text)return;const e=R_[i].el;e.classList.add('pick');e.setAttribute('role','button');e.setAttribute('tabindex','0');e.setAttribute('aria-label','Show '+f.label+' on the graph');
+    e.addEventListener('click',()=>graphOn(f.k));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();graphOn(f.k)}})});
+  paintPick();
   const aR=readout('Chip',{right:true,init:'not checked',note:S.addrs?hex(addr):(S.chipNote||'')});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   const fmtV=(f,v)=>f.fmt?f.fmt(v):(Number.isFinite(v)?v.toFixed(f.d??1)+(f.u?' '+f.u:''):(f.opt?'none':'n/a'));
@@ -3584,7 +3601,8 @@ function busPart(b,p){
     await init();
     const v=await S.read(ctx);last=v;
     F.forEach((f,i)=>{const x=v[f.k];R_[i].set(f.text?String(x):fmtV(f,x),(f.opt&&!f.text&&!Number.isFinite(x))?'this chip does not measure it':(f.note||''))});
-    const m=v[main.k];if(Number.isFinite(m))tr.push(m);
+    for(const f of NUMF){const x=v[f.k];if(Number.isFinite(x)){const h=hist[f.k]=hist[f.k]||[];h.push(x);if(h.length>80)h.shift()}}
+    if(Number.isFinite(v[gk]))tr.push(v[gk]);
     if(S.after)S.after(v,ctx);
     return v;
   }
@@ -3624,10 +3642,11 @@ function busPart(b,p){
     row(btn(S.find?'Find the part':'Find on the bus',find),btn('Check the ID',ident),S.stim&&S.stim.optional?btn(S.stim.btn||'Guided test',()=>{live.stop();return runStim('')}):null)];
   if(S.addrs&&S.addrs.length>1)ctls.push(row(el('span',{class:'lbl'},'I2C address'),addrSel=sel('i2cAddr',S.addrs.map(x=>[x,hex(x)+(S.addrNotes?' '+S.addrNotes[S.addrs.indexOf(x)]:'')]),addr,v=>{unreg();addr=+v;inited=false;regDemo();aR.set('not checked',hex(addr))})));
   for(const o of S.opts||[])ctls.push(row(el('span',{class:'lbl'},o.label),sel('o_'+o.k,o.choices,opt[o.k],v=>{opt[o.k]=isNaN(+v)?v:+v;store.set('cts.o.'+p.id+o.k,opt[o.k]);inited=false;unreg();regDemo()})));
+  if(NUMF.length>1)ctls.push(row(el('span',{class:'lbl'},'Graph shows'),gSel=sel('graphOf',NUMF.map(f=>[f.k,f.label+(f.u?' ('+f.u+')':'')]),gk,graphOn)));
   for(const s of S.sim||[]){const r=simRow(s.label,s.min,s.max,s.step,s.val,s.unit,v=>{sv[s.k]=v});if(r)ctls.push(r)}
   if(S.extra)ctls.push(...S.extra(ctx,{read,status}));
   ctls.push(status,el('p',{class:'hint'},S.hint));
-  b.append(stage({reads:[...R_,aR],visual:tr.el,caption:S.cap,controls:ctls.filter(Boolean)}));
+  b.append(stage({reads:[...R_,aR],visual:trWrap,caption:S.cap,controls:ctls.filter(Boolean)}));
 }
 /* Bus parts, part 2: I2C sensors. Each part is a spec for busPart(): how to find it, read its ID, read its values, and a virtual chip for Demo mode. */
 Object.assign(KNOWN,{0x23:'BH1750 light (ADDR low)',0x5C:'BH1750 light (ADDR high)',0x38:'AHT20 temperature and humidity',0x44:'SHT31 (ADDR low)',0x45:'SHT31 (ADDR high)',0x58:'SGP30 air quality',0x61:'SCD30 CO2',
