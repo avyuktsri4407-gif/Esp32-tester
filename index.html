@@ -1477,8 +1477,8 @@ function demoReply(line){
     case 'SERVO':if(!svPins().includes(a[0]))return {c,ok:0,err:'pin must be 13, 14, 27, 32 or 33'};return {c,ok:1,pin:a[0],deg:a[1]};
     case 'SERVOOFF':return {c,ok:1,pin:a[0]};
     case 'SCAN':return {c,ok:1,a:[...new Set([44,104,118,119,...Demo.sim.i2c,...Object.keys(Demo.i2c||{}).map(Number)])].sort((x,y)=>x-y)};
-    case 'IMU':return {c,ok:1,who:104,ax:r3(.12+n()*.06),ay:r3(-.08+n()*.06),az:r3(9.78+n()*.08),gx:r2(-10.2+n()*.4),gy:r2(-15.1+n()*.4),gz:r2(.6+n()*.3),t:27.4};
-    case 'MAG':{const g=(Date.now()/4000)%(2*Math.PI),r4=v=>+v.toFixed(4);return {c,ok:1,type:'QMC5883P',x:r4(.38*Math.cos(g)),y:r4(.38*Math.sin(g)),z:r4(-.29+n()*.01)}}
+    case 'IMU':{const S=Demo.sim||{},th=(S.pitch||0)*Math.PI/180,ph=(S.roll||0)*Math.PI/180,g=9.78;return {c,ok:1,who:104,ax:r3(-g*Math.sin(th)+.12+n()*.06),ay:r3(g*Math.cos(th)*Math.sin(ph)-.08+n()*.06),az:r3(g*Math.cos(th)*Math.cos(ph)+n()*.08),gx:r2(-10.2+n()*.4),gy:r2(-15.1+n()*.4),gz:r2(.6+n()*.3+(S.spin?90:0)),t:27.4}}
+    case 'MAG':{const g=Demo.sim&&Demo.sim.head!=null?Demo.sim.head*Math.PI/180:(Date.now()/4000)%(2*Math.PI),r4=v=>+v.toFixed(4);return {c,ok:1,type:'QMC5883P',x:r4(.38*Math.cos(g)),y:r4(.38*Math.sin(g)),z:r4(-.29+n()*.01)}}
     case 'BARO':return {c,ok:1,d:[{a:118,id:88,chip:'BMP280',t:+(27.1+n()*.05).toFixed(2),p:+(1006.4+n()*.12).toFixed(2)},{a:119,id:85,chip:'BMP180',t:27.4,p:+(1006.1+n()*.3).toFixed(2)}]};
     case 'SD':return {c,ok:1,type:'SDHC',mb:15193,bytes:31,match:1,ms:410};
     case 'SDLS':return {c,ok:1,f:[{n:'tester.txt',s:31,d:0},{n:'LOG001.CSV',s:184320,d:0}]};
@@ -1853,6 +1853,7 @@ function pImu(b){
   async function collect(n=20){const s=[];for(let i=0;i<n;i++){s.push(await dev('IMU'));await sleep(25)}return s}
   b.append(stage({reads:[pR,rR,gR],visual:V.el,caption:'Attitude from gravity alone. Tilt the board and the horizon follows. Fast spins confuse it; that is what the gyro is for.',
     controls:[row(lb,btn('Read once',read)),
+      simRow('Tilt nose up',-90,90,1,0,'°',v=>{Demo.sim.pitch=v}),simRow('Roll right side down',-90,90,1,0,'°',v=>{Demo.sim.roll=v}),simToggle('Spin about Z',v=>{Demo.sim.spin=v?1:0}),
       el('div',{class:'lbl'},'Acceleration'),...A.map(x=>x.el),
       el('div',{class:'lbl'},'Gyro, bias removed'),...G.map(x=>x.el),kv.el,
       el('p',{class:'hint'},'Checks: lay the board flat and still first.'),
@@ -1891,7 +1892,7 @@ function pMag(b){
   }
   const {live,btn:lb}=wireLive(read,120,'Stream live');
   b.append(stage({reads:[hR,fR],visual:V.el,caption:'The card turns so the top marker reads the heading. Keep the board flat and away from magnets, motors and steel.',
-    controls:[row(lb,btn('Read once',read),btn('Field strength check',async()=>{
+    controls:[simRow('Turn the board',0,359,1,90,'°',v=>{Demo.sim.head=v}),row(lb,btn('Read once',read),btn('Field strength check',async()=>{
       live.stop();const s=[];for(let i=0;i<10;i++){s.push((await read()).m);await sleep(40)}
       const m=mean(s),ok=m>=0.25&&m<=0.65;
       setResult('mag',ok?'pass':'fail',`|B| ${fmt(m,3)} G`);
