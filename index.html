@@ -7121,14 +7121,32 @@ function seen(ob,P,W,H){
   for(const x of [b[0],b[3]])for(const y of [b[1],b[4]])for(const z of [b[2],b[5]]){const p=K.iso([x,y,z],P);if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
   return x1>-30&&x0<W+30&&y1>-30&&y0<H+30;
 }
-/* pin numbers are drawn last so no part ever hides them, with a dark halo so they read over the board */
+/* pin numbers are drawn last, but a number is left out when a part stands in front of it, so text never shows through a model */
+const LBL_L=22.9,LBL_R=-19.4;
+function hullOf(pts){
+  const p=pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]),cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];
+  for(const q of p){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q)}
+  for(const q of p.slice().reverse()){while(up.length>1&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q)}
+  return lo.slice(0,-1).concat(up.slice(0,-1));
+}
+const inHull=(h,q)=>{for(let i=0;i<h.length;i++){const a=h[i],b=h[(i+1)%h.length];if((b[0]-a[0])*(q[1]-a[1])-(b[1]-a[1])*(q[0]-a[0])<-.5)return false}return true};
 function pinLabels(P,o){
   if(o.lite||K.cameraOf(P).k<=1.1)return '';
   const Pl=Object.assign({},P,{origin:K.iso(BO,P)});let s='';
+  const zl=BO[2]+T,occ=objs.filter(b=>b.box[5]>zl+.4&&b.box[2]>=zl-.5&&b.id!=='pcb').map(b=>{
+    const c=[];for(const x of [b.box[0],b.box[3]])for(const y of [b.box[1],b.box[4]])for(const z of [b.box[2],b.box[5]])c.push(K.iso([x,y,z],P));
+    return {h:hullOf(c),d:K.depthOf([(b.box[0]+b.box[3])/2,(b.box[1]+b.box[4])/2,(b.box[2]+b.box[5])/2],P)};
+  });
+  const hidden=(x,y,len)=>{
+    const dl=K.depthOf([x,y,zl],P);
+    for(const t of [0,.5,1]){const q=K.iso([x-.7+len*2.3*.6*t,y,zl],P);for(const b of occ)if(b.d>dl&&inHull(b.h,q))return true}
+    return false;
+  };
   PIN_X.forEach((x,i)=>{
     const l=LAB_L[NP-1-i],r=LAB_R[NP-1-i];
-    s+=K.faceTextSvg(K.topMatrix([x-.7,22.2],T,Pl,'y'),l,{size:2.3,tone:'hi'});
-    s+=K.faceTextSvg(K.topMatrix([x-.7,-18.7],T,Pl,'y'),r,{size:2.3,tone:'hi'});
+    if(!hidden(x,LBL_L,l.length))s+=K.faceTextSvg(K.topMatrix([x-.7,LBL_L],T,Pl,'y'),l,{size:2.3,tone:'hi'});
+    if(!hidden(x,LBL_R,r.length))s+=K.faceTextSvg(K.topMatrix([x-.7,LBL_R],T,Pl,'y'),r,{size:2.3,tone:'hi'});
   });
   return `<g class="hm-pl">${s}</g>`;
 }
