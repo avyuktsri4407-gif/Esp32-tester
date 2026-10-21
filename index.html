@@ -908,7 +908,8 @@ body.has-rec{padding-bottom:96px}
 .read.pick{cursor:pointer;border-radius:12px;transition:background .15s,box-shadow .15s}
 .read.pick:hover{background:var(--hover)}
 .read.pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.read.graphed{box-shadow:inset 0 -2px 0 var(--accent)}
+.read.pick .v.accent{color:inherit}
+.read.pick.graphed .v{color:var(--accent-hi)}
 
 .chk[data-v]{font:600 16px/1.4 var(--f-body);padding:12px 16px;border-radius:12px;border:1px solid var(--hair2)}
 .chk[data-v=pass]{color:var(--pass);background:var(--pass-soft);border-color:var(--pass)}
@@ -919,12 +920,15 @@ body.has-rec{padding-bottom:96px}
 @media (max-width:760px){.swipe{display:block}}
 .trwrap{width:100%;max-width:560px;margin-inline:auto}
 .conn .srch kbd{display:none}
-.jump{width:100%;max-width:none;border-radius:18px}
+.jump{width:max-content;max-width:100%;margin-inline:auto;border-radius:999px;top:max(24px,env(safe-area-inset-top,0px));background:var(--raise);border-color:var(--hair2);box-shadow:0 14px 30px -12px rgba(0,0,0,.95),0 0 0 1px rgba(0,0,0,.35)}
+.rec-tab{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:6px 16px;margin-left:6px;border-radius:999px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent-hi);font:600 13.5px var(--f-body);cursor:pointer}
+.rec-tab:hover{background:var(--accent);color:var(--on-accent)}
+.rec-tab[hidden]{display:none}
+.rec-tab .rdot{width:9px;height:9px;border-radius:50%;background:#E5484D}
+@media (min-width:960px){#bSearch{display:none}body.is-home #bSearch{display:inline-flex}}
 .rec-who{background:var(--surface);border:1px solid var(--hair2);border-radius:10px;color:var(--fg);padding:8px 10px;font:400 13.5px var(--f-body);width:150px}
 body.has-rec #toast{bottom:104px}
 
-.rec-fab{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:55;box-shadow:0 12px 36px rgba(0,0,0,.5);background:var(--raise);padding:11px 18px}
-.rec-fab[hidden]{display:none}
 .gfig{width:100%}
 .gchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 2px}
 .gchip{font:500 13px var(--f-body);padding:6px 14px;border-radius:999px;border:1px solid var(--hair2);background:transparent;color:var(--muted);cursor:pointer;min-height:34px}
@@ -2162,7 +2166,7 @@ const REF={
 };
 const PBDATA={
   'HW-290 / GY-87':{n:'HW-290 (GY-87)',pins:['VCC','GND','SCL','SDA'],alias:{'VCC / VIN':'VCC'},src:'t',
-    note:'Power is 3 to 5 V (onboard regulator) and all three sensors share the I2C pair. The module has extra header pins (such as INT and DRDY) that this tool leaves unconnected. No source gives the header order, so match by the printed label.',refs:[REF.hw]},
+    note:'Power it from 3 to 5 V. All three sensors use the same SDA and SCL wires. Extra pins on the module (INT, DRDY) are not used here.',refs:[REF.hw]},
   'GY-BMEP':{n:'GY-BMEP (BMP280)',pins:['VCC','GND','SCL','SDA','CSB','SDO'],alias:{'CSB (if present)':'CSB','SDO (if present)':'SDO'},src:'v',
     note:'Pin order from Components101. VCC is 3.3 V only (no regulator, 3.6 V maximum). CSB and SDO have pull resistors on the board, so leaving them open gives I2C at 0x76.',refs:[REF.bmp]},
   'DFRobot MicroSD':{n:'DFRobot MicroSD',pins:['MISO','SCK','SS','MOSI','GND','+5V'],alias:{'SS (CS)':'SS'},src:'v',
@@ -2297,7 +2301,7 @@ function wiringView(p){
     el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...[(w.left||'ESP32')+' pin','Part pin','Wire'].map(h=>el('th',{},h)))),
       el('tbody',{},...w.rows.map(r=>el('tr',{},el('td',{class:'m'},r[0]),el('td',{class:'m'},r[1]),el('td',{},swatch(r[2]),r[2]+(r[3]==='opt'?' (optional)':''))))))),
     el('ul',{class:'plain'},...w.notes.map(n=>el('li',{},n)))));
-  box.append(blk('Pin order',el('p',{class:'hint'},(pb.src==='v'?'Checked against the maker pinout. ':'Typical order, not confirmed from a datasheet. ')+pb.note)));
+  box.append(blk('Pin order',el('p',{class:'hint'},(pb.src==='v'?'Matches the maker pinout. ':'Pin positions differ between boards, so connect each wire to the label printed on your board. ')+pb.note)));
   return box;
 }
 
@@ -2365,7 +2369,7 @@ function mapView(id,qs){
   out.push(el('h4',{class:'mapname'},name),holder,
     el('div',{class:'row'},el('span',{class:'chip fill'},'pin in use'),el('span',{class:'chip dash'},'free pin'),
       el('span',{class:'hint'},'Drawn for the common 30-pin ESP32 DevKit V1, USB at the bottom. Match pins by the GPIO numbers printed on your board, not by position.')));
-  if(w){const pb=pbOf(w);out.push(el('p',{class:'hint'},(pb.src==='v'?'Pin order checked against published sources. ':'Typical pin order, match by the printed label. ')+pb.note))}
+  if(w){const pb=pbOf(w);out.push(el('p',{class:'hint'},(pb.src==='v'?'Matches the maker pinout. ':'Pin positions differ between boards, so connect each wire to the label printed on your board. ')+pb.note))}
   if(w){
     const typ={pwr:'power',gnd:'ground',sig:'signal',opt:'optional'};
     out.push(el('div',{class:'lbl'},'Connections'),
@@ -7554,6 +7558,11 @@ const Rec={
   /* ---------- interface ---------- */
   syncBtns(){},
   page(p){this.canRec=!!p&&!p.home&&!p.overview;this.fabShow()},
+  mount(nav){
+    const b=el('button',{type:'button',class:'rec-tab','aria-label':'Record this test so you can download the data',onclick:()=>this.start()},el('span',{class:'rdot','aria-hidden':'true'}),'Record test');
+    b.dataset.tip='Record the readings and serial traffic, then download a report to send to a teammate, a CSV or a raw log.';
+    nav.append(b);this.fab=b;this.fabShow();
+  },
   fabShow(){if(this.fab)this.fab.hidden=!(this.canRec&&!this.on&&!this.ready)},
   render(tick){
     this.fabShow();
@@ -7583,8 +7592,6 @@ const Rec={
   init(){
     try{this.who=localStorage.getItem('cts.who')||''}catch(e){}
     this.bar=el('div',{class:'rec',role:'region','aria-label':'Recorder',hidden:true});document.body.append(this.bar);
-    this.fab=el('button',{type:'button',class:'btn rec-btn rec-fab',hidden:true,'aria-label':'Record this test so you can download the data',onclick:()=>this.start()},'Record test');
-    this.fab.dataset.tip='Record the readings and serial traffic, then download a report to send to a teammate, a CSV or a raw log.';document.body.append(this.fab);
     document.addEventListener('mousedown',e=>{if(this.menu&&!e.target.closest('.rec')){this.menu=false;this.render()}});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.menu){this.menu=false;this.render()}});
     addEventListener('beforeunload',e=>{if(this.on||this.unsaved){e.preventDefault();e.returnValue=''}});
@@ -7754,7 +7761,7 @@ const TIPRX=[
 let tipEl=null,tipT=0,tipFor=null;
 function tipText(b){
   if(b.dataset&&b.dataset.tip)return b.dataset.tip;
-  if(b.id==='bSearch'||b.classList.contains('hm-fab'))return 'Search every part by name, pin or kind. Shortcut from anywhere: '+(typeof palKey==='function'?palKey():'Ctrl K')+', or / when you are not typing in a box. Esc closes it.';
+  if(b.id==='bSearch'||b.id==='navQ'||b.classList.contains('hm-fab'))return 'Search every part by name, pin or kind. Shortcut from anywhere: '+(typeof palKey==='function'?palKey():'Ctrl K')+', or / when you are not typing in a box. Esc closes it.';
   const t=(b.textContent||'').replace(/\s+/g,' ').trim();
   if(!t||t.length>48)return '';
   if(TIPS[t])return TIPS[t];
@@ -7772,13 +7779,13 @@ function tipShow(b,txt){
 }
 function tipInit(){
   if(window.matchMedia&&matchMedia('(hover:none)').matches)return;
-  const sel='button,[role=button],[data-tip]';
+  const sel='button,[role=button],[data-tip],#navQ';
   document.addEventListener('mouseover',e=>{
     const b=e.target.closest&&e.target.closest(sel);
     if(!b||b===tipFor||b===tipInit.cand)return;
     tipHide();tipInit.cand=b;
     const txt=tipText(b);if(!txt)return;
-    const d=b.dataset.tipDelay!=null?+b.dataset.tipDelay:(b.id==='bSearch'||b.classList.contains('hm-fab')?350:TIP_DELAY);
+    const d=b.dataset.tipDelay!=null?+b.dataset.tipDelay:(b.id==='bSearch'||b.id==='navQ'||b.classList.contains('hm-fab')?350:TIP_DELAY);
     tipT=setTimeout(()=>{if(b.isConnected&&tipInit.cand===b)tipShow(b,txt)},d);
   });
   document.addEventListener('mouseout',e=>{
@@ -7899,7 +7906,8 @@ async function show(id){
   if(p.overview){HL='h3';const b=el('div',{class:'ov'});overview(b);panel.append(b);return}
   HL='h4';
   const secs=[['circuit','Circuit'],['test','Live test'],p.id==='power'?null:['code','Your code'],['notes','Pass criteria and notes']].filter(Boolean);
-  const jump=el('nav',{class:'jump','aria-label':'On this page'},...secs.map(([k,l])=>el('button',{type:'button',class:'jl',onclick:()=>{const t=$('#s-'+k);t.scrollIntoView({block:'start'});t.focus({preventScroll:true})}},l)));
+  const jump=el('nav',{class:'jump','aria-label':'On this page'},...secs.map(([k,l])=>el('button',{type:'button',class:'jl',onclick:()=>{const t=$('#s-'+k);t.scrollIntoView({block:'start'});t.focus({preventScroll:true})}},l)))
+  try{Rec.mount(jump)}catch(e){}
   const sec=(k,title,...kids)=>el('section',{class:'sec sec-'+k,id:'s-'+k,tabindex:'-1','aria-labelledby':'h-'+k},el('h3',{id:'h-'+k},title),...kids);
   const tb=el('div');TESTS[p.id](tb);
   const notes=el('div');
