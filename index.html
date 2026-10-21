@@ -963,6 +963,15 @@ body.has-rec #toast{bottom:104px}
 .hm-step .btn{min-height:44px}
 .hm-sec.hm-end{min-height:14vh;padding:0}
 .hm-index{margin-top:2vh}
+.mtsvg{max-width:560px}
+.isoc .mw{--anatomy-paper:#b9b6ac;--anatomy-shade-0:#8f8c83;--anatomy-shade-1:#a09d93;--anatomy-shade-2:#b3b0a5;--anatomy-shade-3:#c7c4b8;--anatomy-top:#dcd9cc}
+.isoc .mtw{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.isoc .mtw.o{stroke:#050506}
+.isoc .mtw.wr{stroke:#e5484d}.isoc .mtw.wb{stroke:#6b9bff}.isoc .mtw.wy{stroke:#e9c46a}.isoc .mtw.wg{stroke:#4cc38a}
+.isoc .mtw.wo{stroke:#f08a3c}.isoc .mtw.wp{stroke:#d77fc0}.isoc .mtw.wk{stroke:#2a2c31}
+.isoc .mtfan{fill:#8b6a2a;stroke:var(--anatomy-hi);stroke-width:.8px;stroke-linejoin:round}
+.isoc .mthub{fill:#cbc7bc;stroke:var(--anatomy-hi);stroke-width:.8px}
+.isoc .iso-line.gold{stroke:#d8b877}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1760,7 +1769,8 @@ function pLed(b){
 }
 
 const svOpts=()=>svPins().map((p,i)=>[p,`GPIO${p} servo ${i+1}`]);
-function servoSVG(){
+function servoSVG(kind){
+  const MG=kind==='mg';
   const cx=200,cy=196,R=150,P=a=>{const t=(180-a)*Math.PI/180;return[cx+R*Math.cos(t),cy-R*Math.sin(t)]};
   const s=svgEl('0 0 400 290','servosvg');
   let g='';
@@ -1770,7 +1780,7 @@ function servoSVG(){
   s.innerHTML=`${g}<path class="trk" d="M${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}"/><path class="fill" d=""/>
   <g class="body"><rect class="ear" x="128" y="214" width="144" height="18" rx="4"/><circle class="hole" cx="137" cy="223" r="3.2"/><circle class="hole" cx="263" cy="223" r="3.2"/>
   <rect class="case" x="146" y="172" width="108" height="98" rx="8"/><rect class="gear" x="168" y="176" width="64" height="38" rx="19"/>
-  <text class="sg" x="200" y="246" text-anchor="middle">SG90</text><text class="sgs" x="200" y="260" text-anchor="middle">micro servo 9 g</text></g>
+  <text class="sg" x="200" y="246" text-anchor="middle">${MG?'MG996R':'SG90'}</text><text class="sgs" x="200" y="260" text-anchor="middle">${MG?'metal gear servo 55 g':'micro servo 9 g'}</text></g>
   <g class="horn"><path d="M-9 0 L-5.5 -86 A5.5 5.5 0 0 1 5.5 -86 L9 0 A9 9 0 0 1 -9 0 Z"/><circle r="15"/><circle class="hh" cy="-30" r="2.4"/><circle class="hh" cy="-48" r="2.4"/><circle class="hh" cy="-66" r="2.4"/><circle class="hh" cy="-80" r="2.4"/><circle class="screw" r="4.5"/></g>
   <line class="aim" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-R}"/>
   <g class="handle" tabindex="0" role="slider" aria-label="Selected servo angle" aria-valuemin="0" aria-valuemax="180"><circle class="hring" r="17"/><circle class="hdot" r="9"/></g>`;
@@ -1782,9 +1792,9 @@ function servoSVG(){
     applied(a){horn.style.transform=`translate(${cx}px,${cy}px) rotate(${a-90}deg)`},
     angleAt(e){const p=svgPt(s,e),dx=p.x-cx,dy=cy-p.y;let a=180-Math.atan2(Math.max(dy,0),dx)*180/Math.PI;if(dy<0)a=dx<0?0:180;return Math.max(0,Math.min(180,Math.round(a)))}};
 }
-function pServo(b){
+function pServo(b,kind){
   let pin=CFG.sv0,ang=90,applied=null,busy=false,pend=null;
-  const V=servoSVG();
+  const V=servoSVG(kind);
   const selR=readout('Selected angle',{accent:true,init:'90°'}),appR=readout('Applied angle',{right:true,init:'n/a',note:'reported by the ESP32'});
   const pulse=el('span',{class:'mono'},'');
   const rng=el('input',{type:'range',min:0,max:180,value:ang,id:'ang','aria-label':'Servo angle'});
@@ -3059,11 +3069,7 @@ function pBuzzP(b){
 }
 
 /* ---- DC motor ---- */
-function motorSVG(){
-  const s=svgEl('0 0 200 140','motorsvg','Motor');
-  s.innerHTML='<rect class="can" x="30" y="40" width="110" height="60" rx="10"/><rect class="cap2" x="140" y="52" width="16" height="36" rx="3"/><line class="sh" x1="156" y1="70" x2="180" y2="70"/><g class="rot"><circle class="hub2" cx="70" cy="70" r="16"/><line class="bl" x1="70" y1="54" x2="70" y2="86"/><line class="bl" x1="54" y1="70" x2="86" y2="70"/></g><text class="lt" x="100" y="128" text-anchor="middle">130-size motor</text>';
-  return s;
-}
+function motorSVG(){return MT.dc('130 size DC motor')}
 function pMotor(b){
   let pin=4,hz=1000,duty=0,alive=true;
   const ico=motorSVG(),rot=ico.querySelector('.rot');
@@ -4311,7 +4317,7 @@ defPart({id:'pcm5102',grp:'Sound',n:'PCM5102A I2S stereo DAC',s:'I2S: BCK GPIO26
 defPart({id:'mg996r',grp:'Motors and drivers',n:'MG996R metal-gear servo (180°, 10 kg·cm)',s:'Signal on GPIO13, separate 5 to 6 V supply',alias:'servo metal gear high torque mg996 mg995',cmds:['SERVO'],
   wiring:{title:'MG996R servo',part:'MG996R servo',rows:[['GPIO13','Signal (orange or yellow)','orange','sig'],['GND','GND (brown or black), joined with the supply −','black','gnd'],['5V (VIN)','V+ ONLY for an unloaded test (red)','red','opt']],notes:['Power the servo from its own 5 to 6 V supply of 2 A or more, and join its GND to the ESP32 GND. It stalls at about 2.5 A, far more than USB or the VIN pin can supply: the ESP32 resets.','Add a 470 to 1000 µF capacitor across the servo supply.','Wire order: brown GND, red V+, orange signal.']},
   criteria:['It moves to 0°, 90° and 180° smoothly.','The ESP32 does not reset when the servo starts.','Holds position with a light push on the horn.'],notes:['The pulse range is 500 to 2500 µs. Cheap clones use plastic gears: the "metal" label does not always mean it.','A buzzing at rest means the signal is jittery or the supply sags.'],
-  page:b=>{pServo(b);b.append(el('p',{class:'hint'},'MG996R: unload the horn for the first test. Hold test 2x moves it 0 to 90 degrees twice. A servo that jitters at rest has a weak supply, add the capacitor. Stalling against a stop for more than a few seconds burns the motor.'))},
+  page:b=>{pServo(b,'mg');b.append(el('p',{class:'hint'},'MG996R: unload the horn for the first test. Hold test 2x moves it 0 to 90 degrees twice. A servo that jitters at rest has a weak supply, add the capacitor. Stalling against a stop for more than a few seconds burns the motor.'))},
   ex:{cmd:{'Sweep':'SERVO 13 0\nwait 700\nSERVO 13 90\nwait 700\nSERVO 13 180\nwait 700\nSERVOOFF 13\n'},js:{'Sweep':"for (const a of [0, 90, 180, 90]) { await dev('SERVO 13 ' + a); await sleep(700); }\nawait dev('SERVOOFF 13');\n"}}});
 
 /* ---- RGB LED on three PWM pins ---- */
@@ -4811,7 +4817,7 @@ defPart({id:'keypad',grp:'Buttons, knobs and touch',n:'4x4 matrix membrane keypa
 
 /* ---- EC11 rotary encoder ---- */
 function mvEncoder(b){
-  let alive=true,spin=false;const A=14,B=27,SW=15,dial=mvDial('Encoder shaft');
+  let alive=true,spin=false;const A=14,B=27,SW=15,dial=MT.stepper('enc','KY-040 rotary encoder, knob turning');
   if(Link.mode==='demo')Demo.din[SW]=1;
   cleanups.push(()=>{alive=false;delete Demo.din[SW];if(Link.mode!=='none')return dev('ENC 0').catch(()=>{})});
   onStop(()=>dev('ENC 0').catch(()=>{}));
@@ -4871,7 +4877,7 @@ defPart({id:'yfs201',grp:'Water, soil and flow',n:'YF-S201 water flow sensor (ha
 
 /* ---- 28BYJ-48 with ULN2003 ---- */
 function mvStep28(b){
-  let alive=true,stop=false,us=2000,deg=0,steps=0;const P=[14,27,32,33],SPR=4096,dial=mvDial('28BYJ-48 shaft');
+  let alive=true,stop=false,us=2000,deg=0,steps=0;const P=[14,27,32,33],SPR=4096,dial=MT.stepper('step28','28BYJ-48 geared stepper motor, shaft turning');
   cleanups.push(()=>{alive=false;stop=true});onStop(()=>{stop=true});
   const aR=readout('Commanded angle',{accent:true,init:'0°'}),sR=readout('Half steps sent',{right:true,init:'0'}),vR=readout('Speed',{right:true,init:'n/a'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
@@ -4891,7 +4897,7 @@ defPart({id:'step28',grp:'Motors and drivers',n:'28BYJ-48 unipolar stepper motor
 
 /* ---- step and direction drivers: A4988 and NEMA 17 ---- */
 function mvStepDir(cfg){return function(b){
-  let alive=true,stop=false,micro=16,sps=500,hold=false,deg=0,steps=0;const SP=14,DR=27,EN=32,dial=mvDial('Stepper shaft');
+  let alive=true,stop=false,micro=16,sps=500,hold=false,deg=0,steps=0;const SP=14,DR=27,EN=32,dial=MT.stepper('nema17','NEMA 17 stepper motor, shaft turning');
   cleanups.push(()=>{alive=false;stop=true;if(Link.mode!=='none')return dev(`OUT ${EN} 1`).catch(()=>{})});onStop(()=>{stop=true});
   const aR=readout('Commanded angle',{accent:true,init:'0°'}),sR=readout('Steps sent',{right:true,init:'0'}),vR=readout('Speed',{right:true,init:'n/a'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
@@ -4924,7 +4930,7 @@ defPart({id:'nema17',grp:'Motors and drivers',n:'NEMA 17 bipolar stepper motor (
 /* ---- DC motor drivers: L298N and L9110S ---- */
 function mvBridge(cfg){return function(b){
   let alive=true,ch=0,dir='coast',spd=50;
-  const ico=motorSVG(),rot=ico.querySelector('.rot');
+  const ico=MT.dc('130 size DC motor'),rot=ico.querySelector('.rot');
   cleanups.push(()=>{alive=false;if(Link.mode!=='none')return coast(0).then(()=>coast(1)).catch(()=>{})});onStop(()=>coast(ch).catch(()=>{}));
   const dR=readout('Direction',{accent:true,init:'coast'}),sR=readout('Speed',{right:true,init:'0 %'}),pR=readout('Pins',{right:true,init:cfg.pinText(0)});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
@@ -6933,6 +6939,262 @@ function figureSvg({ width, height, label, body, standalone = false, className }
 }
 
 return {AZIMUTH,ELEVATION,cameraOf,iso,towardViewer,depthOf,pathOf,roundedPlan,extrude,ringOf,slabOf,circleRing,cylinder,insetPlan,onTop,planOutline,lineOnTop,segment,rise,ring,pointsAt,corners,boxCorners,knurl,sideArc,sideSeam,topMatrix,sideMatrix,radialTicks,topTicks,haloOf,fitProjection,solidSvg,lineSvg,dotsSvg,wireSvg,faceTextSvg,groupSvg};
+})();
+/* Motors drawn as real objects with the Anatomy iso kit: 28BYJ-48 geared stepper, NEMA 17 stepper, 130 size DC motor.
+   Each model is a pure function of the camera and the shaft angle. Static parts are drawn once, only the rotor is redrawn. */
+const MT=(()=>{
+const K=ISO,AZ=38,EL=30,RD=Math.PI/180,VW=560,VH=420;
+const sol=(p,mat,o={})=>K.solidSvg(p,{tone:o.tone||'lo',crease:o.crease||'faint',className:mat,lit:o.lit,inner:o.inner||''});
+const ln=(d,tone,cls)=>d?K.lineSvg(d,{tone,className:cls}):'';
+const dt=(pts,size,tone)=>K.dotsSvg(pts,{size,tone});
+const R=(x0,y0,x1,y1,r=0)=>({x:x0,y:y0,w:x1-x0,d:y1-y0,r});
+const I=(P,x,y,z)=>K.iso([x,y,z],P);
+const slab=(P,x0,y0,x1,y1,z,h,mat,o={})=>sol(K.slabOf(R(x0,y0,x1,y1,o.r||0),z,h,P,o.steps||6,o.bevel||0),mat,o);
+const cyl=(P,cx,cy,r,z,h,mat,o={})=>sol(K.cylinder(cx,cy,r,z,h,P,o.steps||32,o.bevel||0),mat,o);
+const ring=(P,cx,cy,r,z)=>K.ring(cx,cy,r,z,P,40);
+const bez=(a,b,c,d,n=16)=>{const o=[];for(let i=0;i<=n;i++){const t=i/n,u=1-t;o.push([0,1,2].map(k=>u*u*u*a[k]+3*u*u*t*b[k]+3*u*t*t*c[k]+t*t*t*d[k]))}return o};
+const wire=(P,pts,col,w=1)=>{const d=K.pathOf(pts.map(p=>K.iso(p,P)));return `<path class="mtw o" d="${d}" style="stroke-width:${(4.6*w).toFixed(1)}px"/><path class="mtw ${col}" d="${d}" style="stroke-width:${(2.4*w).toFixed(1)}px"/>`};
+const tx=(P,x,y,z,t,size,tone,along='x')=>K.faceTextSvg(K.topMatrix([x,y],z,P,along),t,{size,tone});
+const rot2=(x,y,a)=>[x*Math.cos(a)-y*Math.sin(a),x*Math.sin(a)+y*Math.cos(a)];
+function hull(pts){
+  const p=pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]),cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];
+  for(const q of p){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q)}
+  for(const q of p.slice().reverse()){while(up.length>1&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q)}
+  return lo.slice(0,-1).concat(up.slice(0,-1));
+}
+/* a rod or can lying along the x axis: banded shading, a lit end cap, one outline */
+function prismX(P,cy,cz,ry,rz,x0,x1,mat,o={}){
+  const n=o.steps||32,cam=K.cameraOf(P),v=[cam.cosA*cam.cosE,cam.sinA*cam.cosE,cam.sinE],L=[.25,.45,.86];
+  const ringAt=x=>Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2;return [x,cy+ry*Math.cos(a),cz+rz*Math.sin(a)]});
+  const A=ringAt(x0),B=ringAt(x1),pa=A.map(p=>K.iso(p,P)),pb=B.map(p=>K.iso(p,P));
+  let s=`<g class="iso-solid ${mat}"><path class="iso-fill" d="${K.pathOf(hull([...pa,...pb]),true)}"/>`;
+  for(let i=0;i<n;i++){
+    const a=(i+.5)/n*Math.PI*2,ny=Math.cos(a)/ry,nz=Math.sin(a)/rz,m=Math.hypot(ny,nz),N=[0,ny/m,nz/m];
+    if(N[0]*v[0]+N[1]*v[1]+N[2]*v[2]<=0)continue;
+    const l=Math.max(0,N[0]*L[0]+N[1]*L[1]+N[2]*L[2]),sh=Math.min(3,Math.floor(l*3.6));
+    const j=(i+1)%n;s+=`<path class="iso-shade" data-shade="${sh}" d="${K.pathOf([pa[i],pb[i],pb[j],pa[j]],true)}"/>`;
+  }
+  if(o.cap!==false)s+=`<path class="iso-top" d="${K.pathOf(pb,true)}"/>`;
+  s+=`<path class="iso-line iso-edge" data-tone="${o.tone||'lo'}" d="${K.pathOf(hull([...pa,...pb]),true)}"/>`;
+  if(o.cap!==false)s+=`<path class="iso-line iso-crease" data-tone="faint" d="${K.pathOf(pb,true)}"/>`;
+  return s+'</g>';
+}
+const ringX=(P,x,cy,cz,ry,rz,n=36)=>K.pathOf(Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2;return K.iso([x,cy+ry*Math.cos(a),cz+rz*Math.sin(a)],P)}),true);
+const arcX=(P,x,cy,cz,ry,rz,n=40)=>{
+  const c=K.cameraOf(P),out=[];
+  for(let i=0;i<=n;i++){const a=i/n*Math.PI*2,vis=Math.cos(a)/ry*c.sinA*c.cosE+Math.sin(a)/rz*c.sinE>0;
+    if(vis)out.push(K.iso([x,cy+ry*Math.cos(a),cz+rz*Math.sin(a)],P));else if(out.length&&out[out.length-1]!==null)out.push(null)}
+  const runs=[];let cur=[];for(const q of out){if(q===null){if(cur.length>1)runs.push(cur);cur=[]}else cur.push(q)}
+  if(cur.length>1)runs.push(cur);
+  return runs.map(r=>K.pathOf(r)).join('');
+};
+/* vertical bars on a round part, turned by `ph` radians (shows the part is turning) */
+function bars(P,cx,cy,r,z0,z1,n,ph,pick){
+  const [vx,vy]=K.towardViewer(P),big=[],small=[];
+  for(let i=0;i<n;i++){const a=ph+i/n*Math.PI*2,nx=Math.cos(a),ny=Math.sin(a);if(nx*vx+ny*vy<.12)continue;(i===0&&pick?big:small).push(K.segment([cx+r*nx,cy+r*ny,z0],[cx+r*nx,cy+r*ny,z1],P))}
+  return {small:small.join(''),big:big.join('')};
+}
+const topRadial=(P,cx,cy,r0,r1,z,ph)=>K.lineOnTop([cx+r0*Math.cos(ph),cy+r0*Math.sin(ph)],[cx+r1*Math.cos(ph),cy+r1*Math.sin(ph)],z,P);
+function floor(P,x0,y0,x1,y1,z=-3){
+  let s=slab(P,x0,y0,x1,y1,z,3,'mp',{tone:'mid',r:4,bevel:.4,steps:6});
+  s+=ln(K.planOutline(R(x0+3,y0+3,x1-3,y1-3,2),0,P,4),'faint');
+  s+=dt([[x0+7,y0+7],[x1-7,y0+7],[x0+7,y1-7],[x1-7,y1-7]].map(([x,y])=>I(P,x,y,0)),.9,'hi');
+  /* ruler along the front edge, 1 mm ticks, 5 mm longer, 10 mm numbered */
+  const t=K.topTicks(x0+12,x1-12,2,5,y1-6,0,[1.2,2.4],P,'x');
+  s+=ln(t.minor,'faint')+ln(t.major,'mid');
+  return s;
+}
+const lugs=(P,pts)=>pts.map(([x,y,z])=>slab(P,x-.3,y-1.2,x+.3,y+1.2,z,3,'mg',{crease:'none'})).join('');
+
+/* ---------------- 28BYJ-48 ---------------- */
+const SHAFT=[0,8];                         /* the output shaft sits 8 mm off the can axis */
+function step28(){
+  const pts=[];for(const x of [-52,52])for(const y of [-34,40])for(const z of [-3,34])pts.push([x,y,z]);
+  const stat=P=>{
+    let s=floor(P,-50,-32,50,38);
+    /* the can: steel, 28 mm across, 17 high, with a seam, a rear bump for the wires and the crimp tabs */
+    s+=cyl(P,0,0,14,0,17,'mm',{tone:'mid',steps:40,bevel:.3});
+    s+=ln(K.ring(0,0,14,8.6,P,40),'faint')+ln(K.ring(0,0,14,2.2,P,40),'faint');
+    s+=ln(K.knurl(0,0,14,2.2,8.6,44,P,.5),'faint');
+    s+=slab(P,10,-4.5,17.4,4.5,2.2,7,'mm',{tone:'mid',r:1.2,bevel:.3});               /* wire exit boss on the +x side */
+    s+=ln(K.rise([17.4,0],2.6,8.6,P),'faint');
+    /* the mounting plate with its two ears and holes */
+    s+=slab(P,-20.8,-3.6,20.8,3.6,17,1.1,'mm',{tone:'mid',r:3.6,steps:8,bevel:.2});
+    s+=slab(P,-14,-14,14,14,17,1.1,'mm',{r:14,steps:40,bevel:.2});
+    const holes=[[-17.5,0],[17.5,0]];
+    s+=ln(holes.map(([x,y])=>ring(P,x,y,2.1,18.1)).join(''),'mid')+dt(holes.map(([x,y])=>I(P,x,y,18.1)),1.1,'hi');
+    for(const [x,y] of holes)s+=ln(ring(P,x,y,2.9,18.1),'faint');
+    /* gearbox cover (dark plastic) with its ribs and the label */
+    s+=cyl(P,0,0,12.6,18.1,2.2,'mb',{tone:'mid',steps:40,bevel:.3});
+    s+=ln(ring(P,0,0,10.4,20.3),'faint')+ln(ring(P,0,0,6.2,20.3),'faint');
+    s+=ln(Array.from({length:6},(_,i)=>{const a=i*Math.PI/3+.3;return K.lineOnTop([10.4*Math.cos(a),10.4*Math.sin(a)],[12.2*Math.cos(a),12.2*Math.sin(a)],20.3,P)}).join(''),'faint');
+    s+=tx(P,-10.5,-2.6,20.3,'28BYJ-48',1.9,'mid')+tx(P,-10.5,.6,20.3,'DC 5V',1.5,'lo');
+    /* output boss and the splined shaft with two flats */
+    s+=cyl(P,SHAFT[0],SHAFT[1],4.6,20.3,3.2,'mm',{tone:'mid',steps:24,bevel:.2});
+    s+=ln(ring(P,SHAFT[0],SHAFT[1],3.3,23.5),'faint');
+    s+=cyl(P,SHAFT[0],SHAFT[1],2.5,23.5,6.4,'mm',{tone:'hi',steps:20});
+    /* the five wires and the white XH socket */
+    const a=[17.4,0,5.4],cols=['wb','wp','wy','wo','wr'];
+    cols.forEach((c,i)=>{const dy=(i-2)*.9;s+=wire(P,bez([a[0],dy,a[2]],[26,dy*1.2,5],[30,dy*3+2,1.4],[35+dy*.2,dy*4.6+8,.6+i*.04]),c)});
+    s+=slab(P,34,3.5,40,16.5,0,4.6,'mw',{tone:'mid',r:.6});
+    s+=ln([0,1,2,3,4].map(i=>K.lineOnTop([35.2,5.5+i*2.2],[38.8,5.5+i*2.2],4.6,P)).join(''),'lo')+dt([0,1,2,3,4].map(i=>I(P,37,5.9+i*2.2,4.6)),.5,'hi');
+    return s;
+  };
+  const rot=(P,deg)=>{
+    const ph=deg*RD,b=bars(P,SHAFT[0],SHAFT[1],2.5,23.7,29.5,16,ph,true);
+    let s=ln(b.small,'mid')+ln(b.big,'hi','gold');
+    /* the pointer arm turns with the shaft */
+    const ring4=[[-3.2,-1.5],[14.5,-1.5],[14.5,1.5],[-3.2,1.5]].map(([u,v])=>{const [dx,dy]=rot2(u,v,ph);return [SHAFT[0]+dx,SHAFT[1]+dy]});
+    s+=sol(K.extrude(ring4,29.9,1.5,P,{convex:true,bevel:0}),'mg',{tone:'mid',lit:true});
+    s+=cyl(P,SHAFT[0],SHAFT[1],3.6,29.9,1.5,'mm',{tone:'hi',steps:20});
+    s+=dt([I(P,SHAFT[0],SHAFT[1],31.4)],.9,'hi');
+    return s;
+  };
+  return {pts,stat,rot};
+}
+
+/* ---------------- NEMA 17 ---------------- */
+function nema17(){
+  const pts=[];for(const x of [-52,56])for(const y of [-34,40])for(const z of [-3,70])pts.push([x,y,z]);
+  const H=21.15;
+  const stat=P=>{
+    let s=floor(P,-50,-32,50,38);
+    s+=slab(P,-H,-H,H,H,0,40,'mb',{tone:'mid',r:3.2,steps:6,bevel:.3});
+    /* the lamination stack shows as fine bands on the two faces you see */
+    let b='';for(let z=2.5;z<39;z+=2.5)b+=K.segment([H,-H+3,z],[H,H-3,z],P)+K.segment([-H+3,H,z],[H-3,H,z],P);
+    s+=ln(b,'faint');
+    s+=ln(K.rise([H,-H+3],0,40,P)+K.rise([H,H-3],0,40,P)+K.rise([-H+3,H],0,40,P),'faint');
+    s+=slab(P,-H,-H,H,H,40,3.2,'mm',{tone:'mid',r:3.2,steps:6,bevel:.3});
+    const hs=[[-15.5,-15.5],[15.5,-15.5],[-15.5,15.5],[15.5,15.5]];
+    s+=ln(hs.map(([x,y])=>ring(P,x,y,1.8,43.2)+ring(P,x,y,3.0,43.2)).join(''),'mid')+dt(hs.map(([x,y])=>I(P,x,y,43.2)),1.2,'hi');
+    s+=cyl(P,0,0,11,43.2,2,'mm',{tone:'mid',steps:44,bevel:.25});
+    s+=ln(ring(P,0,0,8,45.2)+ring(P,0,0,6.2,45.2),'faint');
+    s+=tx(P,-17,-17.2,43.2,'17HS4401',1.9,'lo')+tx(P,-17,15.6,43.2,'1.8°  1.7A',1.5,'faint');
+    /* shaft with a D flat */
+    s+=cyl(P,0,0,2.5,45.2,22,'mm',{tone:'hi',steps:22});
+    /* cable: four wires from the +x face to a white JST socket */
+    s+=slab(P,H,-5,H+4,5,5.2,5.6,'mb',{tone:'mid',r:1.2,bevel:.25});
+    const cols=['wr','wb','wg','wk'];
+    cols.forEach((c,i)=>{const dy=(i-1.5)*1.1;s+=wire(P,bez([H+4,dy,8],[H+14,dy*1.4,8],[H+18,dy*2.5+2,2],[H+23,dy*3.2+6,.8]),c)});
+    s+=slab(P,H+21,3,H+27,14.5,0,4.6,'mw',{tone:'mid',r:.6});
+    s+=ln([0,1,2,3].map(i=>K.lineOnTop([H+22.2,5+i*2.2],[H+25.8,5+i*2.2],4.6,P)).join(''),'lo')+dt([0,1,2,3].map(i=>I(P,H+24,5.4+i*2.2,4.6)),.5,'hi');
+    /* GT2 pulley: lower flange, toothed barrel, upper flange, hub with set screw */
+    s+=cyl(P,0,0,8.6,50,1,'ml',{tone:'mid',steps:40});
+    s+=cyl(P,0,0,6.1,51,8,'ml',{tone:'mid',steps:40});
+    s+=cyl(P,0,0,8.6,59,1,'ml',{tone:'mid',steps:40});
+    s+=cyl(P,0,0,4.9,60,5,'ml',{tone:'mid',steps:32});
+    return s;
+  };
+  const rot=(P,deg)=>{
+    const ph=deg*RD,b=bars(P,0,0,6.1,51,59,20,ph,true),h=bars(P,0,0,4.9,60,65,6,ph+.2,false);
+    let s=ln(b.small,'mid')+ln(b.big,'hi','gold')+ln(h.small,'faint');
+    s+=ln(ring(P,0,0,4.9,65),'faint')+ln(topRadial(P,0,0,0,4.9,65,ph),'hi','gold');
+    const sc=[Math.cos(ph+1.1)*4.9,Math.sin(ph+1.1)*4.9],[vx,vy]=K.towardViewer(P);
+    if(sc[0]*vx+sc[1]*vy>0)s+=dt([I(P,sc[0],sc[1],62.4)],1.1,'hi');
+    return s;
+  };
+  return {pts,stat,rot};
+}
+
+/* ---------------- 130 size DC motor, lying on two cradles ---------------- */
+function dc130(){
+  const pts=[];for(const x of [-34,32])for(const y of [-22,22])for(const z of [-3,32])pts.push([x,y,z]);
+  const CZ=15,RY=10.2,RZ=7.7;
+  const stat=P=>{
+    let s=floor(P,-32,-20,32,22);
+    for(const x of [-6,7])s+=slab(P,x-2.6,-9,x+2.6,9,0,CZ-RZ+1.4,'mb',{tone:'mid',r:1,bevel:.2});
+    /* the two leads leave the rear lugs, loop round the can on the side you can see and end as bare tips on the plate */
+    s+=wire(P,bez([-16,-4,CZ-3],[-18,14,CZ-3],[-17,21,7],[-10,21,.8]),'wr',.9)+wire(P,bez([-16,4,CZ-3],[-20,16,CZ-4],[-19,22,7],[-13,21.6,.8]),'wk',.9);
+    s+=dt([I(P,-10,21,.8),I(P,-13,21.6,.8)],1.1,'hi');
+    /* rear bearing boss and the can */
+    s+=prismX(P,0,CZ,3.6,3.6,-17,-12.4,'mm',{steps:16,tone:'mid'});
+    s+=prismX(P,0,CZ,RY,RZ,-12.4,12.4,'mm',{tone:'mid',steps:36});
+    s+=ln(arcX(P,-9,0,CZ,RY,RZ)+arcX(P,-7.4,0,CZ,RY,RZ)+arcX(P,9.4,0,CZ,RY,RZ),'faint');
+    /* two crimp tabs and the long seam on the can */
+    s+=ln(K.segment([-12.4,RY*.55,CZ+RZ*.83],[12.4,RY*.55,CZ+RZ*.83],P),'faint');
+    /* dark plastic front cap with two screw holes and the bearing boss */
+    s+=prismX(P,0,CZ,RY-.3,RZ-.3,12.4,15,'mb',{steps:36,tone:'mid'});
+    s+=ln([[-6,CZ],[6,CZ]].map(([y,z])=>ringX(P,15.01,y,z,1,1,10)).join(''),'mid');
+    s+=prismX(P,0,CZ,3.2,3.2,15,17,'mm',{steps:20,tone:'mid'});
+    s+=prismX(P,0,CZ,1,1,17,26,'mm',{steps:14,tone:'hi',cap:true});
+    return s;
+  };
+  const rot=(P,deg)=>{
+    const ph=deg*RD,xs=26.4;
+    let s=ln(ringX(P,xs,0,CZ,8.4,8.4,48),'faint');
+    const blade=a=>{const q=[[1.2,-1.4],[8.6,-2.1],[8.6,2.1],[1.2,1.4]].map(([u,v])=>{const [py,pz]=rot2(u,v,a);return K.iso([xs,py,CZ+pz],P)});return `<path class="mtfan" d="${K.pathOf(q,true)}"/>`};
+    s+=blade(ph)+blade(ph+Math.PI);
+    s+=`<path class="mthub" d="${ringX(P,xs+.2,0,CZ,2.3,2.3,18)}"/>`;
+    return s;
+  };
+  return {pts,stat,rot};
+}
+
+/* ---------------- KY-040 rotary encoder module ---------------- */
+function enc(){
+  const pts=[];for(const x of [-30,30])for(const y of [-26,24])for(const z of [-3,26])pts.push([x,y,z]);
+  const stat=P=>{
+    let s=floor(P,-28,-24,28,22);
+    s+=slab(P,-20,-14,20,14,2,2.4,'mp',{tone:'mid',r:2,bevel:.3});
+    s+=ln(K.planOutline(R(-18,-12,18,12,1),4.4,P,4),'faint');
+    s+=dt([[-17,-11],[17,-11],[-17,11],[17,11]].map(([x,y])=>I(P,x,y,4.4)),1.1,'hi');
+    /* five header pins along the near edge: GND + SW? CLK DT SW */
+    const pins=[-8,-4,0,4,8];
+    s+=slab(P,-10.5,9.6,10.5,12,4.4,2.5,'mk',{tone:'mid',r:.3});
+    s+=pins.map(x=>slab(P,x-.35,10.3,x+.35,11.3,6.9,5,'mg',{crease:'none'})).join('');
+    s+=tx(P,-9,5.2,4.4,'GND + SW DT CLK',1.3,'faint');
+    /* the encoder body: steel case with a bent-over lip, threaded bushing and the shaft */
+    s+=slab(P,-6.5,-6.5,6.5,6.5,4.4,5.6,'mm',{tone:'mid',r:.8,bevel:.25});
+    s+=slab(P,-7.2,-3,-6.5,3,5,3.4,'mm',{crease:'none'});
+    s+=ln(K.planOutline(R(-5,-5,5,5,.6),10,P,4),'faint');
+    s+=cyl(P,0,0,3.6,10,4,'mm',{tone:'mid',steps:24});
+    s+=ln(K.knurl(0,0,3.6,10,14,14,P,.4),'faint')+ln(ring(P,0,0,2.4,14),'faint');
+    s+=cyl(P,0,0,3,14,6,'mk',{tone:'mid',steps:24});
+    return s;
+  };
+  const rot=(P,deg)=>{
+    const ph=deg*RD,[vx,vy]=K.towardViewer(P);
+    /* the knob: black skirt, knurled grip, flat top with a dimple and a pointer line */
+    let s=cyl(P,0,0,8.4,16,2.2,'mk',{tone:'mid',steps:40});
+    s+=cyl(P,0,0,7.4,18.2,6.6,'mk',{tone:'mid',steps:40});
+    const b=bars(P,0,0,7.4,18.4,24.6,28,ph,true);
+    s+=ln(b.small,'faint')+ln(b.big,'hi','gold');
+    s+=ln(ring(P,0,0,6.2,24.8)+ring(P,0,0,1.6,24.8),'faint');
+    s+=ln(topRadial(P,0,0,2.6,6.2,24.8,ph),'hi','gold');
+    return s;
+  };
+  return {pts,stat,rot};
+}
+
+const MODELS={step28,nema17,dc130,enc};
+/* the figure: an svg with a static layer and a rotor layer. `set(deg)` turns it; the DC motor also reads its own `.rot` element */
+function make(kind,label){
+  const M=MODELS[kind](),P=K.fitProjection(M.pts,VW,VH,{pad:12,azimuth:AZ,elevation:EL});
+  const s=svgEl(`0 0 ${VW} ${VH}`,'mtsvg isoc '+kind,label||'Motor');
+  s.innerHTML=`<g class="mt-s">${M.stat(P)}</g><g class="mt-r"></g><g class="rot" data-spin></g>`;
+  const rg=s.querySelector('.mt-r'),rot=s.querySelector('.rot');
+  let cur=null;const draw=d=>{d=((d%360)+360)%360;if(cur!==null&&Math.abs(d-cur)<.05)return;cur=d;rg.innerHTML=M.rot(P,d)};
+  draw(0);
+  return {el:s,rot,set:draw,draw};
+}
+/* stepper: set(deg) turns the shaft */
+function stepper(kind,label){const m=make(kind,label);return {el:m.el,set:d=>m.set(d)}}
+/* DC motor: keeps the old contract. Toggle class `spin` on `.rot`, set animationDuration (s per turn) and animationDirection */
+function dc(label){
+  const m=make('dc130',label||'DC motor'),rot=m.rot;let ang=0,last=performance.now(),born=last;
+  const still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (function tick(t){
+    if(!m.el.isConnected&&t-born>3000)return;
+    if(m.el.isConnected&&rot.classList.contains('spin')&&!still){
+      const secs=parseFloat(rot.style.animationDuration)||1,dir=rot.style.animationDirection==='reverse'?-1:1;
+      ang+=dir*360*(t-last)/1000/Math.max(.08,secs);m.draw(ang);
+    }
+    last=t;requestAnimationFrame(tick);
+  })(last);
+  return m.el;
+}
+return {stepper,dc,make};
 })();
 /* ---- Home figure: an ESP32 DevKit on its own, drawn with the Anatomy iso kit (ISO).
    Pure model: no DOM. Every part is a box with a draw(P,ctx) function. Painter's order is a topological sort of the boxes, cached per view quadrant. ---- */
