@@ -1049,7 +1049,7 @@ html.bp-busy{overflow:hidden}
 .bpd-tf:focus-visible{outline:2px solid var(--accent);border-radius:14px}
 .bpd-tf .bp-fig{position:absolute;inset:0;display:block;margin:0;animation:none;aspect-ratio:auto}
 .bpd-tf .bp-svg{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .2s cubic-bezier(.23,1,.32,1)}
-.bpd-tf .l,.bpd-tf .fr{opacity:0;transition:none}.bpd-tf.is-f .l{opacity:1}.bpd-tf.is-f .n{opacity:0}
+.bpd-tf .l{opacity:0}.bpd-tf.is-f .l{opacity:1}.bpd-tf.is-f .n{opacity:0}
 .bpd-lb{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none;will-change:transform,opacity}
 .bpd-lb b{font:600 13px/1.2 var(--f-body);color:var(--fg)}
 .bpd-lb i{font:500 11px/1 var(--f-mono);font-style:normal;color:var(--faint);letter-spacing:.03em}
@@ -8427,7 +8427,7 @@ function pickerGo(id,card){
   const r=card.getBoundingClientRect(),fig=card.querySelector('.bp-fig'),fr=fig.getBoundingClientRect();
   const g=el('div',{class:'bp-grow isoc','aria-hidden':'true'});
   g.style.cssText='left:'+fr.left+'px;top:'+fr.top+'px;width:'+fr.width+'px;height:'+fr.height+'px';
-  const src=[...card.querySelectorAll('svg.l,svg.fr')].find(s=>s.style.opacity==='1')||card.querySelector('svg'),sv=src.cloneNode(true);sv.removeAttribute('style');sv.setAttribute('class','hm-svg');g.append(sv);
+  const sv=(card.querySelector('svg.l')||card.querySelector('svg')).cloneNode(true);sv.removeAttribute('style');sv.setAttribute('class','hm-svg');g.append(sv);
   document.body.append(g);document.documentElement.classList.add('bp-busy');
   const root=$('.bpk');if(root)root.classList.add('go');
   g.getBoundingClientRect();
@@ -8503,7 +8503,7 @@ function pickerDock(b){
   const list=DK_ORDER.map(id=>BRD.by(id)),n=list.length;
   const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:400}):setTimeout(f,30);
   const clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
-  const FR=21,BASE_K=8,STEP=4,frAz=k=>10+STEP*k;
+  const BASE_AZ=44;
   const wrap=d=>((d+n/2)%n+n)%n-n/2;
   let idx=DK_ORDER.indexOf(BRD.cur),pos,vel=0,tgt,raf=0,last=0,SW=1200,SH=600,hw=480,hh=360,bigEl=null;
   if(idx<0)idx=DK_ORDER.indexOf('devkit');pos=tgt=idx;
@@ -8524,35 +8524,10 @@ function pickerDock(b){
     fig.addEventListener('click',()=>{if(moved)return;if(i===idx)go();else turnTo(i)});
     fig.addEventListener('focus',()=>{if(i!==idx)turnTo(i)});
     stage.append(fig,lb);
-    return {i,fig,lb,sL,sN,dL:0,dN:0,ly:[],cur:BASE_K};
+    return {i,fig,lb,sL,sN,dL:0,dN:0,};
   });
   stage.prepend(glow);
-  const drawL=i=>{const o=it[i];if(o.dL)return;o.dL=1;pickerDraw(o.sL,list[i].id,frAz(BASE_K),0,true,28);o.ly[BASE_K]=o.sL};
-  /* the board in front turns for real: one drawing per camera angle, built a few at a time, and the pointer only picks which one is shown */
-  let fToken=0;
-  function buildFrames(i){
-    const tok=++fToken,o=it[i];
-    (function step(){
-      if(tok!==fToken||!b.isConnected)return;
-      /* outward from the default angle, so what is built is always one unbroken run of angles */
-      let k=-1;for(let d=1;d<FR&&k<0;d++){for(const q of [BASE_K+d,BASE_K-d])if(q>=0&&q<FR&&!o.ly[q]){k=q;break}}
-      if(k<0)return;
-      const sv=mk('fr');sv.innerHTML=pickerStr(list[i].id,frAz(k),0,true,28);o.sL.parentNode.append(sv);o.ly[k]=sv;
-      if(o.fig.classList.contains('is-f'))paintFr(o);
-      idle(step);
-    })();
-  }
-  /* each angle is its own compositor layer. The shown one is opaque, the ones within three steps are a hair above invisible so their pixels are already
-     on the GPU, and a swap is one opacity flip with nothing to paint and no cross-fade (a fade between two angles shows both boards at once) */
-  const NEAR=3;
-  function paintFr(o){const k=o.cur;for(let q=0;q<FR;q++){const e=o.ly[q];if(!e)continue;const d=Math.abs(q-k);e.style.willChange=d<=NEAR?'opacity':'';e.style.opacity=d===0?'1':d<=NEAR?'.004':'0'}}
-  function clearFr(o){for(let q=0;q<FR;q++){const e=o.ly[q];if(e){e.style.opacity='';e.style.willChange=''}}}
-  function showFrame(o,az){
-    let k=clamp(Math.round((az-10)/STEP),0,FR-1);
-    if(!o.ly[k]){let best=99,kk=o.cur;for(let q=0;q<FR;q++)if(o.ly[q]&&Math.abs(q-k)<best){best=Math.abs(q-k);kk=q}k=kk}
-    if(k===o.cur||Math.abs(az-frAz(o.cur))<STEP*.68&&o.ly[o.cur])return;
-    if(!o.ly[k])return;o.cur=k;paintFr(o);
-  }
+  const drawL=i=>{const o=it[i];if(o.dL)return;o.dL=1;pickerDraw(o.sL,list[i].id,BASE_AZ,0,true,28)};
   const drawN=i=>{const o=it[i];if(o.dN)return;o.dN=1;pickerDraw(o.sN,list[i].id,40,0,false,28)};
   const go=()=>{drawL(idx);pickerGo(list[idx].id,it[idx].fig)};
   function turnTo(i){const c=Math.round(pos);tgt=c+wrap(i-c);kick()}
@@ -8587,23 +8562,20 @@ function pickerDock(b){
   }
   function setIdx(i){
     idx=i;drawL(i);drawN(i);
-    it.forEach(o=>{const f=o.i===i;o.fig.classList.toggle('is-f',f);if(f&&o.ly.length)paintFr(o);else if(!f)clearFr(o);o.fig.setAttribute('aria-current',f?'true':'false');o.fig.setAttribute('aria-label',list[o.i].n+', '+BRD.CHIPS[list[o.i].fam].n+(f?'. Press Enter to use this board':''));o.fig.tabIndex=f?0:-1});
+    it.forEach(o=>{const f=o.i===i;o.fig.classList.toggle('is-f',f);o.fig.setAttribute('aria-current',f?'true':'false');o.fig.setAttribute('aria-label',list[o.i].n+', '+BRD.CHIPS[list[o.i].fam].n+(f?'. Press Enter to use this board':''));o.fig.tabIndex=f?0:-1});
     setBig(DK_BIG[list[i].id]);paintCap();
-    if(!reduce){clearTimeout(frT);frT=setTimeout(()=>buildFrames(i),180)}
   }
-  let frT=0;
   function render(t){
     const mid=SW/2;
     it.forEach(o=>{
       const d=wrap(o.i-pos),ad=Math.abs(d),sg=d<0?-1:1,j=Math.min(3,Math.floor(ad)),f=Math.min(1,ad-j);
       const x=sg*(X[j]+(X[j+1]-X[j])*f),sc=S[j]+(S[j+1]-S[j])*f,ph=clamp(1-ad,0,1);
       const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9;
-      const bob=ph*(5*Math.sin(t*1.1)),pop=ph*ph*(3-2*ph)*SH*.05;
+      const bob=0,pop=ph*ph*(3-2*ph)*SH*.05;
       const op=clamp(1-(ad-3.2)/.9,0,1);
       const fg=o.fig,vis=op>.02;
       const tr='translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y+pop-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+ang.toFixed(2)+'deg)';
       if(tr!==o._tr){o._tr=tr;fg.style.transform=tr}
-      if(o.i===idx&&ph>.5&&!reduce)showFrame(o,44+ppx*34+9*Math.sin(t*.45));
       const ops=op.toFixed(3),zs=String(60-Math.round(ad*10)),vs=vis?'visible':'hidden';
       if(ops!==o._op){o._op=ops;fg.style.opacity=ops}
       if(zs!==o._z){o._z=zs;fg.style.zIndex=zs}
@@ -8625,10 +8597,9 @@ function pickerDock(b){
       for(let i=0;i<st;i++){vel+=(-150*(pos-tgt)-22*vel)*h;pos+=vel*h}
       if(Math.abs(pos-tgt)<.0006&&Math.abs(vel)<.003){pos=tgt;vel=0}
     }
-    const k=1-Math.exp(-dt*6);ppx+=(tpx-ppx)*k;ppy+=(tpy-ppy)*k;
     const ni=((Math.round(pos)%n)+n)%n;if(ni!==idx)setIdx(ni);
     render(now/1000);
-    if(!reduce||pos!==tgt)raf=requestAnimationFrame(tick);
+    if(pos!==tgt||drag)raf=requestAnimationFrame(tick);
   }
   function kick(){
     if(reduce){pos=tgt;vel=0;const ni=((Math.round(pos)%n)+n)%n;if(ni!==idx)setIdx(ni);render(0);return}
@@ -8694,7 +8665,7 @@ function pickerDock(b){
     const j=order[q>>1];if(q&1)drawL(j);else drawN(j);q++;
     idle(pump);
   });setTimeout(pump0,80);
-  kick();if(!reduce)raf=raf||requestAnimationFrame(tick);
+  kick();
 }
 
 /* header chip: shows the chosen board, opens the picker */
