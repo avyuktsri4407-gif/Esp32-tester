@@ -1029,36 +1029,44 @@ html.bp-busy{overflow:hidden}
 
 /* header: the board chip sits next to the logo */
 .top .lft{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
-/* dock picker */
-.bpd{max-width:min(1640px,96vw)}
-.bpd-head{margin:0 auto;max-width:none;text-align:center;position:relative;z-index:3}
-.bpd-head h2{font-size:clamp(24px,2.6vw,38px);text-wrap:balance}
-.bpd-head .bp-lead{margin:8px auto 0;font-size:clamp(14px,1.2vw,16px)}
-.bpd-arena{position:relative;margin:0 0 0;height:clamp(380px,min(44vw,calc(100vh - 400px)),640px)}
+/* wheel picker */
+.bpd{max-width:min(1700px,97vw);padding-bottom:3vh}
+.bpd{position:relative}
+.bpd-head{position:absolute;left:8px;top:0;margin:0;max-width:21em;text-align:left;z-index:6;pointer-events:none}
+.bpd-head h2{font-size:clamp(22px,2.3vw,34px);text-wrap:balance}
+.bpd-head .bp-lead{margin:6px 0 0;font-size:clamp(13px,1.1vw,15px)}
+.bpd-arena{position:relative;height:clamp(560px,calc(100vh - 150px),900px);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;will-change:transform}
-.bpd-big{position:absolute;left:-4%;right:-4%;top:46%;margin:0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.bpd-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.1) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.6;animation:bpdletter .5s calc(var(--i)*.025s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big{position:absolute;left:-4%;right:-4%;top:40%;margin:0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
+.bpd-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.1) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.55;animation:bpdletter .5s calc(var(--i)*.025s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
-@keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04);filter:blur(7px)}to{opacity:.6;transform:none;filter:none}}
+@keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:.55;transform:none}}
 @keyframes bpdout{to{opacity:0}}
-.bpd-stage{position:absolute;inset:0;overflow:visible;cursor:pointer}
-.bpd-fg{position:absolute;left:0;top:0;width:400px;transform-origin:50% 100%;pointer-events:none;will-change:transform,opacity}
-.bpd-fg .bp-fig{display:block;width:100%;margin:0;animation:none}
-.bpd-glow{position:absolute;left:0;top:0;height:34px;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.42),transparent);pointer-events:none;will-change:transform,width;z-index:0}
-.bpd-i{position:absolute;left:0;top:0;width:120px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;appearance:none;border:0;background:none;color:inherit;font:inherit;pointer-events:none;z-index:200;will-change:transform}
-.bpd-i:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px}
-.bpd-n{display:block;font:600 12px/1.2 var(--f-body);color:var(--fg);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bpd-f{display:block;font:500 10.5px/1 var(--f-mono);color:var(--faint);letter-spacing:.03em;}
-.bpd-cap{display:flex;flex-direction:column;align-items:center;text-align:center;margin:6px auto 5vh;max-width:40em;min-height:10.5em;position:relative;z-index:3}
-.bpd-cap h3{margin:0;font:500 clamp(24px,2.4vw,32px)/1.15 var(--f-body);letter-spacing:-.015em;color:var(--fg)}
-.bpd-t{margin:8px 0 0;color:var(--muted);font-size:16px;line-height:1.5}
-.bpd-m{margin:8px 0 18px;font:500 12px/1.5 var(--f-mono);color:var(--faint);letter-spacing:.02em}
+.bpd-stage{position:absolute;inset:0;overflow:hidden}
+.bpd-tf{position:absolute;left:0;top:0;display:block;padding:0;margin:0;appearance:none;border:0;background:none;color:inherit;font:inherit;cursor:pointer;transform-origin:50% 100%;will-change:transform,opacity;-webkit-tap-highlight-color:transparent;outline-offset:6px}
+.bpd-tf:focus-visible{outline:2px solid var(--accent);border-radius:14px}
+.bpd-tf .bp-fig{position:absolute;inset:0;display:block;margin:0;animation:none;aspect-ratio:auto}
+.bpd-tf .bp-svg{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .25s ease-out}
+.bpd-tf .l{opacity:0}.bpd-tf.is-f .l{opacity:1}.bpd-tf.is-f .n{opacity:0}
+.bpd-lb{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none;will-change:transform,opacity}
+.bpd-lb b{font:600 13px/1.2 var(--f-body);color:var(--fg)}
+.bpd-lb i{font:500 11px/1 var(--f-mono);font-style:normal;color:var(--faint);letter-spacing:.03em}
+.bpd-glow{position:absolute;height:40px;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.4),transparent);pointer-events:none;will-change:transform}
+.bpd-hint{position:absolute;right:6px;top:6px;z-index:6;font:500 11px var(--f-mono);color:var(--faint);letter-spacing:.04em;pointer-events:none}
+.bpd-nav{position:absolute;top:44%;z-index:7;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(20,20,22,.6);color:var(--fg);display:grid;place-items:center;cursor:pointer;transition:transform .16s ease-out,background .2s}
+.bpd-nav:active{transform:scale(.94)}
+.bpd-nav.l{left:8px}.bpd-nav.r{right:8px}
+.bpd-cap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:min(40em,70%)}
+.bpd-cap h3{margin:0;font:500 clamp(22px,2.2vw,30px)/1.15 var(--f-body);letter-spacing:-.015em;color:var(--fg)}
+.bpd-t2{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.45}
+.bpd-m{margin:6px 0 14px;font:500 12px/1.5 var(--f-mono);color:var(--faint);letter-spacing:.02em}
 .bpd-cap.in>*{animation:bpdin .24s cubic-bezier(.23,1,.32,1) both}
 .bpd-cap.in>*:nth-child(2){animation-delay:25ms}.bpd-cap.in>*:nth-child(3){animation-delay:50ms}.bpd-cap.in>*:nth-child(4){animation-delay:75ms}
 @keyframes bpdin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.bpd-cap.in>*,.bpd-big span{animation:none}.bpd-big.out{display:none}}
-.bpk.go .bpd-fg,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{opacity:.25;transition:opacity .4s}
+.bpk.go .bpd-tf,.bpk.go .bpd-lb,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{opacity:.25;transition:opacity .4s}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -8472,31 +8480,44 @@ function pickerDock(b){
   const defs=document.createElementNS(NS,'svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
   defs.innerHTML='<defs><radialGradient id="hmGr"><stop offset="0" stop-color="#ff5a50" stop-opacity=".75"/><stop offset="1" stop-color="#ff5a50" stop-opacity="0"/></radialGradient><radialGradient id="hmGb"><stop offset="0" stop-color="#5a9bff" stop-opacity=".75"/><stop offset="1" stop-color="#5a9bff" stop-opacity="0"/></radialGradient></defs>';
   const list=DK_ORDER.map(id=>BRD.by(id)),n=list.length;
-  let focus=DK_ORDER.indexOf('devkit'),fp=focus,fv=0,raf=0,last=0,changed=0,SW=1200,SH=520;
-  let tpx=0,tpy=0,ppx=0,ppy=0,bigEl=null,hlast=0,hcost=4;
-  const cur=list.map(()=>({az:NaN,el:NaN,lab:null}));
+  const clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
+  const wrap=d=>((d+n/2)%n+n)%n-n/2;
+  let idx=DK_ORDER.indexOf('devkit'),pos=idx,vel=0,tgt=idx,raf=0,last=0,SW=1200,SH=600,hw=480,hh=360,bigEl=null;
+  let tpx=0,tpy=0,ppx=0,ppy=0,snapT=0,lastStep=0,drag=null,moved=false,X=[0,400,610,772,900],S=[1,.36,.24,.17,.12],K=0,YB=0;
+  const mk=c=>{const v=document.createElementNS(NS,'svg');v.setAttribute('class','hm-svg bp-svg '+c);v.setAttribute('viewBox','0 0 400 300');v.setAttribute('aria-hidden','true');return v};
   const cap=el('div',{class:'bpd-cap','aria-live':'polite'});
-  const arena=el('div',{class:'bpd-arena'});
+  const arena=el('div',{class:'bpd-arena',role:'group','aria-label':'ESP32 boards. Scroll, drag or use the arrow keys to turn the wheel.'});
   const bigw=el('div',{class:'bpd-bigw','aria-hidden':'true'});
   const glow=el('div',{class:'bpd-glow','aria-hidden':'true'});
-  const stage=el('div',{class:'bpd-stage',role:'group','aria-label':'ESP32 boards'});
-  const figs=[],btns=[];
-  list.forEach((bd,i)=>{
-    const svg=document.createElementNS(NS,'svg');
-    svg.setAttribute('class','hm-svg bp-svg');svg.setAttribute('viewBox','0 0 400 300');svg.setAttribute('aria-hidden','true');
-    const fg=el('div',{class:'bpd-fg','aria-hidden':'true'},el('span',{class:'bp-fig isoc'},svg));
-    const bt=el('button',{type:'button',class:'bpd-i','data-id':bd.id,'aria-label':bd.n+', '+BRD.CHIPS[bd.fam].n},
-      el('span',{class:'bpd-n'},DK_SHORT[bd.id]),el('span',{class:'bpd-f'},BRD.CHIPS[bd.fam].n.replace('ESP32-','')||'ESP32'));
-    bt.addEventListener('focus',()=>setFocus(i));
-    figs.push(fg);btns.push(bt);stage.append(fg);
+  const stage=el('div',{class:'bpd-stage'});
+  /* every drawing is made once, then only moved: turning the wheel is transforms on ready layers */
+  const it=list.map((bd,i)=>{
+    const sL=mk('l'),sN=mk('n');
+    const fig=el('button',{type:'button',class:'bpd-tf isoc','data-id':bd.id,'aria-label':bd.n+', '+BRD.CHIPS[bd.fam].n},el('span',{class:'bp-fig'},sL,sN));
+    const lb=el('span',{class:'bpd-lb','aria-hidden':'true'},el('b',{},DK_SHORT[bd.id]),el('i',{},BRD.CHIPS[bd.fam].n));
+    fig.addEventListener('click',()=>{if(moved)return;if(i===idx)go();else turnTo(i)});
+    fig.addEventListener('focus',()=>{if(i!==idx)turnTo(i)});
+    stage.append(fig,lb);
+    return {i,fig,lb,sL,sN,dL:0,dN:0};
   });
-  btns.forEach(x=>stage.append(x));
-  stage.append(glow);
-  arena.append(bigw,stage);
-  function measure(){const r=stage.getBoundingClientRect();SW=Math.max(300,r.width);SH=Math.max(200,r.height);fitBig()}
+  stage.prepend(glow);
+  const drawL=i=>{const o=it[i];if(o.dL)return;o.dL=1;pickerDraw(o.sL,list[i].id,40,0,true,28)};
+  const drawN=i=>{const o=it[i];if(o.dN)return;o.dN=1;pickerDraw(o.sN,list[i].id,40,0,false,28)};
+  const go=()=>{drawL(idx);pickerGo(list[idx].id,it[idx].fig)};
+  function turnTo(i){const c=Math.round(pos);tgt=c+wrap(i-c);kick()}
+  function step(d){tgt=Math.round(tgt)+d;kick()}
+  function measure(){
+    const r=stage.getBoundingClientRect();SW=Math.max(320,r.width);SH=Math.max(300,r.height);
+    hw=Math.min(SW*.38,SH*.52*4/3);hh=hw*.75;
+    const g=hw*.15;S=[1,.36,.24,.17,.12];X=[0];
+    for(let j=1;j<5;j++)X[j]=X[j-1]+hw*S[j-1]/2+g+hw*S[j]/2;
+    K=SH*.075/(X[1]*X[1]);YB=SH*.6;
+    it.forEach(o=>{o.fig.style.width=hw.toFixed(0)+'px';o.fig.style.height=hh.toFixed(0)+'px'});
+    fitBig();render(0);
+  }
   function fitBig(){
     if(!bigEl)return;const len=bigEl.textContent.length;
-    bigEl.style.fontSize=Math.round(Math.min(SH*1.02,SW*.94/(len*.56)))+'px';
+    bigEl.style.fontSize=Math.round(Math.min(SH*.9,SW*.94/(len*.56)))+'px';
   }
   function setBig(txt){
     const old=bigEl;
@@ -8505,111 +8526,109 @@ function pickerDock(b){
     if(old){old.classList.add('out');setTimeout(()=>old.remove(),reduce?0:220)}
     bigw.append(bigEl);
   }
-  const clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
-  /* where everything sits for a (float) focus: an even row on a gentle arc, the focus lifted out of it and big */
-  function layout(f){
-    const pitch=SW/n,tw=Math.min(pitch*.82,SH*.24),hh=SH*.74,hw=Math.min(hh*4/3,SW*.44),half=hw/2;
-    const baseT=SH-44,baseH=SH*.83;
-    return list.map((_,k)=>{
-      const d=k-f,ad=Math.abs(d),p0=clamp(1-ad*1.25,0,1),ph=p0*p0*(3-2*p0),sx=pitch*(k+.5);
-      const over=Math.max(0,ad-2.2),lift=Math.min(170,16*Math.pow(over,1.5)),sl=24*Math.sqrt(over)/pitch;
-      const x=sx+(clamp(sx,half+6,SW-half-6)-sx)*ph,w=tw+(hw-tw)*ph;
-      const bt=baseT-lift,bottom=bt+(baseH-bt)*ph;
-      return {x,w,bottom,ph,ad,d,ang:-Math.sign(d)*Math.atan(sl)*57.3*(1-ph),hw};
-    });
+  function paintCap(){
+    const bd=list[idx];
+    cap.replaceChildren(el('h3',{},bd.n),el('p',{class:'bpd-t2'},bd.tag),
+      el('p',{class:'bpd-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.'),
+      btn('Use this board',go,'primary'));
+    cap.classList.remove('in');void cap.offsetWidth;cap.classList.add('in');
   }
-  function render(dt,t){
-    const L=layout(fp),want=[];
-    list.forEach((bd,k)=>{
-      const c=L[k],ph=c.ph;
-      const bob=ph*(10+6*Math.sin(t*1.1))+(1-ph)*(2.5*Math.sin(t*.9+k*1.7));
-      const tilt=ph*8,ry=ppx*tilt*1.4,rx=-ppy*tilt*.8;
-      const f=figs[k];
-      f.style.transform='perspective(1100px) translate3d('+(c.x-200).toFixed(1)+'px,'+(c.bottom-300-bob).toFixed(1)+'px,0) scale('+(c.w/400).toFixed(4)+') rotate('+c.ang.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) rotateX('+rx.toFixed(2)+'deg)';
-      f.style.opacity=(.72+.28*ph).toFixed(3);
-      f.style.zIndex=String(100-Math.round(c.ad*10));
-      f.classList.toggle('is-f',k===focus);
-      const bt=btns[k];bt.style.transform='translate3d('+(c.x-60).toFixed(1)+'px,'+(c.bottom+(1-ph)*6).toFixed(1)+'px,0)';bt.style.opacity=(1-ph*3>0?1-ph*3:0).toFixed(2);
-      /* camera: the board in focus drifts around on its own, the others turn towards it */
-      const az=k===focus?42+24*Math.sin(t*.4)+ppx*10:clamp(42-clamp(c.d,-3.2,3.2)*13,3,86)+3*Math.sin(t*.33+k);
-      const e=k===focus?29+5*Math.sin(t*.27+1):31+2*Math.sin(t*.21+k);
-      const lab=k===focus&&Math.abs(fp-focus)<.05;
-      const o=cur[k],da=Math.abs(az-o.az)||99,de=Math.abs(e-o.el)||99;
-      if(lab!==o.lab||da>.7||de>.7)want.push({k,az,e,lab,sc:(lab!==o.lab?200:0)+(k===focus?100:0)+da+de,hero:k===focus});
-    });
-    want.sort((a,c)=>c.sc-a.sc);let spent=0;const t0=performance.now();
-    for(const w of want){
-      const o=cur[w.k],first=isNaN(o.az),flip=w.lab!==o.lab;
-      if(w.hero&&!first&&!flip&&t0-hlast<hcost*1.25)continue;
-      if(!w.hero&&!first&&!flip&&(spent>=2||performance.now()-t0>8))continue;
-      if(!w.hero)spent++;
-      o.az=w.az;o.el=w.e;o.lab=w.lab;
-      const a0=performance.now();pickerDraw(figs[w.k].querySelector('svg'),list[w.k].id,w.az,t,w.lab,w.e);
-      if(w.hero){hcost=hcost*.7+(performance.now()-a0)*.3;hlast=performance.now()}
-    }
-    const h=L[Math.round(clamp(fp,0,n-1))];
-    glow.style.transform='translate3d('+(h.x-h.hw*.45).toFixed(1)+'px,'+(SH*.83-h.hw*.17).toFixed(1)+'px,0)';glow.style.width=(h.hw*.9).toFixed(1)+'px';
-    bigw.style.transform='translate3d('+(-ppx*20).toFixed(1)+'px,'+(-ppy*10).toFixed(1)+'px,0)';
+  function setIdx(i){
+    idx=i;drawL(i);drawN(i);
+    it.forEach(o=>{const f=o.i===i;o.fig.classList.toggle('is-f',f);o.fig.setAttribute('aria-current',f?'true':'false');o.fig.tabIndex=f?0:-1});
+    setBig(DK_BIG[list[i].id]);paintCap();
   }
+  function render(t){
+    const mid=SW/2;
+    it.forEach(o=>{
+      const d=wrap(o.i-pos),ad=Math.abs(d),sg=d<0?-1:1,j=Math.min(3,Math.floor(ad)),f=Math.min(1,ad-j);
+      const x=sg*(X[j]+(X[j+1]-X[j])*f),sc=S[j]+(S[j+1]-S[j])*f,ph=clamp(1-ad,0,1);
+      const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9,yaw=-clamp(d,-2.5,2.5)*13;
+      const bob=ph*(5*Math.sin(t*1.1)),ry=ph*(14*Math.sin(t*.45)+ppx*13),rx=ph*(-2+4*Math.sin(t*.33)-ppy*7),rz=ph*2.2*Math.sin(t*.37+1);
+      const op=(.82+.18*ph)*clamp(1-(ad-2.5)/1,0,1);
+      const fg=o.fig,vis=op>.02;
+      fg.style.transform=(ph>.02?'perspective(1300px) ':'')+'translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+(ang+rz).toFixed(2)+'deg)'+(ph>.02?' rotateY('+(yaw+ry).toFixed(2)+'deg) rotateX('+rx.toFixed(2)+'deg)':'');
+      fg.style.opacity=op.toFixed(3);fg.style.zIndex=String(60-Math.round(ad*10));fg.style.visibility=vis?'visible':'hidden';
+      const lo=ad>.55?clamp((ad-.55)/.3,0,1)*clamp(1-(ad-2.3)/.4,0,1)*clamp((SW/2-Math.abs(x)-80)/50,0,1):0;
+      o.lb.style.transform='translate3d('+(mid+x-75).toFixed(1)+'px,'+(YB+y+10).toFixed(1)+'px,0)';o.lb.style.opacity=lo.toFixed(2);
+    });
+    glow.style.transform='translate3d('+(mid-hw*.45).toFixed(1)+'px,'+(YB-hw*.05).toFixed(1)+'px,0)';glow.style.width=(hw*.9).toFixed(0)+'px';
+    bigw.style.transform='translate3d('+(-ppx*18-pos*0).toFixed(1)+'px,'+(-ppy*9).toFixed(1)+'px,0)';
+  }
+  /* a spring chases the target, so a flick, a notch of the wheel and a click all arrive the same soft way, and can be interrupted */
   function tick(now){
     raf=0;if(!b.isConnected)return;
     const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
-    const st=Math.max(1,Math.ceil(dt/.008)),hs=dt/st;
-    for(let i=0;i<st;i++){fv+=(-230*(fp-focus)-25*fv)*hs;fp+=fv*hs}
-    if(Math.abs(fp-focus)<.0004&&Math.abs(fv)<.002){fp=focus;fv=0}
-    const k=1-Math.exp(-dt*7);ppx+=(tpx-ppx)*k;ppy+=(tpy-ppy)*k;
-    render(dt,now/1000);raf=requestAnimationFrame(tick);
+    if(drag){pos=tgt;vel=0}else{
+      const st=Math.max(1,Math.ceil(dt/.008)),h=dt/st;
+      for(let i=0;i<st;i++){vel+=(-150*(pos-tgt)-22*vel)*h;pos+=vel*h}
+      if(Math.abs(pos-tgt)<.0006&&Math.abs(vel)<.003){pos=tgt;vel=0}
+    }
+    const k=1-Math.exp(-dt*6);ppx+=(tpx-ppx)*k;ppy+=(tpy-ppy)*k;
+    const ni=((Math.round(pos)%n)+n)%n;if(ni!==idx)setIdx(ni);
+    render(now/1000);
+    if(!reduce||pos!==tgt)raf=requestAnimationFrame(tick);
   }
-  function paintCap(){
-    const bd=list[focus];
-    cap.replaceChildren(el('h3',{},bd.n),el('p',{class:'bpd-t'},bd.tag),
-      el('p',{class:'bpd-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.'),
-      btn('Use this board',()=>pickerGo(bd.id,figs[focus]),'primary'));
-    cap.classList.remove('in');void cap.offsetWidth;cap.classList.add('in');
+  function kick(){
+    if(reduce){pos=tgt;vel=0;const ni=((Math.round(pos)%n)+n)%n;if(ni!==idx)setIdx(ni);render(0);return}
+    if(!raf){last=0;raf=requestAnimationFrame(tick)}
   }
-  function setFocus(i){
-    if(i===focus)return;focus=i;changed=performance.now();
-    btns.forEach((x,k)=>{x.classList.toggle('is-f',k===focus);x.setAttribute('aria-current',k===focus?'true':'false')});
-    setBig(DK_BIG[list[focus].id]);paintCap();
-    if(reduce){fp=focus;fv=0;render(0,0)}
-  }
-  /* pointer: what is under it is decided on the layout the focus is heading for, so the choice never depends on the row that is still moving */
-  stage.addEventListener('pointermove',e=>{
-    if(e.pointerType==='touch')return;
-    const r=stage.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-    tpx=clamp(x/r.width*2-1,-1,1);tpy=clamp(y/r.height*2-1,-1,1);
-    if(performance.now()-changed<70)return;
-    const L=layout(focus),h=L[focus];
-    if(Math.abs(x-h.x)<h.w*.5&&y>h.bottom-h.w*.75-10&&y<h.bottom+8)return;
-    let hit=-1,best=1e9;
-    L.forEach((c,k)=>{if(k===focus)return;if(Math.abs(x-c.x)<SW/n*.5&&y>c.bottom-c.w*.9-26&&y<c.bottom+46){const dd=Math.abs(x-c.x);if(dd<best){best=dd;hit=k}}});
-    if(hit>=0)setFocus(hit);
+  /* scroll wheel: a notch is one step, a trackpad swipe turns it continuously and settles on the nearest board */
+  arena.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const dd=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY,now=performance.now();
+    if(e.deltaMode===1||Math.abs(dd)>=70){if(now-lastStep<140)return;lastStep=now;step(dd>0?1:-1);return}
+    tgt+=dd/220;kick();clearTimeout(snapT);snapT=setTimeout(()=>{tgt=Math.round(tgt);kick()},120);
+  },{passive:false});
+  arena.addEventListener('pointerdown',e=>{
+    if(e.button!==0||e.target.closest('.bpd-cap button,.bpd-nav'))return;
+    drag={x:e.clientX,t:tgt,x0:e.clientX,lt:performance.now(),lx:e.clientX,v:0};moved=false;
   });
-  stage.addEventListener('pointerleave',()=>{tpx=0;tpy=0});
-  stage.addEventListener('click',()=>pickerGo(list[focus].id,figs[focus]));
-  stage.addEventListener('keydown',e=>{
-    const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;
-    const k=btns.indexOf(document.activeElement)+d;if(k>=0&&k<n){e.preventDefault();btns[k].focus()}
+  window.addEventListener('pointermove',e=>{
+    const r=stage.getBoundingClientRect();
+    tpx=clamp((e.clientX-r.left)/r.width*2-1,-1,1);tpy=clamp((e.clientY-r.top)/r.height*2-1,-1,1);
+    if(!drag)return;
+    if(!moved&&Math.abs(e.clientX-drag.x0)>6){moved=true;arena.classList.add('drag');try{arena.setPointerCapture(e.pointerId)}catch(_){}}
+    if(!moved)return;
+    const now=performance.now(),dtm=Math.max(1,now-drag.lt);
+    drag.v=drag.v*.6+((drag.lx-e.clientX)/ (hw*.62)/dtm*1000)*.4;drag.lt=now;drag.lx=e.clientX;
+    tgt=drag.t+(drag.x-e.clientX)/(hw*.62);kick();
   });
+  const end=()=>{
+    if(!drag)return;const d=drag;drag=null;arena.classList.remove('drag');
+    if(moved){tgt=Math.round(tgt+clamp(d.v*.18,-2,2));kick();setTimeout(()=>{moved=false},60)}
+  };
+  window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end);
+  arena.addEventListener('pointerleave',()=>{if(!drag){tpx=0;tpy=0}});
+  arena.addEventListener('keydown',e=>{
+    const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+    if(!d)return;e.preventDefault();step(d);
+  });
+  const navb=(c,d,t)=>{const x=el('button',{type:'button',class:'bpd-nav '+c,'aria-label':t},d>0?'›':'‹');x.addEventListener('click',()=>step(d));return x};
   const help=el('details',{class:'bp-help'},el('summary',{},'Not sure which board you have?'),
     el('ul',{class:'hm-list'},
       el('li',{},el('b',{},'Read the name.'),' It is usually printed on the board or in the seller’s listing.'),
       el('li',{},el('b',{},'Other ESP32 DevKits'),' with an ESP32-WROOM-32 module (30 or 38 pins) use the same chip and pins as the DevKit V1. Pick that one.'),
       el('li',{},el('b',{},'Look at the shape.'),' The ESP32-CAM has a camera. XIAO and SuperMini boards are about the size of a thumb.'),
       el('li',{},el('b',{},'None match?'),' Pick the one with the same chip. The chip name is printed on the metal can.')));
+  arena.append(bigw,stage,navb('l',-1,'Previous board'),navb('r',1,'Next board'),el('p',{class:'bpd-hint','aria-hidden':'true'},'Scroll or drag to turn'),cap);
   const root=el('div',{class:'bpk bpd'},defs,
     el('div',{class:'bp-head bpd-head'},
       el('h2',{},'Which board are you testing with?'),
-      el('p',{class:'bp-lead'},'Move over a board to look closer, click the one on your desk. The steps, the firmware and the parts that fit change with it.')),
-    arena,cap,
+      el('p',{class:'bp-lead'},'Turn the wheel to the board on your desk, then click it. The steps, the firmware and the parts that fit change with it.')),
+    arena,
     el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),help);
   b.append(root);
-  measure();
-  if(window.ResizeObserver){new ResizeObserver(()=>{if(b.isConnected){measure();if(reduce)render(0,0)}}).observe(stage)}
-  btns[focus].classList.add('is-f');btns[focus].setAttribute('aria-current','true');
-  setBig(DK_BIG[list[focus].id]);paintCap();
-  render(0,performance.now()/1000);
-  if(!reduce)raf=requestAnimationFrame(tick);
+  setIdx(idx);measure();
+  if(window.ResizeObserver)new ResizeObserver(()=>{if(b.isConnected)measure()}).observe(stage);
+  /* the rest are drawn one per idle moment, nearest the default first */
+  const order=[...Array(n).keys()].sort((a,c)=>Math.abs(wrap(a-idx))-Math.abs(wrap(c-idx)));
+  let q=0,pump0;(pump0=function pump(){
+    if(!b.isConnected||q>=order.length*2)return;
+    const j=order[q>>1];if(q&1)drawL(j);else drawN(j);q++;
+    idle(pump);
+  });const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:400}):setTimeout(f,30);setTimeout(pump0,80);
+  kick();if(!reduce)raf=raf||requestAnimationFrame(tick);
 }
 
 /* header chip: shows the chosen board, opens the picker */
