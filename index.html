@@ -825,18 +825,18 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 .hm-chip:hover{border-color:var(--accent-line);background:var(--accent-soft);color:var(--accent-hi)}
 .hm-chip[hidden],.hm-grp[hidden]{display:none}
 .hm-foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
-@media (min-width:900px){
+@media (min-width:900px),(min-width:640px) and (orientation:landscape){
   .hm{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:clamp(24px,4vw,64px)}
   .hm-flow{grid-column:1;grid-row:1}
   .hm{--hmH:min(calc(100vh - 140px),820px)}
   .hm-stage{grid-column:2;grid-row:1;top:calc((100vh - var(--hmH))/2);height:var(--hmH);align-self:start;margin:0}
 }
-@media (max-width:899.98px){.hm-sec{min-height:30vh;padding:4vh 0}.hm-hero{min-height:auto}.hm-spacer{height:18vh}.hm-c.rt,.hm-c.tr{display:none}.hm-call{max-width:64%}.hm-facts{max-width:none}#hm-s1,#hm-s2,#hm-s3,#hm-s4{min-height:18vh}}
+@media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-sec{min-height:30vh;padding:4vh 0}.hm-hero{min-height:auto}.hm-spacer{height:18vh}.hm-c.rt,.hm-c.tr{display:none}.hm-call{max-width:64%}.hm-facts{max-width:none}#hm-s1,#hm-s2,#hm-s3,#hm-s4{min-height:18vh}}
 @media (max-width:560px){.hm-step{grid-template-columns:1fr}.hm-n{font-size:34px;margin-bottom:6px}.hm-facts{grid-template-columns:1fr 1fr 1fr}.hm-fact{padding:10px}.hm-fact b{font-size:22px}}
 .top .brand{color:inherit;text-decoration:none;border-radius:14px;padding:4px 10px 4px 4px;margin:-4px -10px -4px -4px}
 .top .brand:hover h1{color:var(--accent-hi)}
 .top .brand:hover .mark .chip,.top .brand:hover .mark .pins path{stroke:var(--accent-hi)}
-@media (max-width:899.98px){.hm.settled .hm-stage{background:linear-gradient(var(--bg) 93%,transparent)}.hm-stage{z-index:4}}
+@media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{z-index:4}}
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
 .hm-big{position:absolute;left:0;right:0;top:31%;margin:0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
@@ -1071,6 +1071,134 @@ html.bp-busy{overflow:hidden}
 .bpk.go .bpd-tf,.bpk.go .bpd-lb,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{opacity:.25;transition:opacity .4s}
 
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---- Phones: compact header, no overlaps on the home stage (dep_x48) ---- */
+.hm-fab .ic{display:none}
+@media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){
+  .hm-scrollcue{bottom:22px}
+  .hm-stage{height:50vh;background:color-mix(in srgb,var(--bg) calc(var(--pp,0)*100%),transparent)}
+  .hm.settled .hm-stage{background:var(--bg)}
+  .hm-stage::after{content:'';position:absolute;left:0;right:0;top:100%;height:26px;background:linear-gradient(var(--bg),transparent);pointer-events:none;opacity:var(--pp,0)}
+  .hm-c.br{bottom:10px}
+}
+@media (max-width:700px),(pointer:coarse){
+  .hm-fab{top:auto;bottom:max(16px,env(safe-area-inset-bottom,0px));right:16px;width:48px;height:48px;padding:0;justify-content:center;gap:0;transform:translateY(8px)}
+  .hm-fab.on{transform:none}
+  .hm-fab .ic{display:inline-flex}.hm-fab .tx,.hm-fab kbd{display:none}
+}
+@media (max-width:640px){
+  .top{gap:8px;padding:6px 0 14px;align-items:center}
+  .top .lft,.top .conn{display:contents}
+  .top .brand{order:1;flex:1 1 0;min-width:0;gap:10px}
+  .top .mark{width:34px;height:34px}
+  .top h1{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #bSearch{order:2}
+  .top .stat{order:2;font-size:0;gap:0;padding:0;width:36px;height:36px;justify-content:center;flex:none}
+  .top::after{content:'';order:3;flex-basis:100%;height:0}
+  #bBoard{order:4;flex:1 1 0;min-width:0;max-width:none;padding-inline:11px}
+  #bBoard>svg{display:none}
+  #bBoard .bn{max-width:none}
+  #bConnect{order:5}#bDemo{order:6}
+  .top .btn{padding:8px 12px;font-size:13.5px;white-space:nowrap}
+  .hm-big{font-size:clamp(80px,25vw,480px)!important}
+}
+
+/* very narrow phones: the board chip takes the title's place on the first row */
+@media (max-width:340px){
+  .top .brand{flex:none}.top h1{display:none}
+  #bBoard{order:1;flex:1 1 0}
+  #bSearch,.top .stat{order:2}
+  #bConnect{order:5;flex:1 1 0}#bDemo{order:6;flex:1 1 0}
+  .top .btn{justify-content:center}
+}
+/* short landscape phones: one compact header row, big type scaled by height */
+@media (max-height:500px) and (min-width:641px){
+  .top{gap:8px;padding:6px 0 10px;align-items:center;flex-wrap:nowrap}
+  .top .lft,.top .conn{display:contents}
+  .top .brand{order:1;flex:0 1 auto;min-width:0;gap:10px}.top .mark{width:32px;height:32px}.top h1{font-size:17px;white-space:nowrap}
+  #bBoard{order:2;flex:0 1 auto;min-width:0;max-width:11em}
+  .top .conn{margin-left:auto}
+  #bSearch{order:3}.top .stat{order:4;font-size:0;gap:0;padding:0;width:36px;height:36px;justify-content:center;flex:none}
+  #bConnect{order:5}#bDemo{order:6}
+  .top .btn{padding:8px 12px;font-size:13.5px;white-space:nowrap}
+  .hm-big{font-size:min(22vw,34vh)!important}
+}
+@media (max-height:500px){
+  .hm-c.rt{display:none}
+  .hm-call{max-width:44%;padding:6px 10px 7px}.hm-call b{font-size:12px}.hm-call span{font-size:11px;line-height:1.35;margin-top:1px}
+}
+
+/* header sits above the fixed intro layers so its buttons can be tapped */
+header.top{position:relative;z-index:6}
+/* touch targets: at least 40px on touch screens */
+@media (pointer:coarse){
+  .btn.sm,.btn.sm.ghost,.sttb .btn.sm,body .segb,body .cut-tab{min-height:40px}
+  body .seg{gap:4px}
+  body .cut-follow{display:flex;align-items:center;gap:10px;min-height:40px;padding:8px 0}
+  body .cut-follow input{width:22px;height:22px}
+  body .stcol .sw{width:34px;height:34px}
+  details>summary{padding-block:9px}
+}
+
+/* phones: wiring diagram fits the width, tap to zoom (dep_x48) */
+@media (max-width:560px){
+  .mapbox{overflow-x:hidden;touch-action:pan-y}.mapbox.zoom{overflow-x:auto;touch-action:pan-x pan-y}
+  svg.board-svg.cp,main.w2 svg.board-svg.cp{min-width:0;max-width:none;width:100%;height:auto}
+  .mapbox.zoom svg.board-svg.cp{width:200%;min-width:0}
+  .board-svg.cp .pl,.board-svg.cp .an{font-size:13px}
+  .conn-svg.cp .pl{font-size:13px}.conn-svg.cp .stub{font-size:13px}.conn-svg.cp .ttl{font-size:15px}
+  .mapbox{cursor:zoom-in}.mapbox.zoom{cursor:zoom-out}
+}
+/* phones: use the whole width, readable toast, bigger search icon (dep_x48) */
+@media (max-width:640px){
+  body{margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:14px}
+  body main{padding:16px 12px 22px}
+  body.is-home main{padding:0}
+  main .stage{padding:12px}
+  #toast{width:max-content;border-radius:18px;padding:10px 16px}
+  #bSearch{min-width:44px;min-height:44px;padding-inline:14px}
+  .top .stat{width:44px;height:44px}
+  .top .btn{padding-inline:11px}
+  #bBoard{font-size:13px}
+}
+
+/* palette follows the visible viewport when the keyboard is open */
+.pal{bottom:auto;height:var(--vvh,100%)}
+.pal-box{max-height:min(72%,640px)}
+@media (max-width:640px){.navq{display:none}}
+@media (max-width:560px){.bpk .bp-fig{aspect-ratio:16/9}}
+@media (pointer:coarse){
+  body .stchk{min-height:40px;display:inline-flex;align-items:center}
+  body input[type=range]{min-height:32px}
+}
+
+/* phones: tables wrap, forms stay inside the card, switches get a bigger hit area (dep_x48) */
+@media (max-width:560px){
+  table.t td.m{white-space:normal;overflow-wrap:anywhere}
+  table.t td,table.t th{padding:9px 10px}
+  table.t th{white-space:normal}
+  .ide-bar .seg{flex-wrap:wrap;max-width:100%}
+  .ide-bar{padding:10px}
+  body .seg{border-radius:18px}
+  label.stf,.stf>*{min-width:0;max-width:100%}
+  .stf select,.stf input{max-width:100%;min-width:0}
+}
+@media (pointer:coarse){.switch::after{content:'';position:absolute;inset:-8px -4px}}
+@media (max-width:560px){
+  .stagewrap,.stmount{min-width:0}
+  .stu,.stedit,.stlcd,.stlrow,.stlrow .i{min-width:0;max-width:100%}
+  .stu{width:100%}
+  code{overflow-wrap:anywhere}
+}
+
+#bBoard .bs{display:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){#bBoard .bn{display:none}#bBoard .bs{display:inline}}
+
+@media (max-width:440px){.top .btn{font-size:13px;padding-inline:10px}}
+
+@media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{height:50svh}}
+@media (max-width:640px){.hm-c.br{display:none}}
+@media (pointer:coarse){.hm-call,.hm-fab{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(20,22,26,.94)}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -2404,6 +2532,8 @@ function realOf(l,plan){
   const q=BRD.map[l];if(q!=null)return String(q);
   const r=plan?plan(+l):null;return r!=null?String(r):null;
 }
+/* phones: the whole diagram fits the width; tap to zoom and pan */
+function diagZoom(h){h.addEventListener('click',()=>{if(innerWidth>560)return;h.classList.toggle('zoom')})}
 function connSVG(w,plan){
   const M=bdModel(),pb=pbOf(w),pins=pb.pins.slice();
   const rows=w.rows.map(r=>{
@@ -2418,8 +2548,9 @@ function connSVG(w,plan){
   let ls=0,rs=0;
   rows.forEach(o=>{const p=find(o,'R');if(!p||o.id==='GND')return;const wt=o.id==='VIN'||o.id==='3V3'?.5:1;if(p.side==='L')ls+=wt;else rs+=wt});
   const ps=ls>rs?'L':'R',dir=ps==='R'?1:-1;
-  const rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=BW+600,boardTop=48,y0=boardTop+30,bh=(M.n-1)*rh+60,bBot=boardTop+bh,BX=ps==='R'?100:W-100-BW;
-  const nearX=ps==='R'?BX+BW:BX,farX=ps==='R'?BX:BX+BW,pinX=ps==='R'?BX+BW+240:260,bx0=pinX===260?20:pinX;
+  const cp=innerWidth<=560,MG=cp?44:100,GAP=cp?130:240,BOXW=cp?150:240;
+  const rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=cp?MG+BW+GAP+BOXW+10:BW+600,boardTop=48,y0=boardTop+30,bh=(M.n-1)*rh+60,bBot=boardTop+bh,BX=ps==='R'?MG:W-MG-BW;
+  const nearX=ps==='R'?BX+BW:BX,farX=ps==='R'?BX:BX+BW,pinX=ps==='R'?BX+BW+GAP:10+BOXW,bx0=ps==='R'?pinX:10;
   const pinY=i=>y0+i*rh,gap=rh/2;
   const pxOf=p=>p.side==='L'?(p.col?BX+IN:BX):(p.col?BX+BW-IN:BX+BW);
   rows.forEach(o=>{
@@ -2447,8 +2578,8 @@ function connSVG(w,plan){
   const H=bBot+16+8*Math.max(0,farW.length-1)+26;
   const lit=new Set(wires.map(o=>o.loc.side+o.loc.col+'.'+o.loc.row));
   const x2=(a,b)=>`${a},${b}`,mw=M.four?72:68;
-  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg conn-svg" role="img" aria-label="${esc(w.title)}: ${esc(pb.n)} wired to the ${esc(bdName())}. The table below lists every connection.">`;
-  s+=`<text class="ttl" x="${BX}" y="${boardTop-16}">${esc(bdName())}</text><text class="ttl" x="${bx0}" y="${boxTop-12}">${esc(pb.n)}</text>`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg conn-svg${cp?' cp':''}" role="img" aria-label="${esc(w.title)}: ${esc(pb.n)} wired to the ${esc(bdName())}. The table below lists every connection.">`;
+  s+=`<text class="ttl" x="${cp&&BX>W/2?W-MG:BX}" y="${boardTop-16}"${cp&&BX>W/2?' text-anchor="end"':''}>${esc(bdName())}</text><text class="ttl" x="${cp&&ps==='R'?bx0+BOXW:bx0}" y="${boxTop-12}"${cp&&ps==='R'?' text-anchor="end"':''}>${esc(pb.n)}</text>`;
   s+=`<rect class="bd" x="${BX}" y="${boardTop}" width="${BW}" height="${bh}" rx="22"/>`;
   s+=`<rect class="mod" x="${BX+(BW-mw)/2}" y="${boardTop+10}" width="${mw}" height="112" rx="8"/><text class="mt" x="${BX+BW/2}" y="${boardTop+70}" text-anchor="middle">${esc(M.chip)}</text>`;
   for(let u=0;u<M.usb;u++){const cx=BX+BW/2+(M.usb>1?(u?1:-1)*36:0),uw=M.usb>1?52:60;s+=`<rect class="mod" x="${cx-uw/2}" y="${bBot-40}" width="${uw}" height="34" rx="8"/><text class="mt" x="${cx}" y="${bBot-18}" text-anchor="middle">USB</text>`}
@@ -2457,7 +2588,7 @@ function connSVG(w,plan){
     s+=`<circle class="${on?'pu':'pf'}" cx="${x}" cy="${y}" r="5"/>`;
     s+=`<text class="pl${on?' u':''}" x="${left?x+12:x-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(p.lab)}</text>`;
   });
-  s+=`<rect class="bd" x="${bx0}" y="${boxTop}" width="240" height="${boxH}" rx="16"/>`;
+  s+=`<rect class="bd" x="${bx0}" y="${boxTop}" width="${BOXW}" height="${boxH}" rx="16"/>`;
   const usedPin=new Set(rows.filter(o=>!o.skip).map(o=>o.part));
   pins.forEach((p,i)=>{
     const y=ppY(i),on=usedPin.has(p);
@@ -2503,8 +2634,8 @@ function wiringView(p){
   }
   if(!p.wiring){box.append(blk('',el('p',{class:'hint'},'No external wiring. Power and flash over USB.')));return box;}
   const w=W(p.wiring);
-  const holder=el('div',{class:'mapbox'});holder.innerHTML=connSVG(w);const pb=pbOf(w);
-  box.append(blk(w.title,holder,el('p',{class:'hint swipe'},'Swipe the diagram sideways to see all of it. The table below lists every wire.'),
+  const holder=el('div',{class:'mapbox'});holder.innerHTML=connSVG(w);const pb=pbOf(w);diagZoom(holder);
+  box.append(blk(w.title,holder,el('p',{class:'hint swipe'},innerWidth<=560?'Tap the diagram to zoom in. The table below lists every wire.':'Swipe the diagram sideways to see all of it. The table below lists every wire.'),
     el('div',{class:'row'},el('span',{class:'chip fill'},'thick wire = power'),el('span',{class:'chip'},'thin wire = signal'),el('span',{class:'chip dash'},'dotted wire = optional')),
     el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...[(w.left||'ESP32')+' pin','Part pin','Wire'].map(h=>el('th',{},h)))),
       el('tbody',{},...w.rows.map(r=>el('tr',{},el('td',{class:'m'},r[0]),el('td',{class:'m'},r[1]),el('td',{},swatch(r[2]),r[2]+(r[3]==='opt'?' (optional)':''))))))),
@@ -2543,9 +2674,9 @@ function boardSVG(use){
   const U={};
   if(dk)Object.assign(U,use);
   else for(const k in use){const id=/^\d+$/.test(k)?realOf(k,null):k;if(id!=null)U[id]=(U[id]||[]).concat(use[k])}
-  const rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=800,top=24,y0=top+30,bh=(M.n-1)*rh+60,H=top+bh+14,BX=(W-BW)/2,gap=rh/2,mw=M.four?72:68;
+  const cp=innerWidth<=560,rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=cp?(M.four?640:560):800,top=24,y0=top+30,bh=(M.n-1)*rh+60,H=top+bh+14,BX=(W-BW)/2,gap=rh/2,mw=M.four?72:68;
   const pxOf=p=>p.side==='L'?(p.col?BX+IN:BX):(p.col?BX+BW-IN:BX+BW);
-  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg" role="img" aria-label="${esc(bdName())} pin map">`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg${cp?' cp':''}" role="img" aria-label="${esc(bdName())} pin map">`;
   s+=`<rect class="bd" x="${BX}" y="${top}" width="${BW}" height="${bh}" rx="22"/>`;
   s+=`<rect class="mod" x="${BX+(BW-mw)/2}" y="${top+10}" width="${mw}" height="112" rx="8"/><text class="mt" x="${BX+BW/2}" y="${top+70}" text-anchor="middle">${esc(M.chip)}</text>`;
   for(let u=0;u<M.usb;u++){const cx=BX+BW/2+(M.usb>1?(u?1:-1)*36:0),uw=M.usb>1?52:60;s+=`<rect class="mod" x="${cx-uw/2}" y="${top+bh-40}" width="${uw}" height="34" rx="8"/><text class="mt" x="${cx}" y="${top+bh-18}" text-anchor="middle">USB</text>`}
@@ -2578,7 +2709,7 @@ function mapView(id,qs){
     const o=PICK.find(x=>x.id===id);w=o.w();name=o.n;
     Object.assign(use,useFromRows(w.rows));
   }
-  const holder=el('div',{class:'mapbox'});const pk=PARTS.find(x=>x.id===id);holder.innerHTML=w?connSVG(w,pk?BRD.plan(pk):(id==='trim'?BRD.plan(PARTS.find(x=>x.id==='servo')):null)):boardSVG(use);
+  const holder=el('div',{class:'mapbox'});diagZoom(holder);const pk=PARTS.find(x=>x.id===id);holder.innerHTML=w?connSVG(w,pk?BRD.plan(pk):(id==='trim'?BRD.plan(PARTS.find(x=>x.id==='servo')):null)):boardSVG(use);
   out.push(el('h4',{class:'mapname'},name),holder,
     el('div',{class:'row'},el('span',{class:'chip fill'},'pin in use'),el('span',{class:'chip dash'},'free pin'),
       el('span',{class:'hint'},BRD.ident()?'Drawn for the common 30-pin ESP32 DevKit V1, USB at the bottom. Match pins by the GPIO numbers printed on your board, not by position.':'Schematic only. Pins are labelled with this board\'s own numbers and names. Match them by the label printed on your board, not by position.')));
@@ -8276,6 +8407,7 @@ function homeIndex(){
     el('div',{class:'hm-foot'},btn('Pin map and parts table',()=>{show('overview');window.scrollTo(0,0)}),btn('Back to the top',()=>{window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})})));
 }
 const kick0=t=>el('p',{class:'hm-k'},t);
+const hmWide=()=>matchMedia('(min-width:900px),(min-width:640px) and (orientation:landscape)').matches;
 const hmClamp=(v,a,b)=>Math.max(a,Math.min(b,v)),hmEase=t=>t*t*(3-2*t);
 function homeMount(root,S,FG,HM_CH){
   if(!root.isConnected)return;
@@ -8288,14 +8420,23 @@ function homeMount(root,S,FG,HM_CH){
   const lerp=(a,b,t)=>a+(b-a)*t;
   const geo=()=>{const r=slot.getBoundingClientRect();return {l:r.left,t:r.top,w:r.width,h:r.height}};
   const prog=()=>mq.matches&&scrollY<2?0:hmEase(hmClamp(scrollY/(innerHeight*.6),0,1));
-  function size(){W=document.documentElement.clientWidth;H=innerHeight;svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
+  const bigEl=intro.querySelector('.hm-big');
+  /* phones: park the big type under the header instead of behind the buttons */
+  function park(){
+    if(!bigEl)return;
+    if(innerWidth>=700&&innerHeight>=500){bigEl.style.top='';ihit.style.top='';return}
+    const h=document.querySelector('header.top'),hb=h?Math.round(h.getBoundingClientRect().bottom+scrollY):90;
+    ihit.style.top=Math.max(Math.round(innerHeight*.16),hb+6)+'px';
+    bigEl.style.top=Math.round(hb+22+bigEl.offsetHeight/2)+'px';
+  }
+  function size(){W=document.documentElement.clientWidth;H=innerHeight;park();svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
   function target(){
-    const sb=geo(),narrow=innerWidth<900,top=narrow?sb.t+sb.h:0,mid=(top+innerHeight)/2;
+    const sb=geo(),narrow=!hmWide(),top=narrow?sb.t+sb.h:0,mid=(top+innerHeight)/2;
     const cs=secs.map(s=>{const r=s.getBoundingClientRect();return r.top+r.height/2});
     let i=0;for(let k=0;k<cs.length;k++)if(cs[k]<=mid)i=k;
     let u=0;if(i<cs.length-1&&mid>cs[i])u=hmEase(hmClamp((mid-cs[i])/(cs[i+1]-cs[i]),0,1));
     const A=HM_CH[i],B=HM_CH[Math.min(HM_CH.length-1,i+1)],fa=FG.focus[A.f],fb=FG.focus[B.f];
-    return {az:lerp(A.az,B.az,u),el:lerp(A.el,B.el,u),zoom:Math.exp(lerp(Math.log(A.zoom),Math.log(B.zoom),u)),f:[0,1,2].map(a=>lerp(fa[a],fb[a],u)),ex:lerp(A.ex,B.ex,u),ch:u<.5?i:Math.min(HM_CH.length-1,i+1)};
+    return {az:lerp(A.az,B.az,u),el:lerp(A.el,B.el,u),zoom:Math.min(Math.exp(lerp(Math.log(A.zoom),Math.log(B.zoom),u)),narrow?1.15:99),f:[0,1,2].map(a=>lerp(fa[a],fb[a],u)),ex:lerp(A.ex,B.ex,u),ch:u<.5?i:Math.min(HM_CH.length-1,i+1)};
   }
   function say(ch){
     if(ch===chNow)return;chNow=ch;const c=HM_CH[ch];lit=c.lit;
@@ -8305,15 +8446,16 @@ function homeMount(root,S,FG,HM_CH){
   function render(now,lite){
     const age=mq.matches?9:(now-t0)/1000,e=1-Math.pow(1-hmClamp(age/1.5,0,1),4);
     const az=st.az+user.az+(1-e)*-200,elv=hmClamp(st.el+user.el,12,70),sl=geo();
-    const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*.5,sl.t+sl.h/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*.64,sl.h,pS);
+    const nar=!hmWide(),rs=nar?Math.min(sl.h*.3,86):0;
+    const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*.5,sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*.64,sl.h-rs,pS);
     const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,1,pS),st.f,{cx,cy,fw,fh});
     const t1=performance.now(),html=FG.draw(P,{ex:st.ex,lit,t:now/1000,lite:lite||st.zoom<.75,W,H});
     builtAt=performance.now()-t1;g.innerHTML=html;
     const R=Math.hypot(W,H),mk=lerp(R,sl.w*.55,pS).toFixed(0)+'px '+lerp(R,sl.h*.55,pS).toFixed(0)+'px at '+cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
     if(mk!==maskKey){maskKey=mk;const m='radial-gradient(ellipse '+mk+',#000 64%,transparent 100%)';svg.style.webkitMaskImage=m;svg.style.maskImage=m}
     const cr=call,cw=cr.offsetWidth,chh=cr.offsetHeight;
-    cr.style.left=Math.round(sl.l+16)+'px';cr.style.top=Math.round(sl.t+sl.h-chh-(innerWidth<900?36:46))+'px';
-    const a=FG.proj(P,FG.anchor(HM_CH[chNow<0?0:chNow].a)),oT=sl.t+sl.h-chh-(innerWidth<900?36:46),oL=sl.l+16;
+    cr.style.left=Math.round(sl.l+16)+'px';cr.style.top=Math.round(sl.t+sl.h-chh-(hmWide()?46:12))+'px';
+    const a=FG.proj(P,FG.anchor(HM_CH[chNow<0?0:chNow].a)),oT=sl.t+sl.h-chh-(hmWide()?46:12),oL=sl.l+16;
     const bx=hmClamp(a[0],oL+16,oL+cw-16),by=a[1]<oT?oT:oT+chh;
     ring.setAttribute('cx',a[0].toFixed(1));ring.setAttribute('cy',a[1].toFixed(1));dot.setAttribute('cx',a[0].toFixed(1));dot.setAttribute('cy',a[1].toFixed(1));
     ln.setAttribute('x1',a[0].toFixed(1));ln.setAttribute('y1',a[1].toFixed(1));ln.setAttribute('x2',bx);ln.setAttribute('y2',by);
@@ -8352,8 +8494,9 @@ function homeMount(root,S,FG,HM_CH){
     const key=[st.az+user.az,st.el+user.el,st.zoom,st.ex,st.f[0],st.f[1],st.f[2],lit,pS,sl.l,sl.t,Math.min(age,2)].map(v=>typeof v==='number'?v.toFixed(2):v).join('|');
     const moving=key!==lastKey||dirty;
     const slow=builtAt>16&&(now-(frame.t||0))<33;
-    const gap=top&&now-lastScroll>400&&age>2?33:0;
-    if(moving&&!slow&&now-(frame.t||0)>=gap){lastKey=key;dirty=false;frame.t=now;render(now,fast>110||builtAt>30);clearTimeout(settle);if(fast>110||builtAt>30)settle=setTimeout(()=>{dirty=true;kick()},180)}
+    const coarse=matchMedia('(pointer:coarse)').matches;
+    const gap=Math.max(top&&now-lastScroll>400&&age>2?33:0,coarse?45:0);
+    if(moving&&!slow&&now-(frame.t||0)>=gap){lastKey=key;dirty=false;frame.t=now;render(now,fast>(coarse?45:110)||builtAt>30);clearTimeout(settle);if(fast>(coarse?45:110)||builtAt>30)settle=setTimeout(()=>{dirty=true;kick()},180)}
     const busy=moving||top||drag||rel||age<2||Math.abs(prog()-pS)>.001||Math.abs(goal.az-st.az)>.02||Math.abs(goal.zoom-st.zoom)>.001||Math.abs(goal.ex-st.ex)>.002||tg.f.some((v,a)=>Math.abs(v-st.f[a])>.01);
     if(busy)raf=requestAnimationFrame(frame);
   }
@@ -8369,8 +8512,8 @@ function homeMount(root,S,FG,HM_CH){
   };
   grab(hit);grab(S.ihit);
   hit.addEventListener('keydown',e=>{const s=e.key==='ArrowLeft'?-15:e.key==='ArrowRight'?15:0;if(!s)return;e.preventDefault();user.az+=s;rel=performance.now()+2500;kick()});
-  const fab=el('button',{class:'hm-fab',type:'button','aria-label':'Search parts',onclick:()=>palOpen()},'Search parts',el('kbd',{},palKey()));root.appendChild(fab);
-  const fabUpd=()=>fab.classList.toggle('on',scrollY>Math.max(260,innerHeight*.7));addEventListener('scroll',fabUpd,{passive:true});fabUpd();
+  const fabIc=el('span',{class:'ic','aria-hidden':'true'});fabIc.innerHTML='<svg viewBox="0 0 20 20" width="18" height="18"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';const fab=el('button',{class:'hm-fab',type:'button','aria-label':'Search parts',onclick:()=>palOpen()},fabIc,el('span',{class:'tx'},'Search parts'),el('kbd',{},palKey()));root.appendChild(fab);
+  const idx=root.querySelector('#hm-index');const fabUpd=()=>{const hide=idx&&idx.getBoundingClientRect().top<innerHeight*.25;fab.classList.toggle('on',scrollY>Math.max(260,innerHeight*.7)&&!hide)};addEventListener('scroll',fabUpd,{passive:true});fabUpd();
   if(!mq.matches){const b=document.createElement('div');b.className='hm-bang';b.setAttribute('aria-hidden','true');root.appendChild(b);setTimeout(()=>b.remove(),2200)}
   pS=prog();size();chrome();say(target().ch);kick();
 }
@@ -8736,7 +8879,7 @@ function pickerDock(b){
 /* header chip: shows the chosen board, opens the picker */
 function boardChipInit(){
   const c=document.getElementById('bBoard');if(!c||c.dataset.on)return;c.dataset.on='1';
-  const paint=()=>{const bd=BRD.cur?BRD.by(BRD.cur):null;c.querySelector('.bn').textContent=bd?bd.n:'Pick a board';c.setAttribute('aria-label',bd?'Board: '+bd.n+'. Change board':'Pick a board');c.classList.toggle('none',!bd)};
+  const paint=()=>{const bd=BRD.cur?BRD.by(BRD.cur):null;const bnEl=c.querySelector('.bn');bnEl.textContent=bd?bd.n:'Pick a board';let bs=c.querySelector('.bs');if(!bs){bs=document.createElement('span');bs.className='bs';bnEl.after(bs)}bs.textContent=bd?bd.n.replace(/^Seeed /,'').replace(/ESP32[ -]/g,'').trim():'Pick a board';c.setAttribute('aria-label',bd?'Board: '+bd.n+'. Change board':'Pick a board');c.classList.toggle('none',!bd)};
   c.addEventListener('click',()=>pickBoard());
   BRD.onChange(()=>{paint();try{renderNav()}catch(e){}});paint();
 }
@@ -9461,7 +9604,8 @@ $('#bCopy').addEventListener('click',async()=>{
 });
 
 try{if(window.top!==window)$('#frameNote').hidden=false}catch(e){$('#frameNote').hidden=false}
-if(!('serial' in navigator))$('#frameNote').hidden=false;
+if(!('serial' in navigator)){const n=$('#frameNote');n.textContent=(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'This phone browser cannot talk to the ESP32 (no Web Serial). ':'This browser cannot talk to the ESP32 (no Web Serial). ')+'Use Demo mode to explore every page here, or open this page in Chrome or Edge on a computer (Chrome on Android also works over a USB-OTG cable).';n.hidden=false}
+try{if(window.visualViewport){const vv=()=>document.documentElement.style.setProperty('--vvh',Math.round(visualViewport.height)+'px');visualViewport.addEventListener('resize',vv);vv()}}catch(e){}
 renderNav();
 try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
 show('home'); /* always the board picker first */
