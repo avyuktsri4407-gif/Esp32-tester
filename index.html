@@ -1295,6 +1295,9 @@ header.top{position:relative;z-index:6}
   html body .hm-chip::after{content:'';flex:none;margin-left:auto;width:8px;height:8px;border-top:1.8px solid var(--faint);border-right:1.8px solid var(--faint);transform:rotate(45deg)}
   html body .hm-chip.nok{border-style:solid;opacity:.5}
 }
+
+/* the no-Web-Serial notice sits above the fixed hero title instead of under it (dep_x54) */
+#frameNote,.top+.notice{position:relative;z-index:30}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -9624,7 +9627,7 @@ async function show(id){
   await runCleanups();
   const p=PARTS.find(x=>x.id===id)||PARTS[0],panel=$('#panel');
   id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
-  try{history.replaceState(null,'','#'+id)}catch(e){try{location.hash=id}catch(e2){}}
+  try{history.replaceState(null,'','#'+id)}catch(e){}
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
   const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
@@ -9731,6 +9734,12 @@ $('#bCopy').addEventListener('click',async()=>{
 });
 
 try{if(window.top!==window)$('#frameNote').hidden=false}catch(e){$('#frameNote').hidden=false}
+/* touch devices and embedded viewers: a script error shows on screen instead of failing silently */
+if(matchMedia('(pointer:coarse)').matches){
+  const shown=new Set();
+  const rep=m=>{m=String(m||'').slice(0,140);if(!m||/ResizeObserver|Script error\.?$/i.test(m)||shown.has(m)||shown.size>2)return;shown.add(m);try{toast('Something failed: '+m)}catch(_){}};
+  addEventListener('error',e=>rep(e.message));addEventListener('unhandledrejection',e=>rep(e.reason&&e.reason.message||e.reason));
+}
 if(!('serial' in navigator)){const n=$('#frameNote');n.textContent=(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'This phone browser cannot talk to the ESP32 (no Web Serial). ':'This browser cannot talk to the ESP32 (no Web Serial). ')+'Use Demo mode to explore every page here, or open this page in Chrome or Edge on a computer (Chrome on Android also works over a USB-OTG cable).';n.hidden=false}
 try{if(window.visualViewport){const vv=()=>document.documentElement.style.setProperty('--vvh',Math.round(visualViewport.height)+'px');visualViewport.addEventListener('resize',vv);vv()}}catch(e){}
 renderNav();
