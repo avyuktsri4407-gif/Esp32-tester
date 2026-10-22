@@ -7625,10 +7625,10 @@ const LIST=[
   boot:'Join IO0 to GND, then reset. Remove the jumper to run.',tag:'Camera board. Only 6 pins are free, so it tests the camera and a few simple parts.'}
 ];
 const KEY='cts.board';
-let cur=null;try{const v=store.get(KEY,null);if(typeof v==='string'&&LIST.some(b=>b.id===v))cur=v}catch(e){}
+let cur=null;try{store.set(KEY,null)}catch(e){} /* the page always opens on the board picker, so a saved board is not read back */
 const subs=[];
 const by=id=>LIST.find(b=>b.id===id)||null;
-function set(id){cur=id&&by(id)?id:null;try{store.set(KEY,cur)}catch(e){}try{reset()}catch(e){}subs.forEach(f=>{try{f(cur)}catch(e){}})}
+function set(id){cur=id&&by(id)?id:null;try{reset()}catch(e){}subs.forEach(f=>{try{f(cur)}catch(e){}})}
 /* what a part needs from the board: GPIO wires and analog inputs. Read from the part's wiring rows. */
 const ADC_CLASSIC=new Set([32,33,34,35,36,39]);
 const cmdsOf=p=>(p&&p.cmds)||((typeof PART_CMDS!=='undefined'&&p&&PART_CMDS[p.id])||[]);
@@ -9250,7 +9250,6 @@ $('#bCopy').addEventListener('click',async()=>{
 try{if(window.top!==window)$('#frameNote').hidden=false}catch(e){$('#frameNote').hidden=false}
 if(!('serial' in navigator))$('#frameNote').hidden=false;
 renderNav();
-let start='home';
-try{const h=location.hash.slice(1);if(PARTS.some(p=>p.id===h))start=h}catch(e){}
-show(start);
+try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+show('home'); /* always the board picker first */
 </script>
