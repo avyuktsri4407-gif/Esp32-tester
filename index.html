@@ -1024,6 +1024,8 @@ body.has-rec #toast{bottom:104px}
 .bp-grow .hm-svg{position:absolute;inset:0;width:100%;height:100%}
 .bp-grow.out{opacity:0;transition:opacity .5s ease}
 html.bp-busy{overflow:hidden}
+
+#bSearch.locked,#navQ.locked{opacity:.45;cursor:not-allowed}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1302,7 +1304,7 @@ html.bp-busy{overflow:hidden}
 <a class="skip" href="#panel">Skip to the test panel</a>
 <div class="wrap">
   <header class="top">
-    <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, go to the home page">
+    <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, choose your board">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g class="pins"><path d="M17 4v6M24 4v6M31 4v6M17 38v6M24 38v6M31 38v6M4 17h6M4 24h6M4 31h6M38 17h6M38 24h6M38 31h6"/></g><rect class="chip" x="10" y="10" width="28" height="28" rx="6.5"/><path class="wave" d="M15 25.5h4.2l2.6-8.2 4.2 13.4 2.7-8.6 1.6 3.4H33"/><circle class="live" cx="32.5" cy="16" r="2"/></svg>
       <h1>ESP32 Live Tester</h1>
     </a>
@@ -8253,7 +8255,8 @@ function palRecent(){const a=store.get(PAL_KEY,[]);return Array.isArray(a)?a.fil
 function palRemember(id){const p=PARTS.find(x=>x.id===id);if(!p||p.home||p.overview)return;store.set(PAL_KEY,[id,...palRecent().filter(x=>x!==id)].slice(0,8))}
 let palEl=null,palPrev=null;
 function palOpen(){
-  if(palEl)return;palPrev=document.activeElement;
+  if(palEl)return;
+  if(BRD.locked()){toast('Pick your board first. Search opens once you have chosen one.');return}palPrev=document.activeElement;
   const gOf={};for(const g of GROUPS)for(const id of g.ids)gOf[id]=g.n;
   const items=PARTS.filter(p=>!p.home).map(p=>({id:p.id,n:p.n,g:gOf[p.id]||'',hay:(p.n+' '+(()=>{try{return subOf(p)}catch(e){return ''}})()+' '+p.id+' '+(ALIAS[p.id]||'')+' '+(gOf[p.id]||'')).toLowerCase()}));
   const count=items.filter(i=>!PARTS.find(p=>p.id===i.id).overview).length;
@@ -8331,6 +8334,13 @@ function navRecentInit(){
 navRecentInit();
 /* ---- Board picker: the first screen of the Home page, the header board chip, and the "does not fit" marks on parts. ---- */
 BRD.picking=false;
+/* no search until a board is chosen: the parts that fit depend on it */
+BRD.locked=()=>!BRD.cur||BRD.picking;
+function searchLock(){
+  const on=BRD.locked(),why='Pick your board first. Search opens once you have chosen one.';
+  for(const id of ['bSearch','navQ']){const e=document.getElementById(id);if(!e)continue;e.disabled=on;e.classList.toggle('locked',on);if(on)e.setAttribute('title',why);else e.removeAttribute('title')}
+  if(on&&typeof palEl!=='undefined'&&palEl&&palEl._close)palEl._close();
+}
 const BP_FAMS=[
   ['esp32','ESP32','The classic. Wi-Fi and Bluetooth, the most pins and the most examples online.'],
   ['s3','ESP32-S3','More pins, USB built in, Bluetooth LE.'],
@@ -8407,7 +8417,7 @@ function pickerPage(b){
     ...rowsOf,
     el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),
     help,
-    el('div',{class:'hm-foot'},btn('Just look around with the DevKit V1',()=>{BRD.set('devkit');BRD.picking=false;show('home');window.scrollTo(0,0)}),
+    el('div',{class:'hm-foot'},
       cur?btn('Keep '+BRD.by(cur).n,()=>{BRD.picking=false;show('home');window.scrollTo(0,0)}):null));
   b.append(root);
 }
@@ -9044,7 +9054,7 @@ function refreshHead(){
 async function show(id){
   await runCleanups();
   const p=PARTS.find(x=>x.id===id)||PARTS[0],panel=$('#panel');
-  id=p.id;cur=id;try{BRD.reset();BRD.seed(p)}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
+  id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
   try{history.replaceState(null,'','#'+id)}catch(e){try{location.hash=id}catch(e2){}}
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
   const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),noRes(p)?null:el('div',{class:'ph-c'},chip,null));
@@ -9105,7 +9115,7 @@ async function toggleDemo(){
 }
 $('#bDemo').addEventListener('click',()=>toggleDemo().catch(e=>toast(e.message)));
 $('#navSel').addEventListener('change',e=>show(e.target.value));
-$('#brandHome').addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();show('home');window.scrollTo(0,0)});
+$('#brandHome').addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();pickBoard()});
 {const q=$('#navQ');
  q.addEventListener('input',()=>{navQuery=q.value;renderNav()});
  q.addEventListener('keydown',e=>{
