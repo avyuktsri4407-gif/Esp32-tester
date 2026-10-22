@@ -8452,7 +8452,7 @@ function homeMount(root,S,FG,HM_CH){
     return {az:lerp(A.az,B.az,u),el:lerp(A.el,B.el,u),zoom:narrow?1:Math.min(Math.exp(lerp(Math.log(A.zoom),Math.log(B.zoom),u)),99),f:narrow?FG.focus.hero.slice():[0,1,2].map(a=>lerp(fa[a],fb[a],u)),ex:narrow?0:lerp(A.ex,B.ex,u),ch:u<.5?i:Math.min(HM_CH.length-1,i+1)};
   }
   function say(ch){
-    if(ch===chNow)return;chNow=ch;const c=HM_CH[ch];lit=c.lit;
+    if(ch===chNow)return;chNow=ch;const c=HM_CH[ch];lit=hmWide()?c.lit:"";
     call.classList.add('swp');setTimeout(()=>{ct.textContent=c.t;cd.textContent=c.d;call.classList.remove('swp')},mq.matches?0:140);
     dirty=true;
   }
