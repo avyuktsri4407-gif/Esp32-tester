@@ -1030,37 +1030,36 @@ html.bp-busy{overflow:hidden}
 /* header: the board chip sits next to the logo */
 .top .lft{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
 /* dock picker */
-.bpd{max-width:1320px}
-.bpd-head{margin:1vh auto 0;max-width:none;text-align:center}
-.bpd-head h2{font-size:clamp(28px,3.4vw,46px);text-wrap:balance}
-.bpd-head .bp-lead{margin:12px auto 0;font-size:clamp(15px,1.3vw,17px)}
-.bpd-stage{display:flex;align-items:stretch;gap:0;height:clamp(240px,25vw,330px);margin:2vh -6px 0}
-.bpd-i{--e:cubic-bezier(.23,1,.32,1);position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding-bottom:4px;
-  appearance:none;border:0;background:none;color:inherit;font:inherit;padding:0 2px;cursor:pointer;opacity:.6;filter:saturate(.7);
-  transition:flex-grow .3s var(--e),opacity .22s ease,filter .22s ease}
-.bpd-i .bp-fig{width:100%;margin:0;animation:none}
-.bpd-i.is-f{opacity:1;filter:none}
-.bpd-i::after{content:"";position:absolute;left:12%;right:12%;bottom:30px;height:34px;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.34),transparent);opacity:0;transform:scaleX(.6);transition:opacity .3s ease,transform .3s var(--e);pointer-events:none}
-.bpd-i.is-f::after{opacity:1;transform:none}
+.bpd{max-width:min(1640px,96vw)}
+.bpd-head{margin:0 auto;max-width:none;text-align:center;position:relative;z-index:3}
+.bpd-head h2{font-size:clamp(24px,2.6vw,38px);text-wrap:balance}
+.bpd-head .bp-lead{margin:8px auto 0;font-size:clamp(14px,1.2vw,16px)}
+.bpd-arena{position:relative;margin:0 0 0;height:clamp(380px,min(44vw,calc(100vh - 440px)),640px)}
+.bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;will-change:transform}
+.bpd-big{position:absolute;left:-4%;right:-4%;top:46%;margin:0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
+.bpd-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.1) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.6;animation:bpdletter .9s calc(var(--i)*.05s) cubic-bezier(.16,1,.3,1) both}
+.bpd-big.out{animation:bpdout .5s ease both}
+.bpd-big.out span{animation:none}
+@keyframes bpdletter{from{opacity:0;transform:translateY(9%) scale(1.07);filter:blur(14px)}60%{filter:blur(0)}to{opacity:.6;transform:none;filter:none}}
+@keyframes bpdout{to{opacity:0;transform:translateY(-50%) scale(.97)}}
+.bpd-stage{position:absolute;inset:0;overflow:visible;cursor:pointer}
+.bpd-fg{position:absolute;left:0;bottom:6%;width:400px;transform-origin:50% 100%;pointer-events:none;will-change:transform,opacity}
+.bpd-fg .bp-fig{display:block;width:100%;margin:0;animation:none}
+.bpd-glow{position:absolute;left:0;bottom:2%;height:11%;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.42),transparent);pointer-events:none;will-change:transform,width;z-index:0}
+.bpd-i{position:absolute;left:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:0 2px;appearance:none;border:0;background:none;color:inherit;font:inherit;pointer-events:none;z-index:200;will-change:transform}
 .bpd-i:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px}
-.bpd-n{display:block;font:600 12px/1.2 var(--f-body);color:var(--fg);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .2s ease}
-.bpd-f{display:block;font:500 10.5px/1 var(--f-mono);color:var(--faint);letter-spacing:.03em;transition:opacity .2s ease}
+.bpd-n{display:block;font:600 12px/1.2 var(--f-body);color:var(--fg);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .4s ease,color .2s ease}
+.bpd-f{display:block;font:500 10.5px/1 var(--f-mono);color:var(--faint);letter-spacing:.03em;transition:opacity .4s ease}
 .bpd-i.is-f .bpd-n,.bpd-i.is-f .bpd-f{opacity:0}
-.bpd-i:not(.is-f):hover .bpd-n{color:var(--accent-hi)}
-@media (prefers-reduced-motion:no-preference){
-  .bpd-i .bp-fig{animation:bpfloat 6.4s ease-in-out infinite;animation-delay:calc(var(--i)*-.8s)}
-  .bpd-i:active{transform:scale(.985)}
-}
-@media (prefers-reduced-motion:reduce){.bpd-i{transition:opacity .2s ease,filter .2s ease}.bpd-i::after{transition:opacity .2s ease}}
-.bpd-cap{display:flex;flex-direction:column;align-items:center;text-align:center;margin:22px auto 5vh;max-width:40em;min-height:10.5em}
+.bpd-cap{display:flex;flex-direction:column;align-items:center;text-align:center;margin:6px auto 5vh;max-width:40em;min-height:10.5em;position:relative;z-index:3}
 .bpd-cap h3{margin:0;font:500 clamp(24px,2.4vw,32px)/1.15 var(--f-body);letter-spacing:-.015em;color:var(--fg)}
 .bpd-t{margin:8px 0 0;color:var(--muted);font-size:16px;line-height:1.5}
 .bpd-m{margin:8px 0 18px;font:500 12px/1.5 var(--f-mono);color:var(--faint);letter-spacing:.02em}
-.bpd-cap.in>*{animation:bpdin .22s cubic-bezier(.23,1,.32,1) both}
-.bpd-cap.in>*:nth-child(2){animation-delay:30ms}.bpd-cap.in>*:nth-child(3){animation-delay:60ms}.bpd-cap.in>*:nth-child(4){animation-delay:90ms}
-@keyframes bpdin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.bpd-cap.in>*{animation:none}}
-.bpk.go .bpd-i,.bpk.go .bpd-cap{opacity:.25;transition:opacity .4s}
+.bpd-cap.in>*{animation:bpdin .5s cubic-bezier(.16,1,.3,1) both}
+.bpd-cap.in>*:nth-child(2){animation-delay:50ms}.bpd-cap.in>*:nth-child(3){animation-delay:100ms}.bpd-cap.in>*:nth-child(4){animation-delay:150ms}
+@keyframes bpdin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.bpd-cap.in>*,.bpd-big span{animation:none}.bpd-big.out{display:none}}
+.bpk.go .bpd-fg,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{opacity:.25;transition:opacity .4s}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -8387,8 +8386,8 @@ const BP_FAMS=[
   ['c6','ESP32-C6','Wi-Fi 6, Thread and Zigbee.']
 ];
 function pickBoard(){BRD.picking=true;show('home');window.scrollTo(0,0)}
-function pickerDraw(svg,id,az,t,lab){
-  const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,34,1.02,f.focus.hero);
+function pickerDraw(svg,id,az,t,lab,elv,zm){
+  const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,elv||34,zm||1.02,f.focus.hero);
   let g=svg.querySelector('g');if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');svg.append(g)}
   g.innerHTML=f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:!lab,W,H});
 }
@@ -8463,62 +8462,130 @@ function pickerGrid(b){
 const BP_STYLE='dock'; /* 'grid' brings back the earlier picker with one card per board */
 const DK_ORDER=['xiaoc3','c3sm','c3dk','c6dk','devkit','mini32','espcam','s3dk','xiaos3','s2mini'];
 const DK_SHORT={devkit:'DevKit V1',mini32:'Mini32',espcam:'ESP32-CAM',s3dk:'DevKitC-1',xiaos3:'XIAO',c3dk:'DevKitM-1',c3sm:'SuperMini',xiaoc3:'XIAO',s2mini:'S2 Mini',c6dk:'DevKitC-1'};
-const DK_G=[4.7,1.45,1.15];
+const DK_BIG={devkit:'ESP32',mini32:'MINI32',espcam:'CAM',s3dk:'S3',xiaos3:'XIAO S3',c3dk:'C3',c3sm:'SUPERMINI',xiaoc3:'XIAO C3',s2mini:'S2 MINI',c6dk:'C6'};
+const DK_W=[5,1.6,1.3,1.15]; /* cell weight by distance from the focus */
 function pickerPage(b){
   const dock=BP_STYLE==='dock'&&matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)').matches;
   return dock?pickerDock(b):pickerGrid(b);
 }
 function pickerDock(b){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const defs=document.createElementNS('http://www.w3.org/2000/svg','svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
+  const NS='http://www.w3.org/2000/svg';
+  const defs=document.createElementNS(NS,'svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
   defs.innerHTML='<defs><radialGradient id="hmGr"><stop offset="0" stop-color="#ff5a50" stop-opacity=".75"/><stop offset="1" stop-color="#ff5a50" stop-opacity="0"/></radialGradient><radialGradient id="hmGb"><stop offset="0" stop-color="#5a9bff" stop-opacity=".75"/><stop offset="1" stop-color="#5a9bff" stop-opacity="0"/></radialGradient></defs>';
-  const list=DK_ORDER.map(id=>BRD.by(id)),items=[],az=list.map((_,i)=>38+(i%5)*9);
-  let focus=DK_ORDER.indexOf('devkit'),lockUntil=0,inside=false,px=0,py=0,raf=0,last=0,rec=0;
+  const list=DK_ORDER.map(id=>BRD.by(id)),n=list.length;
+  let focus=DK_ORDER.indexOf('devkit'),fp=focus,fv=0,raf=0,last=0,changed=0,SW=1200,SH=520;
+  let tpx=0,tpy=0,ppx=0,ppy=0,bigEl=null,hlast=0,hcost=4;
+  const cur=list.map(()=>({az:NaN,el:NaN,lab:null}));
   const cap=el('div',{class:'bpd-cap','aria-live':'polite'});
+  const arena=el('div',{class:'bpd-arena'});
+  const bigw=el('div',{class:'bpd-bigw','aria-hidden':'true'});
+  const glow=el('div',{class:'bpd-glow','aria-hidden':'true'});
   const stage=el('div',{class:'bpd-stage',role:'group','aria-label':'ESP32 boards'});
+  const figs=[],btns=[];
   list.forEach((bd,i)=>{
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    const svg=document.createElementNS(NS,'svg');
     svg.setAttribute('class','hm-svg bp-svg');svg.setAttribute('viewBox','0 0 400 300');svg.setAttribute('aria-hidden','true');
-    const it=el('button',{type:'button',class:'bpd-i','data-id':bd.id,style:'--i:'+i,'aria-label':bd.n+', '+BRD.CHIPS[bd.fam].n},
-      el('span',{class:'bp-fig isoc'},svg),el('span',{class:'bpd-n'},DK_SHORT[bd.id]),el('span',{class:'bpd-f'},BRD.CHIPS[bd.fam].n.replace('ESP32-','')||'ESP32'));
-    it.addEventListener('pointerenter',e=>{if(e.pointerType==='touch'||performance.now()<lockUntil)return;setFocus(i)});
-    it.addEventListener('focus',()=>setFocus(i));
-    it.addEventListener('click',e=>{if(e.pointerType==='touch'&&i!==focus){setFocus(i);return}pickerGo(bd.id,it)});
-    items.push(it);stage.append(it);
+    const fg=el('div',{class:'bpd-fg','aria-hidden':'true'},el('span',{class:'bp-fig isoc'},svg));
+    const bt=el('button',{type:'button',class:'bpd-i','data-id':bd.id,'aria-label':bd.n+', '+BRD.CHIPS[bd.fam].n},
+      el('span',{class:'bpd-n'},DK_SHORT[bd.id]),el('span',{class:'bpd-f'},BRD.CHIPS[bd.fam].n.replace('ESP32-','')||'ESP32'));
+    bt.addEventListener('focus',()=>setFocus(i));
+    figs.push(fg);btns.push(bt);stage.append(fg);
   });
-  const draw=(i,lab)=>pickerDraw(items[i].querySelector('svg'),list[i].id,az[i],performance.now()/1000,lab);
+  btns.forEach(x=>stage.append(x));
+  stage.append(glow);
+  arena.append(bigw,stage);
+  const wt=d=>{d=Math.abs(d);if(d>=3)return DK_W[3];const i=Math.floor(d),f=d-i;return DK_W[i]+(DK_W[i+1]-DK_W[i])*f};
+  function cells(f){
+    const w=list.map((_,k)=>wt(k-f)),sum=w.reduce((a,c)=>a+c,0);let x=0;
+    return w.map(v=>{const c={x0:x,w:v/sum*SW,cx:x+v/sum*SW/2};x+=c.w;return c});
+  }
+  function measure(){const r=stage.getBoundingClientRect();SW=Math.max(300,r.width);SH=Math.max(200,r.height);fitBig()}
+  function fitBig(){
+    if(!bigEl)return;const len=bigEl.textContent.length;
+    bigEl.style.fontSize=Math.round(Math.min(SH*1.02,SW*.94/(len*.56)))+'px';
+  }
+  function setBig(txt){
+    const old=bigEl;
+    bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i},c===' '?' ':c)));
+    fitBig();
+    if(old){old.classList.add('out');setTimeout(()=>old.remove(),reduce?0:520)}
+    bigw.append(bigEl);
+  }
+  const clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
+  function render(dt,t){
+    const cs=cells(fp);
+    const want=[];
+    list.forEach((bd,k)=>{
+      const d=k-fp,ad=Math.abs(d),ph=clamp(1-ad,0,1),c=cs[k];
+      const vf=1.3+.34*clamp(ad,0,1.6)/1.6*1.6;           /* hero is drawn a little over its cell, the rest a little more */
+      const s=c.w*vf/400;
+      const bob=ph*(24+8*Math.sin(t*1.15))+(1-ph)*(2.5*Math.sin(t*.9+k*1.7));
+      const rot=ph*ppx*1.6;
+      const f=figs[k];
+      f.style.transform='translate3d('+(c.cx-200).toFixed(1)+'px,'+(-bob).toFixed(1)+'px,0) scale('+s.toFixed(4)+') rotate('+rot.toFixed(2)+'deg)';
+      f.style.opacity=(.4+.6*ph).toFixed(3);
+      f.style.zIndex=String(100-Math.round(ad*10));
+      f.classList.toggle('is-f',k===focus);
+      const bt=btns[k];bt.style.transform='translate3d('+c.x0.toFixed(1)+'px,0,0)';bt.style.width=c.w.toFixed(1)+'px';
+      /* where the camera sits: the board in focus sways and follows the pointer, the others turn their faces towards it */
+      const az=ad<.5&&k===focus||k===focus?42+25*Math.sin(t*.4)+ppx*24:clamp(42-clamp(d,-3.2,3.2)*13,3,86)+3*Math.sin(t*.33+k);
+      const e=k===focus?29+6*Math.sin(t*.27+1)-ppy*9:31+2*Math.sin(t*.21+k);
+      const lab=k===focus&&Math.abs(fp-focus)<.22;
+      const o=cur[k],da=Math.abs(az-o.az)||99,de=Math.abs(e-o.el)||99;
+      if(lab!==o.lab||da>.55||de>.55)want.push({k,az,e,lab,sc:(lab!==o.lab?200:0)+(k===focus?100:0)+da+de,hero:k===focus});
+    });
+    want.sort((a,c)=>c.sc-a.sc);let spent=0;const t0=performance.now();
+    for(const w of want){
+      const o=cur[w.k],first=isNaN(o.az),flip=w.lab!==o.lab;
+      if(w.hero&&!first&&!flip&&t0-hlast<hcost*1.25)continue;      /* a slow drawing only gets a new camera as often as it can afford */
+      if(!w.hero&&!first&&!flip&&(spent>=2||performance.now()-t0>9))continue;
+      if(!w.hero)spent++;
+      o.az=w.az;o.el=w.e;o.lab=w.lab;
+      const a0=performance.now();pickerDraw(figs[w.k].querySelector('svg'),list[w.k].id,w.az,t,w.lab,w.e);
+      if(w.hero){hcost=hcost*.7+(performance.now()-a0)*.3;hlast=performance.now()}
+    }
+    const hc=cs[Math.round(clamp(fp,0,n-1))];
+    glow.style.transform='translate3d('+(hc.cx-hc.w*.62).toFixed(1)+'px,0,0)';glow.style.width=(hc.w*1.24).toFixed(1)+'px';
+    bigw.style.transform='translate3d('+(-ppx*22).toFixed(1)+'px,'+(-ppy*12).toFixed(1)+'px,0)';
+  }
   function tick(now){
     raf=0;if(!b.isConnected)return;
     const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
-    az[focus]+=dt*16;draw(focus,true);raf=requestAnimationFrame(tick);
+    const om=4.4,x=om*dt,e=1/(1+x+.48*x*x+.235*x*x*x),ch=fp-focus,tmp=(fv+om*ch)*dt;
+    fv=(fv-om*tmp)*e;fp=focus+(ch+tmp)*e;
+    if(Math.abs(fp-focus)<.0005&&Math.abs(fv)<.001){fp=focus;fv=0}
+    const k=1-Math.exp(-dt*3.2);ppx+=(tpx-ppx)*k;ppy+=(tpy-ppy)*k;
+    render(dt,now/1000);raf=requestAnimationFrame(tick);
   }
   function paintCap(){
     const bd=list[focus];
     cap.replaceChildren(el('h3',{},bd.n),el('p',{class:'bpd-t'},bd.tag),
       el('p',{class:'bpd-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.'),
-      btn('Use this board',()=>pickerGo(bd.id,items[focus]),'primary'));
+      btn('Use this board',()=>pickerGo(bd.id,figs[focus]),'primary'));
     cap.classList.remove('in');void cap.offsetWidth;cap.classList.add('in');
   }
-  function apply(prev){
-    items.forEach((it,k)=>{it.style.flexGrow=String(DK_G[Math.abs(k-focus)]??1);it.classList.toggle('is-f',k===focus);it.setAttribute('aria-current',k===focus?'true':'false')});
-    if(prev!=null&&prev!==focus)draw(prev,false);
-    draw(focus,true);paintCap();
-    if(!reduce&&!raf){last=0;raf=requestAnimationFrame(tick)}
-  }
   function setFocus(i){
-    if(i===focus)return;const prev=focus;focus=i;lockUntil=performance.now()+300;apply(prev);
-    clearTimeout(rec);rec=setTimeout(()=>{ /* the row moved under a still pointer: follow whatever it is over now */
-      if(!inside||!b.isConnected)return;const e=document.elementFromPoint(px,py),it=e&&e.closest&&e.closest('.bpd-i');
-      if(it&&it!==items[focus])setFocus(items.indexOf(it));
-    },320);
+    if(i===focus)return;focus=i;changed=performance.now();
+    btns.forEach((x,k)=>{x.classList.toggle('is-f',k===focus);x.setAttribute('aria-current',k===focus?'true':'false')});
+    setBig(DK_BIG[list[focus].id]);paintCap();
+    if(reduce){fp=focus;fv=0;render(0,0)}
   }
-  stage.addEventListener('pointermove',e=>{px=e.clientX;py=e.clientY;inside=true});
-  stage.addEventListener('pointerleave',()=>{inside=false});
+  /* pointer: which board is under it is decided on the layout the focus is heading for, so the row can move without the choice flickering */
+  stage.addEventListener('pointermove',e=>{
+    if(e.pointerType==='touch')return;
+    const r=stage.getBoundingClientRect(),x=e.clientX-r.left;
+    tpx=clamp(x/r.width*2-1,-1,1);tpy=clamp((e.clientY-r.top)/r.height*2-1,-1,1);
+    if(performance.now()-changed<160)return;
+    const cs=cells(focus);let hit=cs.findIndex(c=>x>=c.x0&&x<c.x0+c.w);
+    if(hit>=0&&hit!==focus)setFocus(hit);
+  });
+  stage.addEventListener('pointerleave',()=>{tpx=0;tpy=0});
+  stage.addEventListener('click',()=>pickerGo(list[focus].id,figs[focus]));
   stage.addEventListener('keydown',e=>{
     const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;
-    const n=items.indexOf(document.activeElement)+d;if(n>=0&&n<items.length){e.preventDefault();items[n].focus()}
+    const k=btns.indexOf(document.activeElement)+d;if(k>=0&&k<n){e.preventDefault();btns[k].focus()}
   });
-  list.forEach((_,k)=>{if(k!==focus)draw(k,false)});
   const help=el('details',{class:'bp-help'},el('summary',{},'Not sure which board you have?'),
     el('ul',{class:'hm-list'},
       el('li',{},el('b',{},'Read the name.'),' It is usually printed on the board or in the seller’s listing.'),
@@ -8529,10 +8596,15 @@ function pickerDock(b){
     el('div',{class:'bp-head bpd-head'},
       el('h2',{},'Which board are you testing with?'),
       el('p',{class:'bp-lead'},'Move over a board to look closer, click the one on your desk. The steps, the firmware and the parts that fit change with it.')),
-    stage,cap,
+    arena,cap,
     el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),help);
   b.append(root);
-  apply(null);
+  measure();
+  if(window.ResizeObserver){new ResizeObserver(()=>{if(b.isConnected){measure();if(reduce)render(0,0)}}).observe(stage)}
+  btns[focus].classList.add('is-f');btns[focus].setAttribute('aria-current','true');
+  setBig(DK_BIG[list[focus].id]);paintCap();
+  render(0,performance.now()/1000);
+  if(!reduce)raf=requestAnimationFrame(tick);
 }
 
 /* header chip: shows the chosen board, opens the picker */
