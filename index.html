@@ -7362,6 +7362,7 @@ const objs=[];
 const add=(id,tag,grp,o,b,draw,after)=>objs.push({id,tag,grp,o,box:[b[0]+o[0],b[1]+o[1],b[2]+o[2],b[3]+o[0],b[4]+o[1],b[5]+o[2]],draw,after:after||[]});
 const NP=15,PX0=-41.3,PIN_X=Array.from({length:NP},(_,i)=>+(PX0+i*5.08).toFixed(2)),PIN_Y=[-25.4,25.4];
 /* DevKit V1 30-pin order, antenna end first; the same labels as the pin map of the tester */
+/* maker chart (USB at the bottom): LAB_L is the left column, LAB_R the right. The drawing's y axis runs to the screen right in that view, so the left column sits at LBL_R */
 const LAB_L=['EN','VP','VN','34','35','32','33','25','26','27','14','12','13','GND','VIN'];
 const LAB_R=['23','22','TX0','RX0','21','19','18','5','TX2','RX2','4','2','15','GND','3V3'];
 
@@ -7561,7 +7562,7 @@ function pinLabels(P,o){
     return false;
   };
   PIN_X.forEach((x,i)=>{
-    const l=LAB_L[NP-1-i],r=LAB_R[NP-1-i];
+    const l=LAB_R[NP-1-i],r=LAB_L[NP-1-i];
     if(!hidden(x,LBL_L,l.length))s+=K.faceTextSvg(K.topMatrix([x-.7,LBL_L],T,Pl,'y'),l,{size:2.3,tone:'hi'});
     if(!hidden(x,LBL_R,r.length))s+=K.faceTextSvg(K.topMatrix([x-.7,LBL_R],T,Pl,'y'),r,{size:2.3,tone:'hi'});
   });
@@ -7746,7 +7747,7 @@ return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,onChange:f=>subs.push(f
 })();
 /* ---- Board figures: every board in the picker, drawn with the Anatomy iso kit (ISO) like the DevKit in homefig.js.
    Shapes are schematic: sizes, ports, buttons, headers and the module are right in kind, not measured to the millimetre.
-   Pin names are printed only where the maker's pin table is known (the XIAO boards). Spec numbers are millimetres, drawing units are 2 x mm. ---- */
+   Pin names come from the maker's own pin charts (see the table block above SPECS). Spec numbers are millimetres, drawing units are 2 x mm. ---- */
 const BD=(()=>{
 const K=ISO,T=3.2,BO=[0,0,21.1],PL=11,m=v=>v*2;
 const R=(x0,y0,x1,y1,r=0)=>({x:x0,y:y0,w:x1-x0,d:y1-y0,r});
@@ -7768,47 +7769,62 @@ const meander=(xa,xb,ya,yb,n)=>{const p=[];for(let i=0;i<=n;i++){const x=xa+(xb-
 
 /* ---------- the boards: mm, board centred on the origin, USB at the -x end, antenna at +x ---------- */
 const XIAO_L=['D0','D1','D2','D3','D4','D5','D6'],XIAO_R=['5V','GND','3V3','D10','D9','D8','D7'];
+/* maker pin tables (Espressif user guides, J1 and J3). The guides list pins from the antenna end, the drawing counts from the USB end, so the lists are turned round */
+const rv=a=>a.slice().reverse();
+const S3_J1=['3V3','3V3','RST','4','5','6','7','15','16','17','18','8','3','46','9','10','11','12','13','14','5V','G'];
+const S3_J3=['G','TX','RX','1','2','42','41','40','39','38','37','36','35','0','45','48','47','21','20','19','G','G'];
+const C3_J1=['GND','3V3','3V3','2','3','GND','RST','GND','0','1','10','GND','5V','5V','GND'];
+const C3_J3=['GND','TX','RX','GND','9','8','GND','7','6','5','4','GND','18','19','GND'];
+const C6_J1=['3V3','RST','4','5','6','7','0','1','8','10','11','2','3','5V','G','NC'];
+const C6_J3=['G','TX','RX','15','23','22','21','20','19','18','9','G','13','12','G','NC'];
+const SM_R=['5V','GND','3V3','4','3','2','1','0'],SM_L=['5','6','7','8','9','10','20','21'];
+/* D1 mini32 (two independent maker diagrams agree: espboards.dev and the Wemos D1 mini32 chart), S2 Mini (Wemos docs 4-column chart), ESP32-CAM (espboards.dev and Random Nerd Tutorials, camera face up, camera end at the top). All read top to bottom with the antenna or camera end up, left column first */
+const M32_IL=['RST','36','26','18','19','23','5','3V3','13','10'],M32_IR=['TX','RX','22','21','17','16','G','5V','15','7'];
+const M32_OL=['G','NC','39','35','33','34','14','NC','9','11'],M32_OR=['G','27','25','32','12','4','0','2','8','6'];
+const S2_OL=['EN','3','5','7','9','11','12','3V3'],S2_IL=['1','2','4','6','8','10','13','14'];
+const S2_IR=['40','38','36','34','21','17','G','15'],S2_OR=['39','37','35','33','18','16','G','VBUS'];
+const CAM_L=['5V','G','12','13','15','14','2','4'],CAM_R=['3V3','16','0','G','VCC','U0R','U0T','G'];
 const SPECS={
  mini32:{n:'ESP32 Mini',big:'MINI32',L:39,W:31,r:2,
-  rows:[{y:14.2,x0:-8.9,n:8,st:'pin'},{y:-14.2,x0:-8.9,n:8,st:'pin'},{y:11.7,x0:-9.5,n:12,st:'pin'},{y:-11.7,x0:-9.5,n:12,st:'pin'}],
+  rows:[{y:-13.97,x0:-10.8,n:10,st:'pin',out:1,lab:rv(M32_OL)},{y:13.97,x0:-10.8,n:10,st:'pin',out:1,lab:rv(M32_OR)},{y:-11.43,x0:-10.8,n:10,st:'pin',lab:rv(M32_IL)},{y:11.43,x0:-10.8,n:10,st:'pin',lab:rv(M32_IR)}],
   usb:[{x:-19.5,y:0,k:'micro'}],mod:{k:'wroom',x0:-5.5,x1:19.5,y0:-9,y1:9,sx1:12,t:'ESP32-WROOM-32',t2:'Wi-Fi + Bluetooth'},
-  bridge:{x:-12.5,y:-6.5,w:5,d:4,t:'CH340C'},reg:{x:-12.5,y:7},btn:[{x:-15.5,y:9.2,s:3.2},{x:-15.5,y:-9.2,s:3.2}],leds:[{x:-7.5,y:-6,c:'b'}],
-  silk:[{t:'ESP32 MINI',x:-13,y:0,s:2.4,f:1}]},
+  bridge:{x:-12.5,y:-6.5,w:5,d:4,t:'CH340C'},reg:{x:-12.5,y:7},btn:[{x:-16.3,y:-11.9,s:3.2}],leds:[{x:-14.3,y:12.8,c:'b'},{x:-17,y:12.8,c:'r'}],
+  silk:[{t:'MINI32 V1.0.0',x:-13,y:0,s:2,f:1}]},
  s3dk:{n:'ESP32-S3 DevKitC-1',big:'S3',L:70,W:25.4,r:2,
-  rows:[{y:11.43,x0:-20,n:22,st:'pin'},{y:-11.43,x0:-20,n:22,st:'pin'}],
+  rows:[{y:-11.43,x0:-20,n:22,st:'pin',lab:rv(S3_J1)},{y:11.43,x0:-20,n:22,st:'pin',lab:rv(S3_J3)}],
   usb:[{x:-35,y:-6.5,k:'c'},{x:-35,y:6.5,k:'c'}],mod:{k:'wroom',x0:9.5,x1:35,y0:-9,y1:9,sx1:26.5,t:'ESP32-S3-WROOM-1',t2:'Wi-Fi + Bluetooth LE'},
   bridge:{x:-24,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-18,y:-5.5},btn:[{x:-28.5,y:-9.8,s:3.2},{x:-28.5,y:9.8,s:3.2}],leds:[{x:-12,y:0,c:'b',rgb:1}],
   silk:[{t:'ESP32-S3-DevKitC-1',x:-8,y:-7.5,s:2.4,f:1}]},
  xiaos3:{n:'XIAO ESP32-S3',big:'XIAO',L:21,W:17.8,r:1.4,
-  rows:[{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
+  rows:[{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
   usb:[{x:-10.5,y:0,k:'c'}],mod:{k:'can',x0:-1.5,x1:8.5,y0:-5.4,y1:5.4,t:'ESP32-S3'},
   btn:[{x:-3.4,y:-2.8,s:2.2},{x:-3.4,y:2.8,s:2.2}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
  c3dk:{n:'ESP32-C3 DevKitM-1',big:'C3',L:54.4,W:25.4,r:2,
-  rows:[{y:11.43,x0:-12,n:15,st:'pin'},{y:-11.43,x0:-12,n:15,st:'pin'}],
+  rows:[{y:-11.43,x0:-12,n:15,st:'pin',lab:rv(C3_J1)},{y:11.43,x0:-12,n:15,st:'pin',lab:rv(C3_J3)}],
   usb:[{x:-27.2,y:0,k:'micro'}],mod:{k:'wroom',x0:10.6,x1:27.2,y0:-6.6,y1:6.6,sx1:23.2,t:'ESP32-C3-MINI-1',t2:'Wi-Fi + Bluetooth LE'},
   bridge:{x:-17.5,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-10.5,y:-6},btn:[{x:-22,y:-9.2,s:3.2},{x:-22,y:9.2,s:3.2}],leds:[{x:-9,y:3.5,c:'b',rgb:1}],
   silk:[{t:'ESP32-C3-DevKitM-1',x:-8,y:-4,s:2.2,f:1}]},
  c3sm:{n:'ESP32-C3 SuperMini',big:'C3',L:22.5,W:18,r:1.2,
-  rows:[{y:7.7,x0:-8.9,n:8,st:'cast'},{y:-7.7,x0:-8.9,n:8,st:'cast'}],
+  rows:[{y:-7.7,x0:-8.9,n:8,st:'cast',lab:SM_R},{y:7.7,x0:-8.9,n:8,st:'cast',lab:SM_L}],
   usb:[{x:-11.25,y:0,k:'c'}],mod:{k:'can',x0:-3.2,x1:3.6,y0:-3.4,y1:3.4,t:'ESP32-C3'},ant:{x0:5.4,x1:10.6,y0:-4.5,y1:4.5},
   reg:{x:-6.2,y:0},btn:[{x:-5.8,y:-5,s:2.2},{x:-5.8,y:5,s:2.2}],leds:[{x:0,y:-5.4,c:'b'}],silk:[]},
  xiaoc3:{n:'XIAO ESP32-C3',big:'XIAO',L:21,W:17.8,r:1.4,
-  rows:[{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
+  rows:[{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
   usb:[{x:-10.5,y:0,k:'c'}],mod:{k:'can',x0:-1.2,x1:7.2,y0:-4.8,y1:4.8,t:'ESP32-C3'},
   btn:[{x:-3.4,y:-2.8,s:2.2},{x:-3.4,y:2.8,s:2.2}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
  s2mini:{n:'LOLIN S2 Mini',big:'S2',L:34.3,W:25.4,r:1.6,
-  rows:[{y:11.4,x0:-8.9,n:8,st:'pin'},{y:-11.4,x0:-8.9,n:8,st:'pin'},{y:8.9,x0:-8.9,n:8,st:'pin'},{y:-8.9,x0:-8.9,n:8,st:'pin'}],
+  rows:[{y:-11.43,x0:-8.4,n:8,st:'pin',out:1,lab:rv(S2_OL)},{y:11.43,x0:-8.4,n:8,st:'pin',out:1,lab:rv(S2_OR)},{y:-8.89,x0:-8.4,n:8,st:'pin',lab:rv(S2_IL)},{y:8.89,x0:-8.4,n:8,st:'pin',lab:rv(S2_IR)}],
   usb:[{x:-17.15,y:0,k:'c'}],mod:{k:'can',x0:-4,x1:5,y0:-5,y1:5,t:'ESP32-S2'},ant:{x0:8.5,x1:16.2,y0:-5.4,y1:5.4},
-  reg:{x:-12.5,y:3.2},btn:[{x:-13.8,y:-6.4,s:3},{x:-13.8,y:6.4,s:3}],leds:[{x:-10,y:-3,c:'b'}],silk:[{t:'S2 MINI',x:-2,y:0,s:2.2,f:1}]},
+  reg:{x:-12.5,y:-3.2},btn:[{x:-13.8,y:-6.4,s:3},{x:-13.8,y:6.4,s:3}],leds:[{x:-10,y:3,c:'b'}],silk:[{t:'S2 MINI',x:-2,y:0,s:2.2,f:1},{t:'RST',x:-9.4,y:-6.4,s:1.4,f:1},{t:'0',x:-9.4,y:6.4,s:1.4,f:1}]},
  c6dk:{n:'ESP32-C6 DevKitC-1',big:'C6',L:51.9,W:25.4,r:2,
-  rows:[{y:11.43,x0:-18,n:16,st:'pin'},{y:-11.43,x0:-18,n:16,st:'pin'}],
+  rows:[{y:-11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J1)},{y:11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J3)}],
   usb:[{x:-25.95,y:-6.5,k:'c'},{x:-25.95,y:6.5,k:'c'}],mod:{k:'wroom',x0:0.5,x1:25.95,y0:-9,y1:9,sx1:17,t:'ESP32-C6-WROOM-1',t2:'Wi-Fi 6 + Bluetooth LE'},
   bridge:{x:-16.2,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-9.5,y:-5.5},btn:[{x:-21,y:-9.8,s:3.2},{x:-21,y:9.8,s:3.2}],leds:[{x:-10,y:2.2,c:'b',rgb:1}],
   silk:[{t:'ESP32-C6-DevKitC-1',x:-7,y:6.5,s:2.2,f:1}]},
  espcam:{n:'ESP32-CAM',big:'CAM',L:40,W:27,r:1,
-  rows:[{y:12.1,x0:-6,n:8,st:'pad'},{y:-12.1,x0:-6,n:8,st:'pad'}],
+  rows:[{y:-12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_L)},{y:12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_R)}],
   mod:{k:'wroom',x0:-20,x1:4,y0:-8,y1:8,sx0:-12.5,sx1:4,t:'ESP-32S',t2:'AI-Thinker',ant:1},cam:{x:11.5,y:0},
-  btn:[],leds:[],flash:{x:4.2,y:-6},silk:[{t:'ESP32-CAM',x:6,y:7.4,s:2.3,f:1}]}
+  btn:[],leds:[],flash:{x:-12,y:9.8},silk:[{t:'ESP32-CAM',x:6,y:7.4,s:2.3,f:1}]}
 };
 
 function make(id,sp){
@@ -8047,7 +8063,7 @@ function make(id,sp){
       return false;
     };
     for(const r of labelled){
-      const px=xs(r.x0,r.n),ly=m(r.y)-(r.y>0?1:-1)*(r.st==='cast'?6.2:4.4);
+      const px=xs(r.x0,r.n),ly=m(r.y)+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?6.2:4.4);
       px.forEach((x,i)=>{const t=r.lab[i],X=m(x);if(t&&!hidden(X,ly,t.length))s+=K.faceTextSvg(K.topMatrix([X-t.length*.7,ly-.6],T,Pl,'x'),t,{size:2.3,tone:'hi'})});
     }
     return `<g class="hm-pl">${s}</g>`;
