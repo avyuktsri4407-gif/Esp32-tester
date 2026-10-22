@@ -985,7 +985,7 @@ body.has-rec #toast{bottom:104px}
 #bBoard{display:inline-flex;align-items:center;gap:7px;max-width:15em}
 #bBoard .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #bBoard.none{border-color:var(--accent-line);color:var(--accent-hi)}
-@media (max-width:640px){#bBoard .bn{display:none}}
+@media (max-width:640px){#bBoard .bn{max-width:92px}}
 .ni.nok{opacity:.5}.ni.nok:hover,.ni.nok[aria-current="true"]{opacity:.85}
 .hm-chip.nok{opacity:.45;border-style:dashed}
 .pal-row.nok{opacity:.55}
@@ -1019,10 +1019,10 @@ body.has-rec #toast{bottom:104px}
 .bp-help>summary{cursor:pointer;padding:14px 0;font:500 14.5px var(--f-body)}
 .bp-help .hm-list{padding:0 0 16px}
 .bpk.go .bp-card{opacity:.3;transition:opacity .4s}
-.bp-grow{position:fixed;z-index:80;background:var(--bg);border-radius:var(--r-lg);overflow:hidden;pointer-events:none;transition:left .56s cubic-bezier(.65,0,.25,1),top .56s cubic-bezier(.65,0,.25,1),width .56s cubic-bezier(.65,0,.25,1),height .56s cubic-bezier(.65,0,.25,1),border-radius .56s}
+.bp-grow{position:fixed;z-index:80;background:var(--bg);border-radius:var(--r-lg);overflow:hidden;pointer-events:none;transition:left .42s cubic-bezier(.23,1,.32,1),top .42s cubic-bezier(.23,1,.32,1),width .42s cubic-bezier(.23,1,.32,1),height .42s cubic-bezier(.23,1,.32,1),border-radius .42s}
 .bp-grow.on{border-radius:0}
 .bp-grow .hm-svg{position:absolute;inset:0;width:100%;height:100%}
-.bp-grow.out{opacity:0;transition:opacity .5s ease}
+.bp-grow.out{opacity:0;transition:opacity .3s cubic-bezier(.23,1,.32,1)}
 html.bp-busy{overflow:hidden}
 
 #bSearch.locked,#navQ.locked{opacity:.45;cursor:not-allowed}
@@ -1032,41 +1032,46 @@ html.bp-busy{overflow:hidden}
 /* wheel picker */
 .bpd{max-width:min(1700px,97vw);padding-bottom:3vh}
 .bpd{position:relative}
+.bpd-head::before{content:'';position:absolute;inset:-26px -50px -22px -30px;background:radial-gradient(closest-side,rgba(10,10,12,.82) 55%,transparent);z-index:-1}
 .bpd-head{position:absolute;left:8px;top:0;margin:0;max-width:21em;text-align:left;z-index:6;pointer-events:none}
-.bpd-head h2{font-size:clamp(22px,2.3vw,34px);text-wrap:balance}
-.bpd-head .bp-lead{margin:6px 0 0;font-size:clamp(13px,1.1vw,15px)}
+.bpd-head h2{font-size:clamp(22px,2.3vw,34px);text-wrap:balance;text-shadow:0 0 18px var(--bg),0 0 6px var(--bg)}
+.bpd-head .bp-lead{text-shadow:0 0 14px var(--bg),0 0 5px var(--bg);margin:6px 0 0;font-size:clamp(13px,1.1vw,15px)}
 .bpd-arena{position:relative;height:clamp(560px,calc(100vh - 150px),900px);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
 .bpd-arena.drag{cursor:grabbing}
-.bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;will-change:transform}
+.bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;will-change:transform;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
 .bpd-big{position:absolute;left:-4%;right:-4%;top:40%;margin:0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.bpd-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.1) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.55;animation:bpdletter .5s calc(var(--i)*.025s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big span{display:inline-block;padding-bottom:.12em;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.1) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.55;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:.55;transform:none}}
 @keyframes bpdout{to{opacity:0}}
-.bpd-stage{position:absolute;inset:0;overflow:hidden}
+.bpd-stage{position:absolute;inset:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
 .bpd-tf{position:absolute;left:0;top:0;display:block;padding:0;margin:0;appearance:none;border:0;background:none;color:inherit;font:inherit;cursor:pointer;transform-origin:50% 100%;will-change:transform,opacity;-webkit-tap-highlight-color:transparent;outline-offset:6px}
 .bpd-tf:focus-visible{outline:2px solid var(--accent);border-radius:14px}
 .bpd-tf .bp-fig{position:absolute;inset:0;display:block;margin:0;animation:none;aspect-ratio:auto}
-.bpd-tf .bp-svg{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .25s ease-out}
+.bpd-tf .bp-svg{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .2s cubic-bezier(.23,1,.32,1)}
 .bpd-tf .l{opacity:0}.bpd-tf.is-f .l{opacity:1}.bpd-tf.is-f .n{opacity:0}
 .bpd-lb{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;pointer-events:none;will-change:transform,opacity}
 .bpd-lb b{font:600 13px/1.2 var(--f-body);color:var(--fg)}
 .bpd-lb i{font:500 11px/1 var(--f-mono);font-style:normal;color:var(--faint);letter-spacing:.03em}
 .bpd-glow{position:absolute;height:40px;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.4),transparent);pointer-events:none;will-change:transform}
 .bpd-hint{position:absolute;right:6px;top:6px;z-index:6;font:500 11px var(--f-mono);color:var(--faint);letter-spacing:.04em;pointer-events:none}
-.bpd-nav{position:absolute;top:44%;z-index:7;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(20,20,22,.6);color:var(--fg);display:grid;place-items:center;cursor:pointer;transition:transform .16s ease-out,background .2s}
+.bpd-nav{position:absolute;top:44%;z-index:7;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(20,20,22,.88);color:var(--fg);display:grid;place-items:center;cursor:pointer;transition:transform .16s cubic-bezier(.23,1,.32,1),background .2s cubic-bezier(.23,1,.32,1)}
+@media (hover:hover) and (pointer:fine){.bpd-nav:hover{background:rgba(48,48,54,.95)}}
+.bpd-nav:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .bpd-nav:active{transform:scale(.94)}
 .bpd-nav.l{left:8px}.bpd-nav.r{right:8px}
-.bpd-cap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:min(40em,70%)}
+.bpd-cap{user-select:text;-webkit-user-select:text;position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:min(40em,70%)}
 .bpd-cap h3{margin:0;font:500 clamp(22px,2.2vw,30px)/1.15 var(--f-body);letter-spacing:-.015em;color:var(--fg)}
 .bpd-t2{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.45}
 .bpd-m{margin:6px 0 14px;font:500 12px/1.5 var(--f-mono);color:var(--faint);letter-spacing:.02em}
 .bpd-cap.in>*{animation:bpdin .24s cubic-bezier(.23,1,.32,1) both}
 .bpd-cap.in>*:nth-child(2){animation-delay:25ms}.bpd-cap.in>*:nth-child(3){animation-delay:50ms}.bpd-cap.in>*:nth-child(4){animation-delay:75ms}
 @keyframes bpdin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.bpd-cap.in>*,.bpd-big span{animation:none}.bpd-big.out{display:none}}
+@media (prefers-reduced-motion:reduce){.bpd-cap.in>*,.bpd-big span{animation:none}.bpd-big.out{display:none}.bpd-tf .bp-svg,.bpd-nav{transition:none}.bp-grow{transition:none}.bpk.go .bpd-tf,.bpk.go .bpd-lb,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{transition:none}}
 .bpk.go .bpd-tf,.bpk.go .bpd-lb,.bpk.go .bpd-cap,.bpk.go .bpd-bigw{opacity:.25;transition:opacity .4s}
+
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1670,11 +1675,11 @@ const PARTS=[
 {id:'home',n:'Home',s:'What this is, and how to start',home:true},
 {id:'overview',n:'Pin map and parts',s:'Every supported part, every GPIO',overview:true},
 {id:'esp',n:'ESP32 DevKit (ESP-WROOM-32)',s:'Any ESP32 DevKit V1 board over USB serial',
-  wiring:null,criteria:['Replies to PING and INFO.'],notes:['Power only from USB while on the bench. Never from USB and the 5 V rail together.','GPIO2 drives the onboard LED on most DevKit boards. Use the LED test for it.']},
-{id:'led',n:'5 mm LED + 220 Ω resistor',s:()=>'Onboard GPIO2 or external on GPIO'+CFG.led,
-  wiring:{title:'LED on GPIO4',part:'LED + 220 Ω',rows:[['GPIO4','220 Ω resistor','orange','sig'],['GND','LED cathode (short leg)','black','gnd']],notes:['Series: GPIO4, then 220 Ω, then LED anode (long leg). Cathode to GND.','If you have no LED, GPIO2 lights the onboard one.']},
+  wiring:null,criteria:['Replies to PING and INFO.'],notes:['Power only from USB while on the bench. Never from USB and the 5 V rail together.','Most boards have an onboard LED. Use the LED test for it.']},
+{id:'led',n:'5 mm LED + 220 Ω resistor',s:()=>(BRD.ident()?'Onboard GPIO2':'Onboard LED')+' or external on GPIO'+CFG.led,
+  wiring:{title:'LED on GPIO4',part:'LED + 220 Ω',rows:[['GPIO4','220 Ω resistor','orange','sig'],['GND','LED cathode (short leg)','black','gnd']],notes:['Series: GPIO4, then 220 Ω, then LED anode (long leg). Cathode to GND.','If you have no LED, use the onboard one.']},
   criteria:['LED lights on HIGH and goes dark on LOW.']},
-{id:'servo',n:'SG90 micro servo (9 g)',s:()=>'Signal on GPIO'+CFG.sv0+', more servos on '+[CFG.sv1,CFG.sv2,CFG.sv3,CFG.sv4].join(', '),
+{id:'servo',n:'SG90 micro servo (9 g)',s:()=>'Signal on GPIO'+CFG.sv0+', more servos on '+[CFG.sv1,CFG.sv2,CFG.sv3,CFG.sv4].map(n=>'GPIO'+n).join(', '),
   wiring:{title:'SG90 on GPIO13',part:'SG90 servo',rows:[['GPIO13','Signal (orange)','orange','sig'],['5V (VIN)','V+ (red)','red','pwr'],['GND','GND (brown or black)','black','gnd']],notes:['More servos use the same three wires on GPIO14, 27, 32 and 33.','USB 5 V is fine for an unloaded sweep only. A loaded servo needs the 5 V rail or a 5 V 2 A adapter, with a 100 to 220 µF cap near it.','SG90 stall current is about 0.65 A.']},
   criteria:['Moves cleanly through 0, 30, 90, 180 degrees.','ESP32 does not reset when the servo moves.']},
 {id:'mpu',n:'MPU-6050 accelerometer + gyro',s:'On the HW-290 (GY-87) board, 0x68',
@@ -1856,7 +1861,7 @@ function pEsp(b){
     controls:[row(btn('Read board info',info,'primary'),btn('Ping once',ping),lb),kv.el]}));
 }
 
-const ledOpts=()=>[[2,'GPIO2 onboard LED'],[4,'GPIO4 external LED + 220 Ω'],[15,'GPIO15 external']];
+const ledOpts=()=>BRD.ident()?[[2,'GPIO2 onboard LED'],[4,'GPIO4 external LED + 220 Ω'],[15,'GPIO15 external']]:[[4,'GPIO4 external LED + 220 Ω'],[15,'GPIO15 external LED + 220 Ω'],[2,'GPIO2 external LED + 220 Ω']];
 function ledSVG(){
   const s=svgEl('0 0 300 250','ledsvg','LED drawing showing whether it is lit');
   s.innerHTML=`<defs><radialGradient id="ledg" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="#FFF4D6"/><stop offset=".45" stop-color="#E8CD97"/><stop offset="1" stop-color="#9C7C3F"/></radialGradient>
@@ -1885,7 +1890,7 @@ function pLed(b){
     controls:[row(el('span',{class:'lbl'},'Power'),sw,blinkB),
       row(el('span',{class:'lbl'},'Blink rate'),rng,hzLbl),
       row(el('span',{class:'lbl'},'Pin'),sel('ledPin',ledOpts(),pin,v=>{live.stop();pin=+v;paint()})),
-      el('p',{class:'hint'},'The onboard LED on most DevKit boards is on GPIO2. For an external LED use GPIO4 with a 220 Ω resistor in series.')]}));
+      el('p',{class:'hint'},BRD.ident()?'The onboard LED on most DevKit boards is on GPIO2. For an external LED use GPIO4 with a 220 Ω resistor in series.':'The onboard LED of this board: '+(BRD.by(BRD.cur).led||'none')+'. This test drives an external LED with a 220 Ω resistor in series, on the pin shown for the choice below.')]}));
   cleanups.push(()=>{if(Link.mode!=='none')return dev(`OUT ${pin} 0`).catch(()=>{})});
 }
 
@@ -2356,6 +2361,13 @@ function matchPin(lbl,pb){
 }
 function pbOf(w){return PBDATA[w.part]||autoPB(w)}
 function swatch(col){const h=wireHex(col);return el('span',{class:'sw',style:'background:'+(h||'var(--accent)')})}
+function bdName(){return BRD.ident()?'ESP32 DevKit':BRD.by(BRD.cur).n}
+function bdChip(){if(BRD.ident())return 'ESP32';return BRD.famName(BRD.by(BRD.cur))}
+function bdLab(id,t,on){
+  if(BRD.ident()||!/^\d+$/.test(id))return t;
+  const q=BRD.map[id];if(q==null)return on?id:'';
+  const pad=BRD.by(BRD.cur).pad;return pad&&pad[q]?q+' '+pad[q]:String(q);
+}
 function connSVG(w){
   const pb=pbOf(w),pins=pb.pins.slice();
   const Ls=new Set(BOARD_L.map(a=>a[0]).filter(x=>x!=='GND')),Rs=new Set(BOARD_R.map(a=>a[0]).filter(x=>x!=='GND'));
@@ -2398,15 +2410,15 @@ function connSVG(w){
   const H=bBot+16+8*Math.max(0,farW.length-1)+26;
   const lit=new Set(wires.map(o=>o.side+o.idx));
   const x2=(a,b)=>`${a},${b}`;
-  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg conn-svg" role="img" aria-label="${esc(w.title)}: ${esc(pb.n)} wired to the ESP32. The table below lists every connection.">`;
-  s+=`<text class="ttl" x="${BX}" y="${boardTop-16}">ESP32 DevKit</text><text class="ttl" x="${bx0}" y="${boxTop-12}">${esc(pb.n)}</text>`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg conn-svg" role="img" aria-label="${esc(w.title)}: ${esc(pb.n)} wired to the ${esc(bdName())}. The table below lists every connection.">`;
+  s+=`<text class="ttl" x="${BX}" y="${boardTop-16}">${esc(bdName())}</text><text class="ttl" x="${bx0}" y="${boxTop-12}">${esc(pb.n)}</text>`;
   s+=`<rect class="bd" x="${BX}" y="${boardTop}" width="${BW}" height="${bh}" rx="22"/>`;
-  s+=`<rect class="mod" x="${BX+56}" y="${boardTop+10}" width="68" height="112" rx="8"/><text class="mt" x="${BX+90}" y="${boardTop+70}" text-anchor="middle">ESP32</text>`;
+  s+=`<rect class="mod" x="${BX+56}" y="${boardTop+10}" width="68" height="112" rx="8"/><text class="mt" x="${BX+90}" y="${boardTop+70}" text-anchor="middle">${esc(bdChip())}</text>`;
   s+=`<rect class="mod" x="${BX+60}" y="${bBot-40}" width="60" height="34" rx="8"/><text class="mt" x="${BX+90}" y="${bBot-18}" text-anchor="middle">USB</text>`;
   [['L',BOARD_L],['R',BOARD_R]].forEach(([sd,arr])=>arr.forEach(([id,t],i)=>{
     const y=pinY(i),on=lit.has(sd+i),left=sd==='L';
     s+=`<circle class="${on?'pu':'pf'}" cx="${left?BX:BX+BW}" cy="${y}" r="5"/>`;
-    s+=`<text class="pl${on?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(t)}</text>`;
+    s+=`<text class="pl${on?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(bdLab(id,t,on))}</text>`;
   }));
   s+=`<rect class="bd" x="${bx0}" y="${boxTop}" width="240" height="${boxH}" rx="16"/>`;
   const usedPin=new Set(rows.filter(o=>!o.skip).map(o=>o.part));
@@ -2491,14 +2503,14 @@ function boardPinId(label){
 }
 function boardSVG(use){
   const W=800,top=24,rh=34,y0=top+30,n=15,bh=(n-1)*rh+60,H=top+bh+14,BX=300,BW=180;
-  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg" role="img" aria-label="ESP32 DevKit pin map">`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg" role="img" aria-label="${esc(bdName())} pin map">`;
   s+=`<rect class="bd" x="${BX}" y="${top}" width="${BW}" height="${bh}" rx="22"/>`;
-  s+=`<rect class="mod" x="356" y="${top+10}" width="68" height="112" rx="8"/><text class="mt" x="390" y="${top+70}" text-anchor="middle">ESP32</text>`;
+  s+=`<rect class="mod" x="356" y="${top+10}" width="68" height="112" rx="8"/><text class="mt" x="390" y="${top+70}" text-anchor="middle">${esc(bdChip())}</text>`;
   s+=`<rect class="mod" x="360" y="${top+bh-40}" width="60" height="34" rx="8"/><text class="mt" x="390" y="${top+bh-18}" text-anchor="middle">USB</text>`;
   const side=(arr,left)=>arr.forEach(([id,t],i)=>{
     const y=y0+i*rh,u=use[id];
     s+=`<circle class="${u?'pu':'pf'}" cx="${left?BX:BX+BW}" cy="${y}" r="5"/>`;
-    s+=`<text class="pl${u?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(t)}</text>`;
+    s+=`<text class="pl${u?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(bdLab(id,t,!!u))}</text>`;
     if(u){
       const c=u.find(x=>x.c),off=c?28:12,sx=left?BX-18:BX+BW+18;
       if(c)s+=`<circle cx="${sx}" cy="${y}" r="6" fill="${c.c}" stroke="${c.c==='#0A0A0B'?'#9A9AA6':c.c}" stroke-width="1.5"/>`;
@@ -2527,7 +2539,7 @@ function mapView(id,qs){
   const holder=el('div',{class:'mapbox'});holder.innerHTML=w?connSVG(w):boardSVG(use);
   out.push(el('h4',{class:'mapname'},name),holder,
     el('div',{class:'row'},el('span',{class:'chip fill'},'pin in use'),el('span',{class:'chip dash'},'free pin'),
-      el('span',{class:'hint'},'Drawn for the common 30-pin ESP32 DevKit V1, USB at the bottom. Match pins by the GPIO numbers printed on your board, not by position.')));
+      el('span',{class:'hint'},BRD.ident()?'Drawn for the common 30-pin ESP32 DevKit V1, USB at the bottom. Match pins by the GPIO numbers printed on your board, not by position.':'Schematic only. Pins are labelled with this board\'s own numbers and names. Match them by the label printed on your board, not by position.')));
   if(w){const pb=pbOf(w);out.push(el('p',{class:'hint'},(pb.src==='v'?'Matches the maker pinout. ':'Pin positions differ between boards, so connect each wire to the label printed on your board. ')+pb.note))}
   if(w){
     const typ={pwr:'power',gnd:'ground',sig:'signal',opt:'optional'};
@@ -4933,7 +4945,7 @@ function mvKeypad(b){
         const ok=!miss.length;setResult('keypad',ok?'pass':'fail',ok?'all 16 keys seen':'missing: '+miss.join(' '));status.textContent=ok?'Pass: all 16 keys seen.':'Fail: these keys were never seen: '+miss.join(' ')+'. Check the ribbon wiring.'},'primary'),btn('Clear keys',()=>{seen.clear();return read()})),
       status,el('p',{class:'hint'},'The 8 pin ribbon is rows R1 to R4 then columns C1 to C4, left to right, when the keypad faces up with the cable at the top. If the keys appear shifted, the order is swapped, find it by pressing the corner keys. Two keys that light up together without being pressed point to a short between two ribbon pins. Rows use GPIO13, 14, 27, 32 and columns GPIO33, 25, 26, 4: no resistors needed, the board uses its internal pull-ups.')]}));
 }
-defPart({id:'keypad',grp:'Buttons, knobs and touch',n:'4x4 matrix membrane keypad (16 keys)',s:'8 wires: rows GPIO13, 14, 27, 32, columns GPIO33, 25, 26, 4',alias:'keyboard matrix membrane numeric pad 4x4 telephone keys',cmds:['KP'],
+defPart({id:'keypad',grp:'Buttons, knobs and touch',n:'4x4 matrix membrane keypad (16 keys)',s:'8 wires: rows GPIO13, GPIO14, GPIO27, GPIO32, columns GPIO33, GPIO25, GPIO26, GPIO4',alias:'keyboard matrix membrane numeric pad 4x4 telephone keys',cmds:['KP'],
   wiring:{title:'4x4 keypad on 8 GPIO pins',part:'4x4 membrane keypad',rows:[['GPIO13','R1 (row 1)','red','sig'],['GPIO14','R2','orange','sig'],['GPIO27','R3','yellow','sig'],['GPIO32','R4','green','sig'],['GPIO33','C1 (column 1)','blue','sig'],['GPIO25','C2','purple','sig'],['GPIO26','C3','white','sig'],['GPIO4','C4','gray','sig']],notes:['Pins 1 to 4 of the ribbon are the rows, pins 5 to 8 the columns, usually. If the key map looks wrong, the page tells you which key it sees.','No resistors, no power wire: the keypad only has switches.']},
   criteria:['All 16 keys are seen once.'],notes:['A key that never shows is a broken membrane track or a loose ribbon pin.','Two different keys that react to one press mean a short.'],
   page:mvKeypad,ex:{cmd:{'Scan once':'KP 13 14 27 32 33 25 26 4\n','Scan 20 times':'repeat 20\n  KP 13 14 27 32 33 25 26 4\n  wait 100\nend\n'},js:{'Pressed key':"const o = await dev('KP 13 14 27 32 33 25 26 4');\nconst keys = '123A456B789C*0#D';\nprint(o.m ? keys[Math.log2(o.m & -o.m)] : 'none');\n"}}});
@@ -5013,7 +5025,7 @@ function mvStep28(b){
       row(el('span',{class:'lbl'},'Speed'),sel('s28us',[[1200,'Fast, 1.2 ms per step'],[2000,'Normal, 2 ms per step'],[3000,'Slow and strong, 3 ms per step']],us,v=>{us=+v})),
       status,el('p',{class:'hint'},'Connect the ULN2003 board IN1 to IN4 to GPIO14, 27, 32, 33 in order, motor plug in the white socket, board + to VIN (5 V) and − to GND. The 5 V motor draws about 250 mA: USB is enough, but never run the 12 V version from 5 V. If it only vibrates, the coil order is wrong: check IN1 to IN4 against the order on the page. It cannot turn faster than about 15 RPM. The gear box has a few degrees of backlash. The board LEDs light in step with the coils.')]}));
 }
-defPart({id:'step28',grp:'Motors and drivers',n:'28BYJ-48 unipolar stepper motor with ULN2003 driver board',s:'IN1 to IN4 on GPIO14, 27, 32, 33, 5 V supply',alias:'stepper motor 28byj48 uln2003 5v gear small step',cmds:['STEP4'],
+defPart({id:'step28',grp:'Motors and drivers',n:'28BYJ-48 unipolar stepper motor with ULN2003 driver board',s:'IN1 to IN4 on GPIO14, GPIO27, GPIO32, GPIO33, 5 V supply',alias:'stepper motor 28byj48 uln2003 5v gear small step',cmds:['STEP4'],
   wiring:{title:'28BYJ-48 with ULN2003',part:'28BYJ-48 + ULN2003 board',rows:[['GPIO14','IN1','red','sig'],['GPIO27','IN2','orange','sig'],['GPIO32','IN3','yellow','sig'],['GPIO33','IN4','green','sig'],['5V (VIN)','+ (motor supply)','red','pwr'],['GND','−','black','gnd']],notes:['Plug the 5 pin motor connector into the ULN2003 board. It can only go one way.','The 5 V and 12 V versions look the same. The 12 V version barely turns on 5 V.','Take the supply from VIN for a test. For a real project use a separate 5 V supply and join the grounds.']},
   criteria:['One full turn in each direction.','Smooth motion, the coil LEDs on the driver board flicker in sequence.'],notes:['About 4096 half steps per turn (4075.77 for the real gear ratio).','Hot to the touch after minutes of holding: switch the coils off when idle.'],
   page:mvStep28,ex:{cmd:{'Quarter turn':'STEP4 14 27 32 33 1024 2000\n','Turn back':'STEP4 14 27 32 33 -1024 2000\n'},js:{'One turn':"await dev('STEP4 14 27 32 33 4096 2000', 15000);\nawait dev('STEP4 14 27 32 33 -4096 2000', 15000);\n"}}});
@@ -5070,7 +5082,7 @@ function mvBridge(cfg){return function(b){
       status,el('p',{class:'hint'},cfg.hint)]}));
 }}
 const BR={pwm:(p,d)=>dev(`PWMM ${p} 1000 ${d}`),off:p=>dev(`PWMM ${p} 0 0`),out:(p,v)=>dev(`OUT ${p} ${v}`)};
-defPart({id:'l298n',grp:'Motors and drivers',n:'L298N dual H-bridge motor driver module',s:'ENA GPIO4, IN1 GPIO15, IN2 GPIO14 (channel B on 33, 27, 32)',alias:'motor driver h-bridge l298 dual dc motor l298n',cmds:['PWMM','OUT'],
+defPart({id:'l298n',grp:'Motors and drivers',n:'L298N dual H-bridge motor driver module',s:'ENA GPIO4, IN1 GPIO15, IN2 GPIO14 (channel B on GPIO33, GPIO27, GPIO32)',alias:'motor driver h-bridge l298 dual dc motor l298n',cmds:['PWMM','OUT'],
   wiring:{title:'L298N on two channels',part:'L298N module',rows:[['GPIO4','ENA (remove its jumper)','orange','sig'],['GPIO15','IN1','yellow','sig'],['GPIO14','IN2','green','sig'],['GPIO33','ENB (remove its jumper)','orange','opt'],['GPIO27','IN3','yellow','opt'],['GPIO32','IN4','green','opt'],['GND','GND, joined with the motor supply −','black','gnd']],notes:['Motor supply (6 to 35 V) goes to the +12V terminal, never from the ESP32 5V pin. Join the supply − to the ESP32 GND.','Remove the ENA and ENB jumpers so the ESP32 can set the speed by PWM.','With the on-board 5V regulator jumper in place the board outputs 5 V on the 5V terminal. Remove the jumper if the supply is above 12 V.','The bridge drops about 2 V: a 6 V supply gives the motor about 4 V.']},
   criteria:['The motor turns forward and reverse.','Speed follows the slider.','Brake stops it fast.'],notes:['An L298N is old and hot: for small 3 to 6 V motors a TB6612 or the L9110S is better.','The motor connects to OUT1 and OUT2 (A) or OUT3 and OUT4 (B).'],
   page:mvBridge({cap:'EN carries the PWM that sets the speed. IN1 and IN2 decide the direction: 1 and 0 forward, 0 and 1 reverse, both equal brakes.',
@@ -5080,7 +5092,7 @@ defPart({id:'l298n',grp:'Motors and drivers',n:'L298N dual H-bridge motor driver
       await BR.out(a,d==='fwd'?1:0);await BR.out(b,d==='fwd'?0:1);await BR.pwm(en,duty)},
     hint:'First test with the motor disconnected: the LED on the board follows IN1 and IN2. A motor that buzzes but does not turn needs more supply voltage, remember the 2 V loss. The heat sink gets hot above 1 A. Add 100 nF across each motor for less noise.'}),
   ex:{cmd:{'Forward at half speed':'OUT 15 1\nOUT 14 0\nPWMM 4 1000 128\nwait 2000\nPWMM 4 0 0\nOUT 15 0\n'},js:{'Forward then reverse':"await dev('OUT 15 1'); await dev('OUT 14 0'); await dev('PWMM 4 1000 160'); await sleep(1500);\nawait dev('OUT 15 0'); await dev('OUT 14 1'); await sleep(1500);\nawait dev('PWMM 4 0 0'); await dev('OUT 14 0');\n"}}});
-defPart({id:'l9110s',grp:'Motors and drivers',n:'L9110S dual DC motor driver module (2.5 to 12 V, 800 mA)',s:'A-IA GPIO4, A-IB GPIO15 (channel B on 33, 14)',alias:'motor driver h-bridge l9110 dual dc motor small',cmds:['PWMM'],
+defPart({id:'l9110s',grp:'Motors and drivers',n:'L9110S dual DC motor driver module (2.5 to 12 V, 800 mA)',s:'A-IA GPIO4, A-IB GPIO15 (channel B on GPIO33, GPIO14)',alias:'motor driver h-bridge l9110 dual dc motor small',cmds:['PWMM'],
   wiring:{title:'L9110S on two channels',part:'L9110S module',rows:[['GPIO4','A-IA','orange','sig'],['GPIO15','A-IB','yellow','sig'],['GPIO33','B-IA','orange','opt'],['GPIO14','B-IB','yellow','opt'],['GND','GND, joined with the motor supply −','black','gnd'],['5V (VIN)','VCC (motor supply, 2.5 to 12 V)','red','pwr']],notes:['VCC powers the motors directly: use 3 to 6 V for small hobby motors. Never more than 12 V.','Motor A connects to OA1 and OA2, motor B to OB1 and OB2.','Up to 800 mA per channel continuous, 1.5 A peak.']},
   criteria:['The motor turns forward and reverse.','Speed follows the slider.'],notes:['IA PWM with IB low is forward, the opposite is reverse. Both low is coast.','There is no current limit: a stalled motor gets hot.'],
   page:mvBridge({cap:'No enable pin: the speed comes from PWM on whichever input is active. IA high and IB low turn it forward, the opposite reverses.',
@@ -5717,17 +5729,17 @@ defPart({id:'sh1106',grp:DPG,n:'SH1106 1.3 inch OLED, 128 x 64, I2C',s:'I2C 0x3C
   wiring:i2cWiring('SH1106 1.3 inch OLED','SH1106 OLED module',[],['A 1.3 inch module is usually an SH1106, not an SSD1306. The two look the same on the bus but the SH1106 has 132 columns, so an SSD1306 driver shows the picture shifted by 2 pixels. This tester drives it correctly.','Some modules want 5 V on VCC. The SDA and SCL pull-ups on the board then sit at 5 V: use the 3V3 pin unless the module says otherwise.']),
   criteria:dpCrit,notes:['If the picture is shifted by 2 pixels or the edge looks noisy, you have an SSD1306: use the SSD1306 page instead.','Pixels are white, blue or two-colour (yellow top 16 rows) depending on the panel.'],
   page:b=>dpPage(b,'sh1106',{id:'sh1106'}),ex:{cmd:{'Show a frame':'DSET 3 0 0\nDFILL 255 255 255\nwait 800\nDCLR\n'},js:{'Show a frame':"await dev('DSET 3 0 0');\nawait dev('DFILL 255 255 255');\nawait sleep(800);\nawait dev('DCLR');\n"}}});
-defPart({id:'st7789',grp:DPG,n:'ST7789 IPS TFT, 240 x 240 (1.3 or 1.54 inch) or 240 x 320 (2.0 inch), SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS 5, DC 16, RST 17',alias:'tft ips lcd 1.3 inch 1.54 inch 1.3" 1.2 inch 240x240 240x320 colour screen st7789v',cmds:['DISPLAY'],
+defPart({id:'st7789',grp:DPG,n:'ST7789 IPS TFT, 240 x 240 (1.3 or 1.54 inch) or 240 x 320 (2.0 inch), SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS GPIO5, DC GPIO16, RST GPIO17',alias:'tft ips lcd 1.3 inch 1.54 inch 1.3" 1.2 inch 240x240 240x320 colour screen st7789v',cmds:['DISPLAY'],
   wiring:dpSpiWiring('ST7789 TFT','ST7789 module'),criteria:dpCrit,notes:['The 240 x 240 panel has no CS pin on many modules: tie CS to GND and set CS in Setup to any free pin, nothing is lost.','If the picture starts at the wrong place, you picked the wrong size: 240 x 240 and 240 x 320 modules use the same chip.'],
   page:b=>dpPage(b,'st7789_240',{id:'st7789',types:['st7789_240','st7789_320']}),ex:dpEx('DSET 4 3 5 16 17 0')});
-defPart({id:'st7735',grp:DPG,n:'ST7735 TFT, 128 x 160 (1.8 inch) or 128 x 128 (1.44 inch), SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS 5, DC 16, RST 17',alias:'tft lcd 1.8 inch 1.44 inch 128x160 128x128 colour screen st7735s',cmds:['DISPLAY'],
+defPart({id:'st7735',grp:DPG,n:'ST7735 TFT, 128 x 160 (1.8 inch) or 128 x 128 (1.44 inch), SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS GPIO5, DC GPIO16, RST GPIO17',alias:'tft lcd 1.8 inch 1.44 inch 128x160 128x128 colour screen st7735s',cmds:['DISPLAY'],
   wiring:dpSpiWiring('ST7735 TFT','ST7735 module'),criteria:dpCrit,notes:['Clones differ by "tab" colour: a green-tab panel needs the picture shifted by a few pixels. Use the shift option in Setup if a line of noise shows at one edge.','Red and blue swapped is common: use Swap red and blue.'],
   page:b=>dpPage(b,'st7735_160',{id:'st7735',types:['st7735_160','st7735_128']}),ex:dpEx('DSET 6 2 5 16 17 0')});
-defPart({id:'ili9341',grp:DPG,n:'ILI9341 2.8 inch TFT, 240 x 320, SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS 5, DC 16, RST 17',alias:'tft lcd 2.8 inch 2.4 inch 3.2 inch 240x320 colour screen touch ili9488',cmds:['DISPLAY'],
+defPart({id:'ili9341',grp:DPG,n:'ILI9341 2.8 inch TFT, 240 x 320, SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS GPIO5, DC GPIO16, RST GPIO17',alias:'tft lcd 2.8 inch 2.4 inch 3.2 inch 240x320 colour screen touch ili9488',cmds:['DISPLAY'],
   wiring:dpSpiWiring('ILI9341 TFT','ILI9341 module',[['GPIO19','SDO / MISO (only if you want to read the panel, not needed)','yellow','opt']],['The module needs 3.3 V on VCC (the 5 V pin feeds an on-board regulator on some boards).','The backlight draws about 80 mA. USB handles it, a weak power bank may not.','The resistive touch layer (T_ pins) and the SD slot on the back are not tested here.']),
   criteria:dpCrit,notes:['A 3.5 inch 320 x 480 module uses an ILI9488 and is not the same chip.','Wrong colours: swap red and blue.'],
   page:b=>dpPage(b,'ili9341',{id:'ili9341'}),ex:dpEx('DSET 8 4 5 16 17 0')});
-defPart({id:'gc9a01',grp:DPG,n:'GC9A01 1.28 inch round TFT, 240 x 240, SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS 5, DC 16, RST 17',alias:'round circular tft lcd 1.28 inch 1.2 inch 240x240 colour screen watch',cmds:['DISPLAY'],
+defPart({id:'gc9a01',grp:DPG,n:'GC9A01 1.28 inch round TFT, 240 x 240, SPI',s:'SPI: SCK GPIO18, MOSI GPIO23, CS GPIO5, DC GPIO16, RST GPIO17',alias:'round circular tft lcd 1.28 inch 1.2 inch 240x240 colour screen watch',cmds:['DISPLAY'],
   wiring:dpSpiWiring('GC9A01 round TFT','GC9A01 module',[],['The pins are labelled SCL and SDA but this is SPI, not I2C: SCL goes to GPIO18, SDA to GPIO23.','Only the circle shows. The studio darkens the corners outside it.']),
   criteria:dpCrit,notes:['Some modules label RST as RES and DC as DC. 3.3 V only.'],
   page:b=>dpPage(b,'gc9a01',{id:'gc9a01'}),ex:dpEx('DSET 9 3 5 16 17 0')});
@@ -7649,7 +7661,7 @@ function fit(p,id){
   const n=need(p);
   if(p.id==='esp32cam'||p.id==='esp32cammb')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.'};
   if(n.gpio>b.pins.length)return {ok:false,why:'Needs '+n.gpio+' GPIO pins. '+b.n+' has '+b.pins.length+' free.'};
-  if(n.adc>b.adc.length)return {ok:false,why:'Needs '+n.adc+' analog input'+(n.adc>1?'s':'')+'. '+b.n+' has '+(b.adc.length||'no')+' usable here.'};
+  if(n.adc>b.adc.length)return {ok:false,why:'Needs '+n.adc+' analog input'+(n.adc>1?'s':'')+'. '+b.n+' has '+(b.adc.length?b.adc.length+' analog input'+(b.adc.length>1?'s':''):'no analog input')+' usable here.'};
   return {ok:true,why:''};
 }
 
@@ -7657,8 +7669,9 @@ function fit(p,id){
    given a real pin of the chosen board, and the firmware is told with PINMAP. Text on the page shows the board's own pin names. ---- */
 const ADC_L=new Set([32,33,34,35,36,39]),I2C_L={21:0,22:1};
 let map={},usedP=new Set(),sentKey=null;const mapSubs=[];
-const ident=()=>{const b=by(cur);return !b||b.fam==='esp32'};
-const bumpMap=()=>{sentKey=null;mapSubs.forEach(f=>{try{f()}catch(e){}})};
+const ident=()=>{const b=by(cur);return !b||(b.fam==='esp32'&&b.id!=='espcam')};
+let quiet=0;
+const bumpMap=()=>{if(quiet)return;sentKey=null;mapSubs.forEach(f=>{try{f()}catch(e){}})};
 function reset(){if(Object.keys(map).length||usedP.size){map={};usedP=new Set()}bumpMap()}
 function alloc(l,adc){
   if(ident())return l;
@@ -7681,6 +7694,13 @@ function seed(p){
   const rank=l=>l in I2C_L?0:(adcCmd&&ADC_L.has(l)?1:2);
   ls.sort((a,b)=>rank(a)-rank(b));
   for(const l of ls)alloc(l,adcCmd&&ADC_L.has(l));
+}
+/* the names a part would get if it were opened first, without changing the current plan. Used for the sidebar subtitles. */
+function preview(p){
+  if(ident())return ()=>null;
+  const sm=map,su=usedP;map={};usedP=new Set();quiet++;
+  try{seed(p);const m=map;return l=>{const q=m[l];if(q==null)return null;const pad=by(cur).pad&&by(cur).pad[q];return 'GPIO'+q+(pad?' ('+pad+')':'')}}
+  finally{quiet--;map=sm;usedP=su}
 }
 /* which words of a command are pins: the same table the firmware uses */
 function pinWords(c,a){
@@ -7723,7 +7743,7 @@ function label(l){
 }
 function chipFam(s){s=String(s||'');return /S3/i.test(s)?'s3':/S2/i.test(s)?'s2':/C3/i.test(s)?'c3':/C6/i.test(s)?'c6':/ESP32/i.test(s)?'esp32':null}
 return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,onChange:f=>subs.push(f),famName:b=>CHIPS[b.fam].n,
-  ident,reset,alloc,seed,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
+  ident,reset,alloc,seed,preview,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
 })();
 /* ---- Board figures: every board in the picker, drawn with the Anatomy iso kit (ISO) like the DevKit in homefig.js.
    Shapes are schematic: sizes, ports, buttons, headers and the module are right in kind, not measured to the millimetre.
@@ -8393,6 +8413,7 @@ const BP_FAMS=[
   ['c6','ESP32-C6','Wi-Fi 6, Thread and Zigbee.']
 ];
 function pickBoard(){BRD.picking=true;show('home');window.scrollTo(0,0)}
+function pickerStr(id,az,t,lab,elv,zm){const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,elv||34,zm||1.02,f.focus.hero);return f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:!lab,W,H})}
 function pickerDraw(svg,id,az,t,lab,elv,zm){
   const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,elv||34,zm||1.02,f.focus.hero);
   let g=svg.querySelector('g');if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');svg.append(g)}
@@ -8400,6 +8421,7 @@ function pickerDraw(svg,id,az,t,lab,elv,zm){
 }
 /* the card grows to fill the window, then the story starts with that board */
 function pickerGo(id,card){
+  if(document.documentElement.classList.contains('bp-busy'))return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const done=()=>{BRD.set(id);BRD.picking=false;return show('home')};
   if(reduce||!card){done().then(()=>window.scrollTo(0,0));return}
@@ -8413,8 +8435,8 @@ function pickerGo(id,card){
   g.style.left='0px';g.style.top='0px';g.style.width='100vw';g.style.height='100vh';g.classList.add('on');
   setTimeout(async()=>{
     await done();window.scrollTo(0,0);
-    requestAnimationFrame(()=>{g.classList.add('out');setTimeout(()=>{g.remove();document.documentElement.classList.remove('bp-busy')},520)});
-  },560);
+    requestAnimationFrame(()=>{g.classList.add('out');setTimeout(()=>{g.remove();document.documentElement.classList.remove('bp-busy')},320)});
+  },430);
 }
 function pickerGrid(b){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -8468,7 +8490,7 @@ function pickerGrid(b){
 /* ---- Dock picker: the DevKit floats in the middle as before, every other board sits beside it. The board under the pointer grows and turns. ---- */
 const BP_STYLE='dock'; /* 'grid' brings back the earlier picker with one card per board */
 const DK_ORDER=['xiaoc3','c3sm','c3dk','c6dk','devkit','mini32','espcam','s3dk','xiaos3','s2mini'];
-const DK_SHORT={devkit:'DevKit V1',mini32:'Mini32',espcam:'ESP32-CAM',s3dk:'DevKitC-1',xiaos3:'XIAO',c3dk:'DevKitM-1',c3sm:'SuperMini',xiaoc3:'XIAO',s2mini:'S2 Mini',c6dk:'DevKitC-1'};
+const DK_SHORT={devkit:'DevKit V1',mini32:'Mini32',espcam:'ESP32-CAM',s3dk:'DevKitC-1 S3',xiaos3:'XIAO S3',c3dk:'DevKitM-1',c3sm:'SuperMini',xiaoc3:'XIAO C3',s2mini:'S2 Mini',c6dk:'DevKitC-1 C6'};
 const DK_BIG={devkit:'ESP32',mini32:'MINI32',espcam:'CAM',s3dk:'S3',xiaos3:'XIAO S3',c3dk:'C3',c3sm:'SUPERMINI',xiaoc3:'XIAO C3',s2mini:'S2 MINI',c6dk:'C6'};
 function pickerPage(b){
   const dock=BP_STYLE==='dock'&&matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)').matches;
@@ -8480,12 +8502,17 @@ function pickerDock(b){
   const defs=document.createElementNS(NS,'svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
   defs.innerHTML='<defs><radialGradient id="hmGr"><stop offset="0" stop-color="#ff5a50" stop-opacity=".75"/><stop offset="1" stop-color="#ff5a50" stop-opacity="0"/></radialGradient><radialGradient id="hmGb"><stop offset="0" stop-color="#5a9bff" stop-opacity=".75"/><stop offset="1" stop-color="#5a9bff" stop-opacity="0"/></radialGradient></defs>';
   const list=DK_ORDER.map(id=>BRD.by(id)),n=list.length;
+  const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:400}):setTimeout(f,30);
   const clamp=(v,a,c)=>Math.max(a,Math.min(c,v));
+  const FR=15,BASE_K=6,frAz=k=>10+5*k;
   const wrap=d=>((d+n/2)%n+n)%n-n/2;
-  let idx=DK_ORDER.indexOf('devkit'),pos=idx,vel=0,tgt=idx,raf=0,last=0,SW=1200,SH=600,hw=480,hh=360,bigEl=null;
+  let idx=DK_ORDER.indexOf(BRD.cur),pos,vel=0,tgt,raf=0,last=0,SW=1200,SH=600,hw=480,hh=360,bigEl=null;
+  if(idx<0)idx=DK_ORDER.indexOf('devkit');pos=tgt=idx;
   let tpx=0,tpy=0,ppx=0,ppy=0,snapT=0,lastStep=0,drag=null,moved=false,X=[0,400,610,772,900],S=[1,.36,.24,.17,.12],K=0,YB=0;
   const mk=c=>{const v=document.createElementNS(NS,'svg');v.setAttribute('class','hm-svg bp-svg '+c);v.setAttribute('viewBox','0 0 400 300');v.setAttribute('aria-hidden','true');return v};
-  const cap=el('div',{class:'bpd-cap','aria-live':'polite'});
+  const cap=el('div',{class:'bpd-cap'});
+  const status=el('p',{class:'sr-only',role:'status','aria-live':'polite'});
+  const ac=new AbortController(),sig={signal:ac.signal};
   const arena=el('div',{class:'bpd-arena',role:'group','aria-label':'ESP32 boards. Scroll, drag or use the arrow keys to turn the wheel.'});
   const bigw=el('div',{class:'bpd-bigw','aria-hidden':'true'});
   const glow=el('div',{class:'bpd-glow','aria-hidden':'true'});
@@ -8498,10 +8525,28 @@ function pickerDock(b){
     fig.addEventListener('click',()=>{if(moved)return;if(i===idx)go();else turnTo(i)});
     fig.addEventListener('focus',()=>{if(i!==idx)turnTo(i)});
     stage.append(fig,lb);
-    return {i,fig,lb,sL,sN,dL:0,dN:0};
+    return {i,fig,lb,sL,sN,dL:0,dN:0,gs:[],cur:BASE_K};
   });
   stage.prepend(glow);
-  const drawL=i=>{const o=it[i];if(o.dL)return;o.dL=1;pickerDraw(o.sL,list[i].id,40,0,true,28)};
+  const drawL=i=>{const o=it[i];if(o.dL)return;o.dL=1;pickerDraw(o.sL,list[i].id,frAz(BASE_K),0,true,28);o.gs[BASE_K]=o.sL.querySelector('g')};
+  /* the board in front turns for real: one drawing per camera angle, built a few at a time, and the pointer only picks which one is shown */
+  let fToken=0;
+  function buildFrames(i){
+    const tok=++fToken,o=it[i];
+    (function step(){
+      if(tok!==fToken||!b.isConnected)return;
+      let k=-1,best=99;for(let q=0;q<FR;q++)if(!o.gs[q]&&Math.abs(q-o.cur)<best){best=Math.abs(q-o.cur);k=q}
+      if(k<0)return;
+      const g=document.createElementNS(NS,'g');g.style.display='none';g.innerHTML=pickerStr(list[i].id,frAz(k),0,true,28);o.sL.append(g);o.gs[k]=g;
+      idle(step);
+    })();
+  }
+  function showFrame(o,az){
+    let k=clamp(Math.round((az-10)/5),0,FR-1);
+    if(!o.gs[k]){let best=99,kk=o.cur;for(let q=0;q<FR;q++)if(o.gs[q]&&Math.abs(q-k)<best){best=Math.abs(q-k);kk=q}k=kk}
+    if(k===o.cur||Math.abs(az-frAz(o.cur))<3.4&&o.gs[o.cur])return;
+    const a=o.gs[o.cur],c=o.gs[k];if(!c)return;if(a)a.style.display='none';c.style.display='';o.cur=k;
+  }
   const drawN=i=>{const o=it[i];if(o.dN)return;o.dN=1;pickerDraw(o.sN,list[i].id,40,0,false,28)};
   const go=()=>{drawL(idx);pickerGo(list[idx].id,it[idx].fig)};
   function turnTo(i){const c=Math.round(pos);tgt=c+wrap(i-c);kick()}
@@ -8526,30 +8571,34 @@ function pickerDock(b){
     if(old){old.classList.add('out');setTimeout(()=>old.remove(),reduce?0:220)}
     bigw.append(bigEl);
   }
+  const cH=el('h3',{}),cT=el('p',{class:'bpd-t2'}),cM=el('p',{class:'bpd-m'}),cB=btn('Use this board',()=>go(),'primary');
+  cap.append(cH,cT,cM,cB);let stT=0;
   function paintCap(){
     const bd=list[idx];
-    cap.replaceChildren(el('h3',{},bd.n),el('p',{class:'bpd-t2'},bd.tag),
-      el('p',{class:'bpd-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.'),
-      btn('Use this board',go,'primary'));
-    cap.classList.remove('in');void cap.offsetWidth;cap.classList.add('in');
+    cH.textContent=bd.n;cT.textContent=bd.tag;cM.textContent=BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.';
+    cap.classList.remove('in');requestAnimationFrame(()=>cap.classList.add('in'));
+    clearTimeout(stT);stT=setTimeout(()=>{status.textContent=bd.n+'. '+bd.tag},300);
   }
   function setIdx(i){
     idx=i;drawL(i);drawN(i);
-    it.forEach(o=>{const f=o.i===i;o.fig.classList.toggle('is-f',f);o.fig.setAttribute('aria-current',f?'true':'false');o.fig.tabIndex=f?0:-1});
+    it.forEach(o=>{const f=o.i===i;o.fig.classList.toggle('is-f',f);o.fig.setAttribute('aria-current',f?'true':'false');o.fig.setAttribute('aria-label',list[o.i].n+', '+BRD.CHIPS[list[o.i].fam].n+(f?'. Press Enter to use this board':''));o.fig.tabIndex=f?0:-1});
     setBig(DK_BIG[list[i].id]);paintCap();
+    if(!reduce){clearTimeout(frT);frT=setTimeout(()=>buildFrames(i),260)}
   }
+  let frT=0;
   function render(t){
     const mid=SW/2;
     it.forEach(o=>{
       const d=wrap(o.i-pos),ad=Math.abs(d),sg=d<0?-1:1,j=Math.min(3,Math.floor(ad)),f=Math.min(1,ad-j);
       const x=sg*(X[j]+(X[j+1]-X[j])*f),sc=S[j]+(S[j+1]-S[j])*f,ph=clamp(1-ad,0,1);
-      const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9,yaw=-clamp(d,-2.5,2.5)*13;
-      const bob=ph*(5*Math.sin(t*1.1)),ry=ph*(14*Math.sin(t*.45)+ppx*13),rx=ph*(-2+4*Math.sin(t*.33)-ppy*7),rz=ph*2.2*Math.sin(t*.37+1);
+      const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9;
+      const bob=ph*(5*Math.sin(t*1.1));
       const op=(.82+.18*ph)*clamp(1-(ad-2.5)/1,0,1);
       const fg=o.fig,vis=op>.02;
-      fg.style.transform=(ph>.02?'perspective(1300px) ':'')+'translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+(ang+rz).toFixed(2)+'deg)'+(ph>.02?' rotateY('+(yaw+ry).toFixed(2)+'deg) rotateX('+rx.toFixed(2)+'deg)':'');
+      fg.style.transform='translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+ang.toFixed(2)+'deg)';
+      if(o.i===idx&&ph>.5&&!reduce)showFrame(o,44+ppx*34+9*Math.sin(t*.45));
       fg.style.opacity=op.toFixed(3);fg.style.zIndex=String(60-Math.round(ad*10));fg.style.visibility=vis?'visible':'hidden';
-      const lo=ad>.55?clamp((ad-.55)/.3,0,1)*clamp(1-(ad-2.3)/.4,0,1)*clamp((SW/2-Math.abs(x)-80)/50,0,1):0;
+      const lo=ad>.55?clamp((ad-.55)/.3,0,1)*clamp(1-(ad-2.3)/.4,0,1)*clamp((SW/2-Math.abs(x)-24)/40,0,1):0;
       o.lb.style.transform='translate3d('+(mid+x-75).toFixed(1)+'px,'+(YB+y+10).toFixed(1)+'px,0)';o.lb.style.opacity=lo.toFixed(2);
     });
     glow.style.transform='translate3d('+(mid-hw*.45).toFixed(1)+'px,'+(YB-hw*.05).toFixed(1)+'px,0)';glow.style.width=(hw*.9).toFixed(0)+'px';
@@ -8557,7 +8606,7 @@ function pickerDock(b){
   }
   /* a spring chases the target, so a flick, a notch of the wheel and a click all arrive the same soft way, and can be interrupted */
   function tick(now){
-    raf=0;if(!b.isConnected)return;
+    raf=0;if(!b.isConnected){ac.abort();ro&&ro.disconnect();return}
     const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
     if(drag){pos=tgt;vel=0}else{
       const st=Math.max(1,Math.ceil(dt/.008)),h=dt/st;
@@ -8575,6 +8624,7 @@ function pickerDock(b){
   }
   /* scroll wheel: a notch is one step, a trackpad swipe turns it continuously and settles on the nearest board */
   arena.addEventListener('wheel',e=>{
+    if(e.ctrlKey||e.metaKey)return;
     e.preventDefault();
     const dd=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY,now=performance.now();
     if(e.deltaMode===1||Math.abs(dd)>=70){if(now-lastStep<140)return;lastStep=now;step(dd>0?1:-1);return}
@@ -8585,33 +8635,36 @@ function pickerDock(b){
     drag={x:e.clientX,t:tgt,x0:e.clientX,lt:performance.now(),lx:e.clientX,v:0};moved=false;
   });
   window.addEventListener('pointermove',e=>{
+    if(!b.isConnected)return;
     const r=stage.getBoundingClientRect();
-    tpx=clamp((e.clientX-r.left)/r.width*2-1,-1,1);tpy=clamp((e.clientY-r.top)/r.height*2-1,-1,1);
+    tpx=clamp((e.clientX-r.left-r.width/2)/(hw*.8),-1,1);tpy=clamp((e.clientY-r.top)/r.height*2-1,-1,1);
     if(!drag)return;
     if(!moved&&Math.abs(e.clientX-drag.x0)>6){moved=true;arena.classList.add('drag');try{arena.setPointerCapture(e.pointerId)}catch(_){}}
     if(!moved)return;
     const now=performance.now(),dtm=Math.max(1,now-drag.lt);
     drag.v=drag.v*.6+((drag.lx-e.clientX)/ (hw*.62)/dtm*1000)*.4;drag.lt=now;drag.lx=e.clientX;
     tgt=drag.t+(drag.x-e.clientX)/(hw*.62);kick();
-  });
+  },sig);
   const end=()=>{
     if(!drag)return;const d=drag;drag=null;arena.classList.remove('drag');
     if(moved){tgt=Math.round(tgt+clamp(d.v*.18,-2,2));kick();setTimeout(()=>{moved=false},60)}
   };
-  window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end);
+  window.addEventListener('pointerup',end,sig);window.addEventListener('pointercancel',end,sig);
   arena.addEventListener('pointerleave',()=>{if(!drag){tpx=0;tpy=0}});
-  arena.addEventListener('keydown',e=>{
+  window.addEventListener('keydown',e=>{
+    if(!arena.isConnected||e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey)return;
     const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
-    if(!d)return;e.preventDefault();step(d);
-  });
-  const navb=(c,d,t)=>{const x=el('button',{type:'button',class:'bpd-nav '+c,'aria-label':t},d>0?'›':'‹');x.addEventListener('click',()=>step(d));return x};
+    if(!d||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.nodeName)||''))return;
+    e.preventDefault();step(d);
+  },sig);
+  const navb=(c,d,t)=>{const x=el('button',{type:'button',class:'bpd-nav '+c,'aria-label':t});x.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(d>0?'M9 5l7 7-7 7':'M15 5l-7 7 7 7')+'"/></svg>';x.addEventListener('click',()=>step(d));return x};
   const help=el('details',{class:'bp-help'},el('summary',{},'Not sure which board you have?'),
     el('ul',{class:'hm-list'},
       el('li',{},el('b',{},'Read the name.'),' It is usually printed on the board or in the seller’s listing.'),
       el('li',{},el('b',{},'Other ESP32 DevKits'),' with an ESP32-WROOM-32 module (30 or 38 pins) use the same chip and pins as the DevKit V1. Pick that one.'),
       el('li',{},el('b',{},'Look at the shape.'),' The ESP32-CAM has a camera. XIAO and SuperMini boards are about the size of a thumb.'),
       el('li',{},el('b',{},'None match?'),' Pick the one with the same chip. The chip name is printed on the metal can.')));
-  arena.append(bigw,stage,navb('l',-1,'Previous board'),navb('r',1,'Next board'),el('p',{class:'bpd-hint','aria-hidden':'true'},'Scroll or drag to turn'),cap);
+  arena.append(bigw,stage,navb('l',-1,'Previous board'),navb('r',1,'Next board'),el('p',{class:'bpd-hint','aria-hidden':'true'},'Scroll, drag or use the arrow keys'),cap,status);
   const root=el('div',{class:'bpk bpd'},defs,
     el('div',{class:'bp-head bpd-head'},
       el('h2',{},'Which board are you testing with?'),
@@ -8620,14 +8673,14 @@ function pickerDock(b){
     el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),help);
   b.append(root);
   setIdx(idx);measure();
-  if(window.ResizeObserver)new ResizeObserver(()=>{if(b.isConnected)measure()}).observe(stage);
+  let ro=null;if(window.ResizeObserver){ro=new ResizeObserver(()=>{if(b.isConnected)measure()});ro.observe(stage)}
   /* the rest are drawn one per idle moment, nearest the default first */
   const order=[...Array(n).keys()].sort((a,c)=>Math.abs(wrap(a-idx))-Math.abs(wrap(c-idx)));
   let q=0,pump0;(pump0=function pump(){
     if(!b.isConnected||q>=order.length*2)return;
     const j=order[q>>1];if(q&1)drawL(j);else drawN(j);q++;
     idle(pump);
-  });const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:400}):setTimeout(f,30);setTimeout(pump0,80);
+  });setTimeout(pump0,80);
   kick();if(!reduce)raf=raf||requestAnimationFrame(tick);
 }
 
@@ -8648,15 +8701,27 @@ function boardNote(p){
 
 /* Pin names on the page. The pages are written for a classic ESP32; on another board every "GPIO<n>" that a part uses is shown as the real pin of that board.
    Code, the raw monitor and form fields keep the classic numbers, which is what the firmware is told. */
+/* the page text for a classic pin list: lab(n) gives the board's name for logical pin n, or null */
+const PIN_RX=/GPIO(\d+)\b/g,PIN_LST=/GPIO\d+(?:(?:, | and |, and )\d{1,2}(?![\d.]| ?(?:V\b|k|Ω|µ|m|us|Hz|steps|pulses|%)))+/g;
+function pinText(o,lab,keep){
+  return o.replace(PIN_LST,m=>m.replace(/(, | and |, and )(\d{1,2})/g,'$1GPIO$2'))
+    .replace(PIN_RX,(m,d)=>lab(+d)||(keep?m:'a spare pin'))
+    .replace(/a spare pin(?:, a spare pin)+/g,'spare pins');
+}
+function subOfB(p){const s=subOf(p);if(BRD.ident()||s.indexOf('GPIO')<0)return s;return pinText(s,BRD.preview(p))}
 (function(){
   const SKIP=new Set(['PRE','CODE','TEXTAREA','SCRIPT','STYLE','INPUT','KBD']);
-  const RX=/GPIO(\d+)\b/g;
+  const SAME=new Set(['preflight','map','pinmap']);
   function fix(n){
     const par=n.parentNode;if(!par||SKIP.has(par.nodeName)||(par.closest&&par.closest('pre,code,[data-raw]')))return;
     if(n.__n!==undefined&&n.nodeValue!==n.__n)n.__o=undefined;
     const o=n.__o!==undefined?n.__o:n.nodeValue;
     if(o.indexOf('GPIO')<0)return;
-    const t=BRD.ident()?o:o.replace(RX,(m,d)=>BRD.label(+d)||m);
+    let t=o;
+    if(!BRD.ident()){
+      const keep=!!par.closest&&!par.closest('#navList,#navSel,.pal')&&typeof cur!=='undefined'&&SAME.has(cur);
+      t=pinText(o,BRD.label,keep);
+    }
     if(t!==n.nodeValue){n.__o=o;n.__n=t;n.nodeValue=t}
     else if(n.__o!==undefined&&t===o){n.__o=undefined;n.__n=undefined}
   }
@@ -8667,20 +8732,23 @@ function boardNote(p){
     const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
     while((n=w.nextNode()))fix(n);
   }
+  const roots=()=>['panel','navList','navSel'].map(id=>document.getElementById(id)).concat([...document.querySelectorAll('.pal')]);
   let pend=new Set(),all=false,raf=0;
-  const flush=()=>{raf=0;const root=document.getElementById('panel');
-    if(all){all=false;pend.clear();walk(root);return}
+  const flush=()=>{raf=0;
+    if(all){all=false;pend.clear();roots().forEach(walk);return}
     const l=[...pend];pend.clear();for(const n of l){if(n.isConnected)walk(n)}};
   const sched=()=>{if(!raf)raf=requestAnimationFrame(flush)};
+  const obs=new MutationObserver(ms=>{
+    for(const m of ms){
+      if(m.type==='characterData'){if(m.target.__n!==m.target.nodeValue)pend.add(m.target)}
+      else for(const a of m.addedNodes)pend.add(a);
+    }
+    if(pend.size)sched();
+  });
+  const watch=r=>{if(r&&!r.__gn){r.__gn=1;obs.observe(r,{childList:true,subtree:true,characterData:true});walk(r)}};
   function init(){
-    const root=document.getElementById('panel');if(!root||root.dataset.gn)return;root.dataset.gn='1';
-    new MutationObserver(ms=>{
-      for(const m of ms){
-        if(m.type==='characterData'){if(m.target.__n!==m.target.nodeValue)pend.add(m.target)}
-        else for(const a of m.addedNodes)pend.add(a);
-      }
-      if(pend.size)sched();
-    }).observe(root,{childList:true,subtree:true,characterData:true});
+    ['panel','navList','navSel'].forEach(id=>watch(document.getElementById(id)));
+    new MutationObserver(ms=>{for(const m of ms)for(const a of m.addedNodes)if(a.nodeType===1&&a.classList.contains('pal'))watch(a)}).observe(document.body,{childList:true});
     BRD.onMap(()=>{all=true;sched()});
     BRD.onChange(()=>{all=true;sched()});
   }
@@ -9217,7 +9285,7 @@ const GROUP_PLAN=[
 })();
 /*NEW:end*/
 let navQuery='';
-const navHay=p=>(p.n+' '+subOf(p)+' '+p.id+' '+(ALIAS[p.id]||'')).toLowerCase();
+const navHay=p=>(p.n+' '+subOfB(p)+' '+p.id+' '+(ALIAS[p.id]||'')).toLowerCase();
 const navMatch=p=>{const q=navQuery.trim().toLowerCase();return !q||q.split(/\s+/).every(w=>navHay(p).includes(w))};
 function renderNav(){
   const ul=$('#navList');ul.replaceChildren();let shown=0;
@@ -9231,7 +9299,7 @@ function renderNav(){
       const fx=BRD.cur?BRD.fit(p):{ok:true};
       const b=el('button',{type:'button',class:'ni'+(fx.ok?'':' nok'),'aria-current':String(p.id===cur),onclick:()=>show(p.id)},
         el('span',{class:'dot'+(r?' '+r.v:''),'aria-hidden':'true'}),
-        el('span',{class:'nn'},p.n,r?el('span',{class:'vh'},r.v==='pass'?', passed':', failed'):null,fx.ok?null:el('span',{class:'vh'},', does not fit this board')),el('span',{class:'ns'},subOf(p)));
+        el('span',{class:'nn'},p.n,r?el('span',{class:'vh'},r.v==='pass'?', passed':', failed'):null,fx.ok?null:el('span',{class:'vh'},', does not fit this board')),el('span',{class:'ns','data-raw':''},subOfB(p)));
       if(!fx.ok)b.title=fx.why;
       inner.append(el('li',{},b));n++;vis.push(p);
     }
