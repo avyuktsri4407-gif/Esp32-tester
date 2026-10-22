@@ -1026,6 +1026,41 @@ body.has-rec #toast{bottom:104px}
 html.bp-busy{overflow:hidden}
 
 #bSearch.locked,#navQ.locked{opacity:.45;cursor:not-allowed}
+
+/* header: the board chip sits next to the logo */
+.top .lft{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
+/* dock picker */
+.bpd{max-width:1320px}
+.bpd-head{margin:1vh auto 0;max-width:none;text-align:center}
+.bpd-head h2{font-size:clamp(28px,3.4vw,46px);text-wrap:balance}
+.bpd-head .bp-lead{margin:12px auto 0;font-size:clamp(15px,1.3vw,17px)}
+.bpd-stage{display:flex;align-items:stretch;gap:0;height:clamp(240px,25vw,330px);margin:2vh -6px 0}
+.bpd-i{--e:cubic-bezier(.23,1,.32,1);position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding-bottom:4px;
+  appearance:none;border:0;background:none;color:inherit;font:inherit;padding:0 2px;cursor:pointer;opacity:.6;filter:saturate(.7);
+  transition:flex-grow .3s var(--e),opacity .22s ease,filter .22s ease}
+.bpd-i .bp-fig{width:100%;margin:0;animation:none}
+.bpd-i.is-f{opacity:1;filter:none}
+.bpd-i::after{content:"";position:absolute;left:12%;right:12%;bottom:30px;height:34px;border-radius:50%;background:radial-gradient(closest-side,rgba(216,184,119,.34),transparent);opacity:0;transform:scaleX(.6);transition:opacity .3s ease,transform .3s var(--e);pointer-events:none}
+.bpd-i.is-f::after{opacity:1;transform:none}
+.bpd-i:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:14px}
+.bpd-n{display:block;font:600 12px/1.2 var(--f-body);color:var(--fg);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:opacity .2s ease}
+.bpd-f{display:block;font:500 10.5px/1 var(--f-mono);color:var(--faint);letter-spacing:.03em;transition:opacity .2s ease}
+.bpd-i.is-f .bpd-n,.bpd-i.is-f .bpd-f{opacity:0}
+.bpd-i:not(.is-f):hover .bpd-n{color:var(--accent-hi)}
+@media (prefers-reduced-motion:no-preference){
+  .bpd-i .bp-fig{animation:bpfloat 6.4s ease-in-out infinite;animation-delay:calc(var(--i)*-.8s)}
+  .bpd-i:active{transform:scale(.985)}
+}
+@media (prefers-reduced-motion:reduce){.bpd-i{transition:opacity .2s ease,filter .2s ease}.bpd-i::after{transition:opacity .2s ease}}
+.bpd-cap{display:flex;flex-direction:column;align-items:center;text-align:center;margin:22px auto 5vh;max-width:40em;min-height:10.5em}
+.bpd-cap h3{margin:0;font:500 clamp(24px,2.4vw,32px)/1.15 var(--f-body);letter-spacing:-.015em;color:var(--fg)}
+.bpd-t{margin:8px 0 0;color:var(--muted);font-size:16px;line-height:1.5}
+.bpd-m{margin:8px 0 18px;font:500 12px/1.5 var(--f-mono);color:var(--faint);letter-spacing:.02em}
+.bpd-cap.in>*{animation:bpdin .22s cubic-bezier(.23,1,.32,1) both}
+.bpd-cap.in>*:nth-child(2){animation-delay:30ms}.bpd-cap.in>*:nth-child(3){animation-delay:60ms}.bpd-cap.in>*:nth-child(4){animation-delay:90ms}
+@keyframes bpdin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.bpd-cap.in>*{animation:none}}
+.bpk.go .bpd-i,.bpk.go .bpd-cap{opacity:.25;transition:opacity .4s}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1304,12 +1339,14 @@ html.bp-busy{overflow:hidden}
 <a class="skip" href="#panel">Skip to the test panel</a>
 <div class="wrap">
   <header class="top">
+    <div class="lft">
     <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, choose your board">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g class="pins"><path d="M17 4v6M24 4v6M31 4v6M17 38v6M24 38v6M31 38v6M4 17h6M4 24h6M4 31h6M38 17h6M38 24h6M38 31h6"/></g><rect class="chip" x="10" y="10" width="28" height="28" rx="6.5"/><path class="wave" d="M15 25.5h4.2l2.6-8.2 4.2 13.4 2.7-8.6 1.6 3.4H33"/><circle class="live" cx="32.5" cy="16" r="2"/></svg>
       <h1>ESP32 Live Tester</h1>
     </a>
-    <div class="conn">
       <button id="bBoard" class="btn brd" type="button" aria-label="Pick a board"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="3" y="5.5" width="14" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 5.5V3.6M10 5.5V3.6M13.5 5.5V3.6M6.5 14.5v1.9M10 14.5v1.9M13.5 14.5v1.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="bn">Pick a board</span></button>
+    </div>
+    <div class="conn">
       <button id="bSearch" class="btn srch" type="button" aria-haspopup="dialog" aria-keyshortcuts="Control+K /"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Search</span><kbd></kbd></button>
       <span id="status" class="stat" role="status">Not connected</span>
       <button id="bConnect" class="btn primary" type="button">Connect ESP32</button>
@@ -8333,7 +8370,8 @@ function navRecentInit(){
 }
 navRecentInit();
 /* ---- Board picker: the first screen of the Home page, the header board chip, and the "does not fit" marks on parts. ---- */
-BRD.picking=false;
+let _pick=false;
+Object.defineProperty(BRD,'picking',{get:()=>_pick,set:v=>{_pick=!!v;try{searchLock()}catch(e){}},configurable:true});
 /* no search until a board is chosen: the parts that fit depend on it */
 BRD.locked=()=>!BRD.cur||BRD.picking;
 function searchLock(){
@@ -8349,10 +8387,10 @@ const BP_FAMS=[
   ['c6','ESP32-C6','Wi-Fi 6, Thread and Zigbee.']
 ];
 function pickBoard(){BRD.picking=true;show('home');window.scrollTo(0,0)}
-function pickerDraw(svg,id,az,t){
+function pickerDraw(svg,id,az,t,lab){
   const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,34,1.02,f.focus.hero);
   let g=svg.querySelector('g');if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');svg.append(g)}
-  g.innerHTML=f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:true,W,H});
+  g.innerHTML=f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:!lab,W,H});
 }
 /* the card grows to fill the window, then the story starts with that board */
 function pickerGo(id,card){
@@ -8372,11 +8410,11 @@ function pickerGo(id,card){
     requestAnimationFrame(()=>{g.classList.add('out');setTimeout(()=>{g.remove();document.documentElement.classList.remove('bp-busy')},520)});
   },560);
 }
-function pickerPage(b){
+function pickerGrid(b){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const defs=document.createElementNS('http://www.w3.org/2000/svg','svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
   defs.innerHTML='<defs><radialGradient id="hmGr"><stop offset="0" stop-color="#ff5a50" stop-opacity=".75"/><stop offset="1" stop-color="#ff5a50" stop-opacity="0"/></radialGradient><radialGradient id="hmGb"><stop offset="0" stop-color="#5a9bff" stop-opacity=".75"/><stop offset="1" stop-color="#5a9bff" stop-opacity="0"/></radialGradient></defs>';
-  const cur=BRD.cur,cards=[],spinning=new Map();
+  const cards=[],spinning=new Map();
   let raf=0,last=0;
   function tick(now){
     raf=0;if(!b.isConnected){spinning.clear();return}
@@ -8390,10 +8428,10 @@ function pickerPage(b){
     const f=BD.fig(bd.id),svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
     svg.setAttribute('class','hm-svg bp-svg');svg.setAttribute('viewBox','0 0 400 300');svg.setAttribute('role','img');svg.setAttribute('aria-label',bd.n+', drawn as isometric solids');
     const az=38+(i%5)*9;
-    const c=el('button',{type:'button',class:'bp-card'+(bd.id===cur?' is-cur':''),'data-id':bd.id,'data-az':String(az),style:'--i:'+i,onclick:()=>pickerGo(bd.id,c)},
+    const c=el('button',{type:'button',class:'bp-card','data-id':bd.id,'data-az':String(az),style:'--i:'+i,onclick:()=>pickerGo(bd.id,c)},
       el('span',{class:'bp-fig isoc'},svg),
       el('b',{},bd.n),el('span',{class:'bp-d'},bd.tag),
-      el('span',{class:'bp-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests'+(bd.id===cur?', in use':'')));
+      el('span',{class:'bp-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests'));
     pickerDraw(svg,bd.id,az,0);
     c.addEventListener('pointerenter',()=>start(c));c.addEventListener('pointerleave',()=>{if(document.activeElement!==c)stop(c)});
     c.addEventListener('focus',()=>start(c));c.addEventListener('blur',()=>stop(c));
@@ -8417,9 +8455,84 @@ function pickerPage(b){
     ...rowsOf,
     el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),
     help,
-    el('div',{class:'hm-foot'},
-      cur?btn('Keep '+BRD.by(cur).n,()=>{BRD.picking=false;show('home');window.scrollTo(0,0)}):null));
+    );
   b.append(root);
+}
+
+/* ---- Dock picker: the DevKit floats in the middle as before, every other board sits beside it. The board under the pointer grows and turns. ---- */
+const BP_STYLE='dock'; /* 'grid' brings back the earlier picker with one card per board */
+const DK_ORDER=['xiaoc3','c3sm','c3dk','c6dk','devkit','mini32','espcam','s3dk','xiaos3','s2mini'];
+const DK_SHORT={devkit:'DevKit V1',mini32:'Mini32',espcam:'ESP32-CAM',s3dk:'DevKitC-1',xiaos3:'XIAO',c3dk:'DevKitM-1',c3sm:'SuperMini',xiaoc3:'XIAO',s2mini:'S2 Mini',c6dk:'DevKitC-1'};
+const DK_G=[4.7,1.45,1.15];
+function pickerPage(b){
+  const dock=BP_STYLE==='dock'&&matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)').matches;
+  return dock?pickerDock(b):pickerGrid(b);
+}
+function pickerDock(b){
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','svg');defs.setAttribute('width','0');defs.setAttribute('height','0');defs.setAttribute('aria-hidden','true');defs.style.cssText='position:absolute';
+  defs.innerHTML='<defs><radialGradient id="hmGr"><stop offset="0" stop-color="#ff5a50" stop-opacity=".75"/><stop offset="1" stop-color="#ff5a50" stop-opacity="0"/></radialGradient><radialGradient id="hmGb"><stop offset="0" stop-color="#5a9bff" stop-opacity=".75"/><stop offset="1" stop-color="#5a9bff" stop-opacity="0"/></radialGradient></defs>';
+  const list=DK_ORDER.map(id=>BRD.by(id)),items=[],az=list.map((_,i)=>38+(i%5)*9);
+  let focus=DK_ORDER.indexOf('devkit'),lockUntil=0,inside=false,px=0,py=0,raf=0,last=0,rec=0;
+  const cap=el('div',{class:'bpd-cap','aria-live':'polite'});
+  const stage=el('div',{class:'bpd-stage',role:'group','aria-label':'ESP32 boards'});
+  list.forEach((bd,i)=>{
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('class','hm-svg bp-svg');svg.setAttribute('viewBox','0 0 400 300');svg.setAttribute('aria-hidden','true');
+    const it=el('button',{type:'button',class:'bpd-i','data-id':bd.id,style:'--i:'+i,'aria-label':bd.n+', '+BRD.CHIPS[bd.fam].n},
+      el('span',{class:'bp-fig isoc'},svg),el('span',{class:'bpd-n'},DK_SHORT[bd.id]),el('span',{class:'bpd-f'},BRD.CHIPS[bd.fam].n.replace('ESP32-','')||'ESP32'));
+    it.addEventListener('pointerenter',e=>{if(e.pointerType==='touch'||performance.now()<lockUntil)return;setFocus(i)});
+    it.addEventListener('focus',()=>setFocus(i));
+    it.addEventListener('click',e=>{if(e.pointerType==='touch'&&i!==focus){setFocus(i);return}pickerGo(bd.id,it)});
+    items.push(it);stage.append(it);
+  });
+  const draw=(i,lab)=>pickerDraw(items[i].querySelector('svg'),list[i].id,az[i],performance.now()/1000,lab);
+  function tick(now){
+    raf=0;if(!b.isConnected)return;
+    const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
+    az[focus]+=dt*16;draw(focus,true);raf=requestAnimationFrame(tick);
+  }
+  function paintCap(){
+    const bd=list[focus];
+    cap.replaceChildren(el('h3',{},bd.n),el('p',{class:'bpd-t'},bd.tag),
+      el('p',{class:'bpd-m'},BRD.CHIPS[bd.fam].n+', '+bd.pins.length+' pins free for tests. '+bd.usb+'.'),
+      btn('Use this board',()=>pickerGo(bd.id,items[focus]),'primary'));
+    cap.classList.remove('in');void cap.offsetWidth;cap.classList.add('in');
+  }
+  function apply(prev){
+    items.forEach((it,k)=>{it.style.flexGrow=String(DK_G[Math.abs(k-focus)]??1);it.classList.toggle('is-f',k===focus);it.setAttribute('aria-current',k===focus?'true':'false')});
+    if(prev!=null&&prev!==focus)draw(prev,false);
+    draw(focus,true);paintCap();
+    if(!reduce&&!raf){last=0;raf=requestAnimationFrame(tick)}
+  }
+  function setFocus(i){
+    if(i===focus)return;const prev=focus;focus=i;lockUntil=performance.now()+300;apply(prev);
+    clearTimeout(rec);rec=setTimeout(()=>{ /* the row moved under a still pointer: follow whatever it is over now */
+      if(!inside||!b.isConnected)return;const e=document.elementFromPoint(px,py),it=e&&e.closest&&e.closest('.bpd-i');
+      if(it&&it!==items[focus])setFocus(items.indexOf(it));
+    },320);
+  }
+  stage.addEventListener('pointermove',e=>{px=e.clientX;py=e.clientY;inside=true});
+  stage.addEventListener('pointerleave',()=>{inside=false});
+  stage.addEventListener('keydown',e=>{
+    const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(!d)return;
+    const n=items.indexOf(document.activeElement)+d;if(n>=0&&n<items.length){e.preventDefault();items[n].focus()}
+  });
+  list.forEach((_,k)=>{if(k!==focus)draw(k,false)});
+  const help=el('details',{class:'bp-help'},el('summary',{},'Not sure which board you have?'),
+    el('ul',{class:'hm-list'},
+      el('li',{},el('b',{},'Read the name.'),' It is usually printed on the board or in the seller’s listing.'),
+      el('li',{},el('b',{},'Other ESP32 DevKits'),' with an ESP32-WROOM-32 module (30 or 38 pins) use the same chip and pins as the DevKit V1. Pick that one.'),
+      el('li',{},el('b',{},'Look at the shape.'),' The ESP32-CAM has a camera. XIAO and SuperMini boards are about the size of a thumb.'),
+      el('li',{},el('b',{},'None match?'),' Pick the one with the same chip. The chip name is printed on the metal can.')));
+  const root=el('div',{class:'bpk bpd'},defs,
+    el('div',{class:'bp-head bpd-head'},
+      el('h2',{},'Which board are you testing with?'),
+      el('p',{class:'bp-lead'},'Move over a board to look closer, click the one on your desk. The steps, the firmware and the parts that fit change with it.')),
+    stage,cap,
+    el('p',{class:'bp-note'},'Drawings are schematic: the right kind of ports, buttons and pins, not measured to the millimetre.'),help);
+  b.append(root);
+  apply(null);
 }
 
 /* header chip: shows the chosen board, opens the picker */
