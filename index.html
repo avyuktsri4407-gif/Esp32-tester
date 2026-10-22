@@ -972,6 +972,14 @@ body.has-rec #toast{bottom:104px}
 .isoc .mtfan{fill:#8b6a2a;stroke:var(--anatomy-hi);stroke-width:.8px;stroke-linejoin:round}
 .isoc .mthub{fill:#cbc7bc;stroke:var(--anatomy-hi);stroke-width:.8px}
 .isoc .iso-line.gold{stroke:#d8b877}
+.isoc .mtv-bg{fill:rgba(12,13,16,.78);stroke:var(--anatomy-faint);stroke-width:1}
+.isoc .mtv-ring{fill:none;stroke:var(--anatomy-mid);stroke-width:1.4}
+.isoc .mtv-t{stroke:var(--anatomy-mid);stroke-width:1}.isoc .mtv-t.b{stroke:var(--anatomy-hi);stroke-width:1.6}
+.isoc .mtv-l{fill:var(--anatomy-mid);font:500 10px var(--f-mono)}
+.isoc .mtv-w{fill:rgba(216,184,119,.28);stroke:none}
+.isoc .mtv-n{stroke:#d8b877;stroke-width:3;stroke-linecap:round}.isoc .mtv-c{fill:#d8b877}
+.isoc .mtv-h{fill:var(--anatomy-mid);font:500 11px var(--f-mono)}
+.isoc .mtv-k{fill:var(--anatomy-hi);font:500 13px var(--f-mono)}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -7179,7 +7187,23 @@ function make(kind,label){
   return {el:s,rot,set:draw,draw};
 }
 /* stepper: set(deg) turns the shaft */
-function stepper(kind,label){const m=make(kind,label);return {el:m.el,set:d=>m.set(d)}}
+/* top view inset: a protractor that shows the exact angle and the total turns, 0 at 12 o'clock, clockwise is positive */
+function topView(svg){
+  const cx=VW-74,cy=84,r=54,pt=(a,rr)=>[cx+rr*Math.sin(a*RD),cy-rr*Math.cos(a*RD)].map(v=>v.toFixed(1)).join(' ');
+  let t='';for(let a=0;a<360;a+=10){const big=a%90===0,mid=a%30===0;t+=`<line x1="${pt(a,r).split(' ')[0]}" y1="${pt(a,r).split(' ')[1]}" x2="${pt(a,r-(big?10:mid?7:4)).split(' ')[0]}" y2="${pt(a,r-(big?10:mid?7:4)).split(' ')[1]}" class="mtv-t${big?' b':''}"/>`}
+  const lb=[[0,'0'],[90,'90'],[180,'180'],[270,'270']].map(([a,l])=>{const [x,y]=pt(a,r-21).split(' ');return `<text class="mtv-l" x="${x}" y="${(+y+4).toFixed(1)}" text-anchor="middle">${l}</text>`}).join('');
+  const g=document.createElementNS(SVGNS,'g');g.setAttribute('class','mtv');
+  g.innerHTML=`<circle class="mtv-bg" cx="${cx}" cy="${cy}" r="${r+12}"/><circle class="mtv-ring" cx="${cx}" cy="${cy}" r="${r}"/>${t}${lb}<path class="mtv-w" d=""/><line class="mtv-n" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy-r+3}"/><circle class="mtv-c" cx="${cx}" cy="${cy}" r="3.5"/><text class="mtv-h" x="${cx}" y="${cy-r-18}" text-anchor="middle">Top view</text><text class="mtv-k" x="${cx}" y="${cy+r+30}" text-anchor="middle">0.00 turns</text>`;
+  svg.append(g);
+  const w=g.querySelector('.mtv-w'),n=g.querySelector('.mtv-n'),k=g.querySelector('.mtv-k');
+  return tot=>{
+    const a=((tot%360)+360)%360,sa=a*RD,ex=cx+(r-3)*Math.sin(sa),ey=cy-(r-3)*Math.cos(sa);
+    n.setAttribute('x2',ex.toFixed(1));n.setAttribute('y2',ey.toFixed(1));
+    w.setAttribute('d',a<.05?'':`M${cx} ${cy}L${cx} ${cy-r+3}A${r-3} ${r-3} 0 ${a>180?1:0} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}Z`);
+    const tr=tot/360;k.textContent=(Math.abs(tr)<.005?'0':tr.toFixed(2))+(Math.abs(tr)===1?' turn':' turns');
+  };
+}
+function stepper(kind,label){const m=make(kind,label),up=topView(m.el);up(0);return {el:m.el,set:d=>{m.set(d);up(d)}}}
 /* DC motor: keeps the old contract. Toggle class `spin` on `.rot`, set animationDuration (s per turn) and animationDirection */
 function dc(label){
   const m=make('dc130',label||'DC motor'),rot=m.rot;let ang=0,last=performance.now(),born=last;
@@ -8301,6 +8325,12 @@ function renderNav(){
   $('#navNone').hidden=shown>0;
   $('#navCount').textContent=navQuery.trim()?shown+' components found':'';
 }
+function navReveal(){
+  const c=document.querySelector('#navList .ni[aria-current="true"]');if(!c)return;
+  const nav=c.closest('.layout>nav');if(!nav||getComputedStyle(nav).overflowY==='visible')return;
+  const r=c.getBoundingClientRect(),n=nav.getBoundingClientRect();
+  if(r.top<n.top+30||r.bottom>n.bottom-30)nav.scrollTop+=r.top-n.top-(n.height-r.height)/2;
+}
 function refreshHead(){
   if(headChip&&!noRes(PARTS.find(x=>x.id===cur))){headChip.replaceWith(resultChip(cur));headChip=$('#hc');}
 }
@@ -8321,7 +8351,8 @@ async function show(id){
   panel.className=p.overview||p.home?'':'w2';
   document.body.classList.toggle('is-home',!!p.home);
   headChip=chip;
-  renderNav();
+  if(navQuery&&!navMatch(p)){navQuery='';const q=$('#navQ');if(q)q.value=''}
+  renderNav();navReveal();
   if(p.home){HL='h3';const b=el('div',{class:'home'});homePage(b);panel.replaceChildren(b);return}
   if(p.overview){HL='h3';const b=el('div',{class:'ov'});overview(b);panel.append(b);return}
   HL='h4';
