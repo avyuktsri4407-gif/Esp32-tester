@@ -1202,7 +1202,7 @@ header.top{position:relative;z-index:6}
 
 /* phones: the board is a small floating bubble, not a banner at the top. Text reads from the top down. */
 @media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){
-  .hm-stage,.hm.settled .hm-stage{position:fixed;top:auto;right:12px;left:auto;bottom:76px;width:88px;height:88px;margin:0;border-radius:50%;
+  .hm-stage,.hm.settled .hm-stage{position:fixed;top:auto;right:12px;left:auto;top:12px;bottom:auto;width:88px;height:88px;margin:0;border-radius:50%;
     background:color-mix(in srgb,var(--bg) calc(var(--pp,0)*100%),transparent);border:1px solid rgba(255,255,255,calc(var(--pp,0)*.16));
     box-shadow:0 8px 26px rgba(0,0,0,calc(var(--pp,0)*.6))}
   .hm-stage::after{display:none}
@@ -8449,7 +8449,7 @@ function homeMount(root,S,FG,HM_CH){
     let i=0;for(let k=0;k<cs.length;k++)if(cs[k]<=mid)i=k;
     let u=0;if(i<cs.length-1&&mid>cs[i])u=hmEase(hmClamp((mid-cs[i])/(cs[i+1]-cs[i]),0,1));
     const A=HM_CH[i],B=HM_CH[Math.min(HM_CH.length-1,i+1)],fa=FG.focus[A.f],fb=FG.focus[B.f];
-    return {az:lerp(A.az,B.az,u),el:lerp(A.el,B.el,u),zoom:Math.min(Math.exp(lerp(Math.log(A.zoom),Math.log(B.zoom),u)),narrow?.9:99),f:[0,1,2].map(a=>lerp(fa[a],fb[a],u)),ex:lerp(A.ex,B.ex,u),ch:u<.5?i:Math.min(HM_CH.length-1,i+1)};
+    return {az:lerp(A.az,B.az,u),el:lerp(A.el,B.el,u),zoom:narrow?1:Math.min(Math.exp(lerp(Math.log(A.zoom),Math.log(B.zoom),u)),99),f:narrow?FG.focus.hero.slice():[0,1,2].map(a=>lerp(fa[a],fb[a],u)),ex:narrow?0:lerp(A.ex,B.ex,u),ch:u<.5?i:Math.min(HM_CH.length-1,i+1)};
   }
   function say(ch){
     if(ch===chNow)return;chNow=ch;const c=HM_CH[ch];lit=c.lit;
@@ -8461,7 +8461,7 @@ function homeMount(root,S,FG,HM_CH){
     const az=st.az+user.az+(1-e)*-200,elv=hmClamp(st.el+user.el,12,70),sl=geo();
     const nar=!hmWide(),rs=0;
     const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*.5,sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*.64,sl.h-rs,pS);
-    const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,nar?.8:1,pS),st.f,{cx,cy,fw,fh});
+    const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,nar?.85:1,pS),st.f,{cx,cy,fw,fh});
     const t1=performance.now(),html=FG.draw(P,{ex:st.ex,lit,t:now/1000,lite:lite||st.zoom<.75,W,H});
     builtAt=performance.now()-t1;g.innerHTML=html;
     const R=Math.hypot(W,H),kk=nar?.5:.55,mk=lerp(R,sl.w*kk,pS).toFixed(0)+'px '+lerp(R,sl.h*kk,pS).toFixed(0)+'px at '+cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
