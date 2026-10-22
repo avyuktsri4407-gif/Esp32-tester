@@ -7018,9 +7018,9 @@ const lugs=(P,pts)=>pts.map(([x,y,z])=>slab(P,x-.3,y-1.2,x+.3,y+1.2,z,3,'mg',{cr
 /* ---------------- 28BYJ-48 ---------------- */
 const SHAFT=[0,8];                         /* the output shaft sits 8 mm off the can axis */
 function step28(){
-  const pts=[];for(const x of [-52,52])for(const y of [-34,40])for(const z of [-3,34])pts.push([x,y,z]);
+  const pts=[];for(const x of [-18,34])for(const y of [-16,16])for(const z of [0,32])pts.push([x,y,z]);
   const stat=P=>{
-    let s=floor(P,-50,-32,50,38);
+    let s='';
     /* the can: steel, 28 mm across, 17 high, with a seam, a rear bump for the wires and the crimp tabs */
     s+=cyl(P,0,0,14,0,17,'mm',{tone:'mid',steps:40,bevel:.3});
     s+=ln(K.ring(0,0,14,8.6,P,40),'faint')+ln(K.ring(0,0,14,2.2,P,40),'faint');
@@ -7044,9 +7044,9 @@ function step28(){
     s+=cyl(P,SHAFT[0],SHAFT[1],2.5,23.5,6.4,'mm',{tone:'hi',steps:20});
     /* the five wires and the white XH socket */
     const a=[17.4,0,5.4],cols=['wb','wp','wy','wo','wr'];
-    cols.forEach((c,i)=>{const dy=(i-2)*.9;s+=wire(P,bez([a[0],dy,a[2]],[26,dy*1.2,5],[30,dy*3+2,1.4],[35+dy*.2,dy*4.6+8,.6+i*.04]),c)});
-    s+=slab(P,34,3.5,40,16.5,0,4.6,'mw',{tone:'mid',r:.6});
-    s+=ln([0,1,2,3,4].map(i=>K.lineOnTop([35.2,5.5+i*2.2],[38.8,5.5+i*2.2],4.6,P)).join(''),'lo')+dt([0,1,2,3,4].map(i=>I(P,37,5.9+i*2.2,4.6)),.5,'hi');
+    const tips=[];
+    cols.forEach((c,i)=>{const dy=(i-2)*.9,e=[27+dy*.3,dy*3.4+1.2,1.6+i*.1];s+=wire(P,bez([a[0],dy,a[2]],[21,dy*1.2,5],[24,dy*2.4,3.4],e),c);tips.push(I(P,e[0],e[1],e[2]))});
+    s+=dt(tips,.9,'hi');
     return s;
   };
   const rot=(P,deg)=>{
@@ -7064,11 +7064,10 @@ function step28(){
 
 /* ---------------- NEMA 17 ---------------- */
 function nema17(){
-  const pts=[];for(const x of [-52,56])for(const y of [-34,40])for(const z of [-3,70])pts.push([x,y,z]);
+  const pts=[];for(const x of [-23,38])for(const y of [-23,23])for(const z of [0,70])pts.push([x,y,z]);
   const H=21.15;
   const stat=P=>{
-    let s=floor(P,-50,-32,50,38);
-    s+=slab(P,-H,-H,H,H,0,40,'mb',{tone:'mid',r:3.2,steps:6,bevel:.3});
+    let s=slab(P,-H,-H,H,H,0,40,'mb',{tone:'mid',r:3.2,steps:6,bevel:.3});
     /* the lamination stack shows as fine bands on the two faces you see */
     let b='';for(let z=2.5;z<39;z+=2.5)b+=K.segment([H,-H+3,z],[H,H-3,z],P)+K.segment([-H+3,H,z],[H-3,H,z],P);
     s+=ln(b,'faint');
@@ -7084,9 +7083,9 @@ function nema17(){
     /* cable: four wires from the +x face to a white JST socket */
     s+=slab(P,H,-5,H+4,5,5.2,5.6,'mb',{tone:'mid',r:1.2,bevel:.25});
     const cols=['wr','wb','wg','wk'];
-    cols.forEach((c,i)=>{const dy=(i-1.5)*1.1;s+=wire(P,bez([H+4,dy,8],[H+14,dy*1.4,8],[H+18,dy*2.5+2,2],[H+23,dy*3.2+6,.8]),c)});
-    s+=slab(P,H+21,3,H+27,14.5,0,4.6,'mw',{tone:'mid',r:.6});
-    s+=ln([0,1,2,3].map(i=>K.lineOnTop([H+22.2,5+i*2.2],[H+25.8,5+i*2.2],4.6,P)).join(''),'lo')+dt([0,1,2,3].map(i=>I(P,H+24,5.4+i*2.2,4.6)),.5,'hi');
+    const tips=[];
+    cols.forEach((c,i)=>{const dy=(i-1.5)*1.1,e=[H+14,dy*2.6+1.5,2.6+i*.1];s+=wire(P,bez([H+4,dy,8],[H+9,dy*1.4,8],[H+12,dy*2,5],e),c);tips.push(I(P,e[0],e[1],e[2]))});
+    s+=dt(tips,.9,'hi');
     /* GT2 pulley: lower flange, toothed barrel, upper flange, hub with set screw */
     s+=cyl(P,0,0,8.6,50,1,'ml',{tone:'mid',steps:40});
     s+=cyl(P,0,0,6.1,51,8,'ml',{tone:'mid',steps:40});
@@ -7107,14 +7106,13 @@ function nema17(){
 
 /* ---------------- 130 size DC motor, lying on two cradles ---------------- */
 function dc130(){
-  const pts=[];for(const x of [-34,32])for(const y of [-22,22])for(const z of [-3,32])pts.push([x,y,z]);
+  const pts=[];for(const x of [-22,32])for(const y of [-12,18])for(const z of [0,32])pts.push([x,y,z]);
   const CZ=15,RY=10.2,RZ=7.7;
   const stat=P=>{
-    let s=floor(P,-32,-20,32,22);
-    for(const x of [-6,7])s+=slab(P,x-2.6,-9,x+2.6,9,0,CZ-RZ+1.4,'mb',{tone:'mid',r:1,bevel:.2});
+    let s='';
     /* the two leads leave the rear lugs, loop round the can on the side you can see and end as bare tips on the plate */
-    s+=wire(P,bez([-16,-4,CZ-3],[-18,14,CZ-3],[-17,21,7],[-10,21,.8]),'wr',.9)+wire(P,bez([-16,4,CZ-3],[-20,16,CZ-4],[-19,22,7],[-13,21.6,.8]),'wk',.9);
-    s+=dt([I(P,-10,21,.8),I(P,-13,21.6,.8)],1.1,'hi');
+    s+=wire(P,bez([-16,-4,CZ-3],[-18,13,CZ-3],[-17,16,CZ-7],[-13,16,CZ-10]),'wr',.9)+wire(P,bez([-16,4,CZ-3],[-20,14,CZ-4],[-19,18,CZ-8],[-15,18,CZ-11]),'wk',.9);
+    s+=dt([I(P,-13,16,CZ-10),I(P,-15,18,CZ-11)],1.1,'hi');
     /* rear bearing boss and the can */
     s+=prismX(P,0,CZ,3.6,3.6,-17,-12.4,'mm',{steps:16,tone:'mid'});
     s+=prismX(P,0,CZ,RY,RZ,-12.4,12.4,'mm',{tone:'mid',steps:36});
@@ -7141,10 +7139,9 @@ function dc130(){
 
 /* ---------------- KY-040 rotary encoder module ---------------- */
 function enc(){
-  const pts=[];for(const x of [-30,30])for(const y of [-26,24])for(const z of [-3,26])pts.push([x,y,z]);
+  const pts=[];for(const x of [-22,22])for(const y of [-16,16])for(const z of [0,26])pts.push([x,y,z]);
   const stat=P=>{
-    let s=floor(P,-28,-24,28,22);
-    s+=slab(P,-20,-14,20,14,2,2.4,'mp',{tone:'mid',r:2,bevel:.3});
+    let s=slab(P,-20,-14,20,14,2,2.4,'mp',{tone:'mid',r:2,bevel:.3});
     s+=ln(K.planOutline(R(-18,-12,18,12,1),4.4,P,4),'faint');
     s+=dt([[-17,-11],[17,-11],[-17,11],[17,11]].map(([x,y])=>I(P,x,y,4.4)),1.1,'hi');
     /* five header pins along the near edge: GND + SW? CLK DT SW */
