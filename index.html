@@ -1212,6 +1212,89 @@ header.top{position:relative;z-index:6}
   .hm-call>:last-child{display:none}
   .hm-spacer{height:6vh}
 }
+
+/* ===== PHONE SHELL (dep_x53). Phones in portrait only. Desktop and tablets are untouched. ===== */
+@media (max-width:640px){
+  :root{--tabh:62px}
+  html body{padding-top:10px}
+  /* the page is no longer a card inside a page: sections run edge to edge with hairlines */
+  html body:not(.is-home) main{background:transparent;border:0;box-shadow:none;border-radius:0;padding:4px 0 8px}
+  html body:not(.is-home) .layout{display:flex;flex-direction:column;align-items:stretch;gap:14px}
+  html body .layout>nav{display:contents}
+  html body #navSel{order:0;width:100%;min-height:48px;font-size:16px;border-radius:14px;padding-inline:14px}
+  html body .layout>main{order:1}
+  html body .navfoot{order:2;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0;padding:0;border:0}
+  html body .navfoot .btn{min-height:46px;justify-content:center}
+  html body main .sec{padding-top:0;margin-top:30px;scroll-margin-top:66px}
+  html body main .sec>h3:first-child{font-size:22px;margin:0 0 14px;padding:0}
+  html body main .sec+.sec{padding-top:26px;border-top:1px solid var(--hair);margin-top:30px}
+  html body main .ph{gap:8px}
+  html body main .ph h2{font-size:clamp(26px,8vw,34px);line-height:1.06}
+
+  /* bottom tab bar replaces the sideways pill */
+  html body.has-tabs{padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 18px)}
+  html body nav.jump{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;max-width:none;margin:0;z-index:50;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));border:0;border-top:1px solid var(--hair2);border-radius:0;overflow:visible;
+    background:rgba(20,22,26,.97);box-shadow:0 -12px 30px -14px rgba(0,0,0,.9)}
+  html body nav.jump .jl,html body nav.jump .rec-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:50px;margin:0;padding:6px 2px;
+    border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:0;white-space:normal;position:relative}
+  html body nav.jump .jl::before{content:'';width:24px;height:24px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+  html body nav.jump .jl::after{content:attr(data-s);font:500 11.5px/1 var(--f-body);letter-spacing:.01em}
+  html body nav.jump .jl.on{color:var(--accent-hi);background:var(--accent-soft)}
+  html body nav.jump .jl[data-k=circuit]{--ic:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><circle cx='5.5' cy='6.5' r='2.2'/><circle cx='18.5' cy='17.5' r='2.2'/><path d='M7.7 6.5h5.8v11h3'/></svg>")}
+  html body nav.jump .jl[data-k=test]{--ic:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='M3 12h4l2.4-6.5 4.2 13 2.4-6.5H21'/></svg>")}
+  html body nav.jump .jl[data-k=code]{--ic:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5'/></svg>")}
+  html body nav.jump .jl[data-k=notes]{--ic:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='m4 6.5 1.8 1.8L9 5M12.5 7h7.5M4 15.5l1.8 1.8L9 14M12.5 16h7.5'/></svg>")}
+  html body nav.jump .rec-tab{font-size:11.5px;line-height:1;color:var(--accent-hi);border:0;background:transparent}
+  html body nav.jump .rec-tab .rdot{width:14px;height:14px;margin:5px 0}
+  html body nav.jump .rec-tab:hover{background:transparent;color:var(--accent-hi)}
+  html body.has-tabs #toast{bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 14px)}
+  html body.has-tabs .rec{bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px) + 12px)}
+
+  /* code: wraps instead of scrolling sideways */
+  html body .CodeMirror{font-size:12.5px}
+  html body .CodeMirror pre,html body .CodeMirror-line{white-space:pre-wrap!important;word-break:break-word}
+  html body .CodeMirror-scroll{overflow-x:hidden!important}
+  html body pre,html body .cmd-code{white-space:pre-wrap;word-break:break-word;overflow-x:hidden}
+
+  /* pin table on the overview: one row per pin, not four squeezed columns */
+  html body .ov .tw{overflow:visible;border:0;background:none;border-radius:0}
+  html body .ov table.t,html body .ov table.t tbody{display:block;width:100%;border:0}
+  html body .ov table.t thead{display:none}
+  html body .ov table.t tr{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;align-items:baseline;padding:12px 2px;border:0;border-bottom:1px solid var(--hair)}
+  html body .ov table.t td{display:block;padding:0;border:0;white-space:normal;min-width:0}
+  html body .ov table.t:not(.t3) td:nth-child(1){grid-column:1;grid-row:1;font-weight:600;white-space:nowrap;color:var(--fg)}
+  html body .ov table.t:not(.t3) td:nth-child(3){grid-column:2;grid-row:1;justify-self:end;color:var(--faint);font-size:12.5px}
+  html body .ov table.t:not(.t3) td:nth-child(2){grid-column:1/-1;grid-row:2;color:var(--muted);line-height:1.45}
+  /* the all-parts pin map has long side labels that cannot be read at phone width: the list below says the same */
+  html body .ov .mapbox:has(>svg.board-svg),html body .ov .mapbox:has(>svg.board-svg)+.row{display:none}
+  /* the parts table: a title, the module and pins, then what a pass looks like */
+  html body .ov table.t3 tr{grid-template-columns:minmax(0,1fr);gap:4px}
+  html body .ov table.t3 td:nth-child(1){font-weight:600;color:var(--fg);font-size:15.5px;line-height:1.3}
+  html body .ov table.t3 td:nth-child(2){color:var(--muted);font-size:14px;line-height:1.45}
+  html body .ov table.t3 td:nth-child(3){color:var(--faint);font-size:13.5px;line-height:1.45}
+  html body .ov table.t3 td:nth-child(3)::before{content:'Passes when: ';color:var(--faint);font-weight:500}
+
+  /* slim bar that keeps the part name and the connection in reach once the header has scrolled away */
+  #pbar{display:none}
+  html body.has-tabs.pb-on #pbar{display:flex;position:fixed;top:0;left:0;right:0;z-index:48;align-items:center;gap:10px;min-height:calc(52px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 14px 0;
+    background:rgba(20,22,26,.97);border-bottom:1px solid var(--hair2);box-shadow:0 12px 28px -16px rgba(0,0,0,.9)}
+  #pbar .pb-d{flex:none;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted)}
+  #pbar .pb-d.on{background:var(--pass);border-color:var(--pass)}#pbar .pb-d.demo{background:var(--accent);border-color:var(--accent)}
+  #pbar .pb-t{flex:1;min-width:0;text-align:left;background:none;border:0;padding:10px 0;color:var(--fg);font:600 15.5px var(--f-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #pbar .pb-c{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent-hi);font:500 13px var(--f-body)}
+
+  /* home: the parts index reads as a list of rows, not a cloud of pills; the bubble steps aside while you browse it */
+  html body.hm-idxin .hm-stage,html body.hm-idxin .hm-plate{opacity:0;transition:opacity .25s;pointer-events:none}
+  html body .hm-index{padding:18px 14px;border-radius:20px}
+  html body .hm-grp{background:none;border:0;padding:0;margin:0}
+  html body .hm-grp h4{font-size:12.5px;margin:0 0 8px 4px}
+  html body .hm-chips{display:block;border:1px solid var(--hair);border-radius:14px;overflow:hidden;background:var(--bg)}
+  html body .hm-chip{display:flex;align-items:center;gap:10px;min-height:48px;padding:11px 14px;border:0;border-radius:0;border-bottom:1px solid var(--hair);font-size:15px;line-height:1.3;background:none}
+  html body .hm-chip:last-child{border-bottom:0}
+  html body .hm-chip::after{content:'';flex:none;margin-left:auto;width:8px;height:8px;border-top:1.8px solid var(--faint);border-right:1.8px solid var(--faint);transform:rotate(45deg)}
+  html body .hm-chip.nok{border-style:solid;opacity:.5}
+}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -2548,9 +2631,13 @@ function realOf(l,plan){
 /* phones: the whole diagram fits the width; tap to zoom and pan */
 function diagZoom(h){h.addEventListener('click',()=>{if(innerWidth>560)return;h.classList.toggle('zoom')})}
 function connSVG(w,plan){
-  const M=bdModel(),pb=pbOf(w),pins=pb.pins.slice();
+  const M=bdModel(),pb=pbOf(w);
+  /* phone: long pin notes live in the table, the diagram keeps a short name */
+  const sp=t=>{if(innerWidth>560)return t;let x=String(t).replace(/\s*\(.*$/,'').replace(/\s+(from|for|on|via|when|if|and)\s.*$/i,'').replace(/\s*[,;:].*$/,'').replace(/\s+[-−]\s*\(.*$/,'').trim();
+    if(x.length>20)x=x.slice(0,19).replace(/\s+\S*$/,'').replace(/[\s\/]+$/,'')+'…';return x||t};
+  const pins=[...new Set(pb.pins.map(sp))];
   const rows=w.rows.map(r=>{
-    const o={e:r[0],part:matchPin(r[1],pb),col:r[2],kind:r[3],skip:/not connected/i.test(r[0])};
+    const o={e:r[0],part:sp(matchPin(r[1],pb)),col:r[2],kind:r[3],skip:/not connected/i.test(r[0])};
     let id=boardPinId(r[0]);
     if(!id&&/^GPIO/i.test(r[0]))id=String(CFG.led??4);
     o.id=id?(/^\d+$/.test(id)?realOf(id,plan):id):null;
@@ -3094,7 +3181,7 @@ function codeUnderTest(p){
   pre.textContent=srcOf(sel);
   if(cmReady())requestAnimationFrame(()=>{
     if(!host.isConnected)return;
-    cm=CodeMirror(c=>{host.replaceChildren(c)},{value:srcOf(sel),mode:modeOf(sel),readOnly:true,lineNumbers:false,lineWrapping:false,theme:'bench',screenReaderLabel:'Code under test, read only'});
+    cm=CodeMirror(c=>{host.replaceChildren(c)},{value:srcOf(sel),mode:modeOf(sel),readOnly:true,lineNumbers:false,lineWrapping:matchMedia('(max-width:640px)').matches,theme:'bench',screenReaderLabel:'Code under test, read only'});
   });
   paintTabs();paintCap();
   return {
@@ -3146,7 +3233,7 @@ function firmwareBlock(){
     box);
 }
 function overview(b){
-  b.append(el('section',{class:'hero'},el('p',{class:'lead'},'Pick a part on the left. Each page shows the circuit, a live test with the part drawn and moving as the board reports, and an editor for your own commands, JavaScript or Arduino code.')));
+  b.append(el('section',{class:'hero'},el('p',{class:'lead'},(matchMedia('(max-width:959px)').matches?'Pick a part from the list above.':'Pick a part on the left.')+' Each page shows the circuit, a live test with the part drawn and moving as the board reports, and an editor for your own commands, JavaScript or Arduino code.')));
   b.append(blk('How this works',
     el('ul',{class:'plain'},
       el('li',{},'Plug the ESP32 in with a USB cable and press Install firmware below. It flashes from this page in about 40 seconds. No Arduino IDE needed. Do this once.'),
@@ -3156,7 +3243,7 @@ function overview(b){
     el('p',{class:'hint'},'Demo results are never saved. Real results are kept in this browser and can be copied with the Copy results button.')));
   const stRows=PARTS.filter(p=>!noRes(p)).map(p=>el('tr',{},el('td',{},p.n),el('td',{},subOf(p)),el('td',{},(p.criteria||[])[0]||'')));
   b.append(mapBlock());
-  b.append(blk('Parts this tester covers',el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...['Part','Module and pins','Passes when'].map(h=>el('th',{},h)))),el('tbody',{},stRows))),
+  b.append(blk('Parts this tester covers',el('div',{class:'tw'},el('table',{class:'t t3'},el('thead',{},el('tr',{},...['Part','Module and pins','Passes when'].map(h=>el('th',{},h)))),el('tbody',{},stRows))),
     el('p',{class:'hint'},'To add a part, see CONTEXT.md in the project folder.')));
 }
 
@@ -8526,7 +8613,7 @@ function homeMount(root,S,FG,HM_CH){
   grab(hit);grab(S.ihit);
   hit.addEventListener('keydown',e=>{const s=e.key==='ArrowLeft'?-15:e.key==='ArrowRight'?15:0;if(!s)return;e.preventDefault();user.az+=s;rel=performance.now()+2500;kick()});
   const fabIc=el('span',{class:'ic','aria-hidden':'true'});fabIc.innerHTML='<svg viewBox="0 0 20 20" width="18" height="18"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';const fab=el('button',{class:'hm-fab',type:'button','aria-label':'Search parts',onclick:()=>palOpen()},fabIc,el('span',{class:'tx'},'Search parts'),el('kbd',{},palKey()));root.appendChild(fab);
-  const idx=root.querySelector('#hm-index');const fabUpd=()=>{const hide=idx&&idx.getBoundingClientRect().top<innerHeight*.25;fab.classList.toggle('on',scrollY>Math.max(260,innerHeight*.7)&&!hide)};addEventListener('scroll',fabUpd,{passive:true});fabUpd();
+  const fabUpd=()=>{const idx=document.getElementById('hm-index'),it=idx&&idx.isConnected?idx.getBoundingClientRect().top:1e9,hide=it<innerHeight*.25;document.body.classList.toggle('hm-idxin',it<innerHeight*.85);fab.classList.toggle('on',scrollY>Math.max(260,innerHeight*.7)&&!hide)};addEventListener('scroll',fabUpd,{passive:true});fabUpd();
   if(!mq.matches){const b=document.createElement('div');b.className='hm-bang';b.setAttribute('aria-hidden','true');root.appendChild(b);setTimeout(()=>b.remove(),2200)}
   pS=prog();size();chrome();say(target().ch);kick();
 }
@@ -9543,6 +9630,7 @@ async function show(id){
   panel.replaceChildren(head);
   panel.className=p.overview||p.home?'':'w2';
   document.body.classList.toggle('is-home',!!p.home);
+  document.body.classList.remove('has-tabs');if(spyOff){spyOff();spyOff=null}phoneBar(null);
   headChip=chip;
   if(navQuery&&!navMatch(p)){navQuery='';const q=$('#navQ');if(q)q.value=''}
   renderNav();navReveal();
@@ -9551,7 +9639,8 @@ async function show(id){
   HL='h4';
   {const bn=boardNote(p);if(bn)panel.append(bn)}
   const secs=[['circuit','Circuit'],['test','Live test'],p.id==='power'?null:['code','Your code'],['notes','Pass criteria and notes']].filter(Boolean);
-  const jump=el('nav',{class:'jump','aria-label':'On this page'},...secs.map(([k,l])=>el('button',{type:'button',class:'jl',onclick:()=>{const t=$('#s-'+k);t.scrollIntoView({block:'start'});t.focus({preventScroll:true})}},l)))
+  const SHORT={circuit:'Circuit',test:'Test',code:'Code',notes:'Notes'};
+  const jump=el('nav',{class:'jump','aria-label':'On this page'},...secs.map(([k,l])=>el('button',{type:'button',class:'jl','data-k':k,'data-s':SHORT[k]||l,'aria-label':l,onclick:()=>{const t=$('#s-'+k);t.scrollIntoView({block:'start'});t.focus({preventScroll:true})}},l)))
   try{Rec.mount(jump)}catch(e){}
   const sec=(k,title,...kids)=>el('section',{class:'sec sec-'+k,id:'s-'+k,tabindex:'-1','aria-labelledby':'h-'+k},el('h3',{id:'h-'+k},title),...kids);
   const tb=el('div');TESTS[p.id](tb);
@@ -9563,6 +9652,31 @@ async function show(id){
     sec('test','Live test',tb,PART_CMDS[p.id]?monitorPanel(p):null,verdictBar(p)),
     p.id==='power'?null:sec('code','Your code',codePanel(p)),
     sec('notes','Pass criteria and notes',notes));
+  tabSpy(jump,p);
+}
+/* phones: the section tabs sit in a bottom bar, and the current section is marked as you scroll */
+var spyOff=null;
+function phoneBar(p){
+  let b=document.getElementById('pbar');
+  if(!p){if(b)b.remove();return}
+  if(!b){b=el('div',{id:'pbar','aria-hidden':'true'});document.body.append(b)}
+  const st=$('#status');
+  b.replaceChildren(el('span',{class:'pb-d '+(st?st.className.replace('stat','').trim():'')}),
+    el('button',{type:'button',class:'pb-t',tabindex:'-1',onclick:()=>scrollTo({top:0,behavior:'smooth'})},p.n),
+    el('button',{type:'button',class:'pb-c',tabindex:'-1',onclick:()=>$('#bConnect').click()},$('#bConnect').textContent));
+}
+function tabSpy(jump,p){
+  if(spyOff){spyOff();spyOff=null}
+  document.body.classList.toggle('has-tabs',!!jump);document.body.classList.remove('pb-on');
+  phoneBar(jump?p:null);
+  if(!jump)return;
+  const btns=[...jump.querySelectorAll('.jl')];let raf=0;
+  const run=()=>{raf=0;document.body.classList.toggle('pb-on',scrollY>240);let on=null;for(const b of btns){const t=document.getElementById('s-'+b.dataset.k);if(t&&t.getBoundingClientRect().top<=innerHeight*.4)on=b}
+    if(!on&&btns.length)on=btns[0];if(innerHeight+scrollY>=document.documentElement.scrollHeight-8&&btns.length)on=btns[btns.length-1];
+    for(const b of btns){const v=b===on;b.classList.toggle('on',v);if(v)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')}};
+  const h=()=>{if(!raf)raf=requestAnimationFrame(run)};
+  addEventListener('scroll',h,{passive:true});addEventListener('resize',h);run();
+  spyOff=()=>{removeEventListener('scroll',h);removeEventListener('resize',h);if(raf)cancelAnimationFrame(raf);document.body.classList.remove('pb-on')};
 }
 function verdictBar(p){
   const r=R()[p.id];
