@@ -773,9 +773,9 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @keyframes hmring{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.9);opacity:0}}
 .hm-c{opacity:var(--pp,0);position:absolute;z-index:3;font:500 11px/1 var(--f-mono);letter-spacing:.06em;color:var(--faint);pointer-events:none;white-space:nowrap}
 .hm-c.tl{top:16px;left:18px;color:var(--muted)}.hm-c.tr{top:16px;right:18px;text-transform:uppercase;letter-spacing:.1em}
-.hm-c.bl{bottom:16px;left:18px;text-transform:uppercase;letter-spacing:.1em}.hm-c.br{bottom:16px;right:18px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hm-c.rt{top:50%;right:12px;transform:translateY(-50%);writing-mode:vertical-rl;font-size:10px;letter-spacing:.16em;opacity:calc(var(--pp,0)*.5)}.hm-c.br{bottom:16px;right:18px;color:var(--muted);font-variant-numeric:tabular-nums}
 .hm-call{position:absolute;left:16px;top:60vh;max-width:min(280px,58%);padding:10px 14px 11px;border:1px solid var(--accent-line);border-radius:var(--r-md);background:rgba(20,22,26,.86);backdrop-filter:blur(6px);transition:opacity .16s,transform .16s;pointer-events:none}
-.hm-call.sw{opacity:0;transform:translateY(4px)}
+.hm-call.swp{opacity:0;transform:translateY(4px)}
 .hm-call.hid{opacity:0;transform:translateY(8px);transition:none}
 .hm-call b{display:block;font:600 13px/1.3 var(--f-body);color:var(--accent-hi)}
 .hm-call span{display:block;margin-top:3px;font-size:12.5px;line-height:1.45;color:var(--muted)}
@@ -831,7 +831,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
   .hm{--hmH:min(calc(100vh - 140px),820px)}
   .hm-stage{grid-column:2;grid-row:1;top:calc((100vh - var(--hmH))/2);height:var(--hmH);align-self:start;margin:0}
 }
-@media (max-width:899.98px){.hm-sec{min-height:30vh;padding:4vh 0}.hm-hero{min-height:auto}.hm-spacer{height:18vh}.hm-c.bl,.hm-c.tr{display:none}.hm-call{max-width:64%}.hm-facts{max-width:none}#hm-s1,#hm-s2,#hm-s3,#hm-s4{min-height:18vh}}
+@media (max-width:899.98px){.hm-sec{min-height:30vh;padding:4vh 0}.hm-hero{min-height:auto}.hm-spacer{height:18vh}.hm-c.rt,.hm-c.tr{display:none}.hm-call{max-width:64%}.hm-facts{max-width:none}#hm-s1,#hm-s2,#hm-s3,#hm-s4{min-height:18vh}}
 @media (max-width:560px){.hm-step{grid-template-columns:1fr}.hm-n{font-size:34px;margin-bottom:6px}.hm-facts{grid-template-columns:1fr 1fr 1fr}.hm-fact{padding:10px}.hm-fact b{font-size:22px}}
 .top .brand{color:inherit;text-decoration:none;border-radius:14px;padding:4px 10px 4px 4px;margin:-4px -10px -4px -4px}
 .top .brand:hover h1{color:var(--accent-hi)}
@@ -1673,8 +1673,10 @@ const KNOWN={0x68:'MPU6050 (AD0 low)',0x69:'MPU6050 (AD0 high)',0x2C:'QMC5883P c
 const PARTS=[
 {id:'home',n:'Home',s:'What this is, and how to start',home:true},
 {id:'overview',n:'Pin map and parts',s:'Every supported part, every GPIO',overview:true},
-{id:'esp',n:'ESP32 DevKit (ESP-WROOM-32)',s:'Any ESP32 DevKit V1 board over USB serial',
-  wiring:null,criteria:['Replies to PING and INFO.'],notes:['Power only from USB while on the bench. Never from USB and the 5 V rail together.','Most boards have an onboard LED. Use the LED test for it.']},
+{id:'esp',get n(){const b=BRD.cur&&BRD.cur!=='devkit'?BRD.by(BRD.cur):null;return b?b.n+' ('+BRD.famName(b)+')':'ESP32 DevKit (ESP-WROOM-32)'},
+  get s(){const b=BRD.cur&&BRD.cur!=='devkit'?BRD.by(BRD.cur):null;return b?'Your '+b.n+' over USB serial':'Any ESP32 DevKit V1 board over USB serial'},
+  wiring:null,criteria:['Replies to PING and INFO.'],
+  get notes(){const b=BRD.cur&&BRD.cur!=='devkit'?BRD.by(BRD.cur):null;return b?['To flash or connect: '+b.boot,'Power only from USB while on the bench. Never from USB and the 5 V pin together.','Use the LED test for the onboard LED.']:['Power only from USB while on the bench. Never from USB and the 5 V rail together.','Most boards have an onboard LED. Use the LED test for it.']}},
 {id:'led',n:'5 mm LED + 220 Ω resistor',s:()=>(BRD.ident()?'Onboard GPIO2':'Onboard LED')+' or external on GPIO'+CFG.led,
   wiring:{title:'LED on GPIO4',part:'LED + 220 Ω',rows:[['GPIO4','220 Ω resistor','orange','sig'],['GND','LED cathode (short leg)','black','gnd']],notes:['Series: GPIO4, then 220 Ω, then LED anode (long leg). Cathode to GND.','If you have no LED, use the onboard one.']},
   criteria:['LED lights on HIGH and goes dark on LOW.']},
@@ -2360,42 +2362,78 @@ function matchPin(lbl,pb){
 }
 function pbOf(w){return PBDATA[w.part]||autoPB(w)}
 function swatch(col){const h=wireHex(col);return el('span',{class:'sw',style:'background:'+(h||'var(--accent)')})}
-function bdName(){return BRD.ident()?'ESP32 DevKit':BRD.by(BRD.cur).n}
+function bdName(){return !BRD.cur||BRD.cur==='devkit'?'ESP32 DevKit':BRD.by(BRD.cur).n}
 function bdChip(){if(BRD.ident())return 'ESP32';return BRD.famName(BRD.by(BRD.cur))}
 function bdLab(id,t,on){
   if(BRD.ident()||!/^\d+$/.test(id))return t;
   const q=BRD.map[id];if(q==null)return on?id:'';
   const pad=BRD.by(BRD.cur).pad;return pad&&pad[q]?q+' '+pad[q]:String(q);
 }
-function connSVG(w){
-  const pb=pbOf(w),pins=pb.pins.slice();
-  const Ls=new Set(BOARD_L.map(a=>a[0]).filter(x=>x!=='GND')),Rs=new Set(BOARD_R.map(a=>a[0]).filter(x=>x!=='GND'));
+/* ---- board drawings for the wiring and pin-map views: each board's own header, read from its 3D spec (BD), so the pins sit where they do on the real board.
+   Antenna end at the top, USB at the bottom, left column first. The 3D spec lists labels from the USB end, so they are turned round. ---- */
+const LAB_GPIO={s3:{TX:43,RX:44},s2:{},c3:{TX:21,RX:20},c6:{TX:16,RX:17},esp32:{TX:1,RX:3,U0T:1,U0R:3}};
+function labId(b,l){
+  if(/^\d+$/.test(l))return l;
+  if(l==='G')return 'GND';
+  if(l==='3V3'||l==='NC'||l==='VCC')return l;
+  if(l==='5V'||l==='VBUS')return 'VIN';
+  if(l==='RST'||l==='EN')return 'EN';
+  if(b.pad)for(const q in b.pad)if(b.pad[q]===l)return q;
+  const t=(LAB_GPIO[b.fam]||{})[l];return t!=null?String(t):l;
+}
+function labText(b,l,id){
+  if(l==='G')return 'GND';
+  if(/^\d+$/.test(l)||l==='3V3'||l==='NC'||l==='RST'||l==='EN'||l==='VCC'||l==='5V'||l==='VBUS')return l;
+  return /^\d+$/.test(id)?l+' '+id:l;
+}
+function bdModel(){
+  const b=BRD.cur?BRD.by(BRD.cur):null;let L,R,usb=1;
+  if(!b||b.id==='devkit'){
+    const mk=a=>a.map(([id,t])=>({id:id==='TX0'?'1':id==='RX0'?'3':id,lab:t}));L=[mk(BOARD_L)];R=[mk(BOARD_R)];
+  }else{
+    const sp=BD.fig(b.id).spec,rows=(sp.rows||[]).filter(r=>r.lab);usb=(sp.usb||[]).length||1;
+    const side=sg=>rows.filter(r=>sg>0?r.y>0:r.y<0).sort((a,c)=>Math.abs(c.y)-Math.abs(a.y)).map(r=>r.lab.slice().reverse().map(l=>{const id=labId(b,l);return {id,lab:labText(b,l,id)}}));
+    L=side(-1);R=side(1);
+  }
+  const pins=[];
+  [['L',L],['R',R]].forEach(([sd,cols])=>cols.forEach((arr,c)=>arr.forEach((p,row)=>pins.push({id:p.id,lab:p.lab,side:sd,col:c,row}))));
+  return {n:L[0].length,four:L.length>1,usb,chip:bdChip(),pins};
+}
+function realOf(l,plan){
+  if(BRD.ident())return String(l);
+  const q=BRD.map[l];if(q!=null)return String(q);
+  const r=plan?plan(+l):null;return r!=null?String(r):null;
+}
+function connSVG(w,plan){
+  const M=bdModel(),pb=pbOf(w),pins=pb.pins.slice();
   const rows=w.rows.map(r=>{
-    const o={e:r[0],part:matchPin(r[1],pb),col:r[2],kind:r[3],id:boardPinId(r[0]),skip:/not connected/i.test(r[0])};
-    if(!o.id&&/^GPIO/i.test(r[0]))o.id=String(CFG.led??4);
+    const o={e:r[0],part:matchPin(r[1],pb),col:r[2],kind:r[3],skip:/not connected/i.test(r[0])};
+    let id=boardPinId(r[0]);
+    if(!id&&/^GPIO/i.test(r[0]))id=String(CFG.led??4);
+    o.id=id?(/^\d+$/.test(id)?realOf(id,plan):id):null;
     if(!pins.includes(o.part))pins.push(o.part);
     return o;
   });
+  const find=(o,pref)=>{if(o.skip||!o.id)return null;const c=M.pins.filter(p=>p.id===o.id);return c.length?(c.find(p=>p.side===pref)||c[0]):null};
   let ls=0,rs=0;
-  rows.forEach(o=>{if(o.skip||!o.id)return;if(Ls.has(o.id))ls+=o.id==='VIN'?.5:1;else if(Rs.has(o.id))rs+=o.id==='3V3'?.5:1});
+  rows.forEach(o=>{const p=find(o,'R');if(!p||o.id==='GND')return;const wt=o.id==='VIN'||o.id==='3V3'?.5:1;if(p.side==='L')ls+=wt;else rs+=wt});
   const ps=ls>rs?'L':'R',dir=ps==='R'?1:-1;
-  const W=780,rh=34,boardTop=48,y0=boardTop+30,bh=14*rh+60,bBot=boardTop+bh,BW=180,BX=ps==='R'?100:480;
-  const nearX=ps==='R'?BX+BW:BX,farX=ps==='R'?BX:BX+BW,pinX=ps==='R'?520:260,bx0=ps==='R'?520:20;
-  const pinY=i=>y0+i*rh;
+  const rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=BW+600,boardTop=48,y0=boardTop+30,bh=(M.n-1)*rh+60,bBot=boardTop+bh,BX=ps==='R'?100:W-100-BW;
+  const nearX=ps==='R'?BX+BW:BX,farX=ps==='R'?BX:BX+BW,pinX=ps==='R'?BX+BW+240:260,bx0=pinX===260?20:pinX;
+  const pinY=i=>y0+i*rh,gap=rh/2;
+  const pxOf=p=>p.side==='L'?(p.col?BX+IN:BX):(p.col?BX+BW-IN:BX+BW);
   rows.forEach(o=>{
-    if(o.skip||!o.id)return;
-    o.side=o.id==='GND'?ps:(Ls.has(o.id)?'L':'R');
-    o.idx=(o.side==='L'?BOARD_L:BOARD_R).findIndex(a=>a[0]===o.id);
-    o.x=o.side==='L'?BX:BX+BW;o.y=pinY(o.idx);o.far=o.side!==ps;
+    const p=find(o,ps);o.loc=p;if(!p)return;
+    o.side=p.side;o.x=pxOf(p);o.cy=pinY(p.row);o.inner=p.col>0;o.y=o.cy+(o.inner?gap:0);o.far=p.side!==ps;
   });
   const np=pins.length,boxH=np*rh+44,pp=rh;
-  const ref=rows.filter(o=>o.y!=null&&!o.far),use=ref.length?ref:rows.filter(o=>o.y!=null);
+  const placed=rows.filter(o=>o.loc),ref=placed.filter(o=>!o.far),use=ref.length?ref:placed;
   const avg=use.length?use.reduce((a,o)=>a+o.y,0)/use.length:boardTop+bh/2;
   let k=Math.round((avg-boxH/2-(y0-38+rh/2))/rh);let boxTop=y0-38+rh/2+k*rh;
   boxTop=Math.max(boardTop,Math.min(boxTop,bBot-boxH));
   const ppY=i=>boxTop+38+i*pp;
   rows.forEach(o=>{o.py=ppY(pins.indexOf(o.part))});
-  const wires=rows.filter(o=>!o.skip&&o.id),stubs=rows.filter(o=>!o.skip&&!o.id);
+  const wires=rows.filter(o=>o.loc),stubs=rows.filter(o=>!o.skip&&!o.loc);
   const nearW=wires.filter(o=>!o.far&&Math.abs(o.y-o.py)>1),farW=wires.filter(o=>o.far).sort((a,b)=>a.y-b.y);
   const downs=nearW.filter(o=>o.py>o.y).sort((a,b)=>a.y-b.y),ups=nearW.filter(o=>o.py<o.y).sort((a,b)=>b.y-a.y);
   const laneW=Math.abs(pinX-nearX)-50,K=downs.length+ups.length+farW.length,step=Math.max(6,Math.min(18,laneW/(K+1)));
@@ -2407,18 +2445,18 @@ function connSVG(w){
     o.fx=farX+(ps==='R'?-1:1)*(16+8*kk);o.by=bBot+16+8*kk;o.lx=laneX(downs.length+ups.length+farW.length-j);
   });
   const H=bBot+16+8*Math.max(0,farW.length-1)+26;
-  const lit=new Set(wires.map(o=>o.side+o.idx));
-  const x2=(a,b)=>`${a},${b}`;
+  const lit=new Set(wires.map(o=>o.loc.side+o.loc.col+'.'+o.loc.row));
+  const x2=(a,b)=>`${a},${b}`,mw=M.four?72:68;
   let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg conn-svg" role="img" aria-label="${esc(w.title)}: ${esc(pb.n)} wired to the ${esc(bdName())}. The table below lists every connection.">`;
   s+=`<text class="ttl" x="${BX}" y="${boardTop-16}">${esc(bdName())}</text><text class="ttl" x="${bx0}" y="${boxTop-12}">${esc(pb.n)}</text>`;
   s+=`<rect class="bd" x="${BX}" y="${boardTop}" width="${BW}" height="${bh}" rx="22"/>`;
-  s+=`<rect class="mod" x="${BX+56}" y="${boardTop+10}" width="68" height="112" rx="8"/><text class="mt" x="${BX+90}" y="${boardTop+70}" text-anchor="middle">${esc(bdChip())}</text>`;
-  s+=`<rect class="mod" x="${BX+60}" y="${bBot-40}" width="60" height="34" rx="8"/><text class="mt" x="${BX+90}" y="${bBot-18}" text-anchor="middle">USB</text>`;
-  [['L',BOARD_L],['R',BOARD_R]].forEach(([sd,arr])=>arr.forEach(([id,t],i)=>{
-    const y=pinY(i),on=lit.has(sd+i),left=sd==='L';
-    s+=`<circle class="${on?'pu':'pf'}" cx="${left?BX:BX+BW}" cy="${y}" r="5"/>`;
-    s+=`<text class="pl${on?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(bdLab(id,t,on))}</text>`;
-  }));
+  s+=`<rect class="mod" x="${BX+(BW-mw)/2}" y="${boardTop+10}" width="${mw}" height="112" rx="8"/><text class="mt" x="${BX+BW/2}" y="${boardTop+70}" text-anchor="middle">${esc(M.chip)}</text>`;
+  for(let u=0;u<M.usb;u++){const cx=BX+BW/2+(M.usb>1?(u?1:-1)*36:0),uw=M.usb>1?52:60;s+=`<rect class="mod" x="${cx-uw/2}" y="${bBot-40}" width="${uw}" height="34" rx="8"/><text class="mt" x="${cx}" y="${bBot-18}" text-anchor="middle">USB</text>`}
+  M.pins.forEach(p=>{
+    const y=pinY(p.row),on=lit.has(p.side+p.col+'.'+p.row),left=p.side==='L',x=pxOf(p);
+    s+=`<circle class="${on?'pu':'pf'}" cx="${x}" cy="${y}" r="5"/>`;
+    s+=`<text class="pl${on?' u':''}" x="${left?x+12:x-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(p.lab)}</text>`;
+  });
   s+=`<rect class="bd" x="${bx0}" y="${boxTop}" width="240" height="${boxH}" rx="16"/>`;
   const usedPin=new Set(rows.filter(o=>!o.skip).map(o=>o.part));
   pins.forEach((p,i)=>{
@@ -2441,10 +2479,10 @@ function connSVG(w){
     return t+`<circle class="wd" cx="${a[0]}" cy="${a[1]}" r="3.5" fill="${hx}"${st}/><circle class="wd" cx="${b[0]}" cy="${b[1]}" r="3.5" fill="${hx}"${st}/>`;
   };
   wires.forEach(o=>{
-    let pts;
-    if(o.far)pts=[[o.x,o.y],[o.fx,o.y],[o.fx,o.by],[o.lx,o.by],[o.lx,o.py],[pinX,o.py]];
-    else if(Math.abs(o.y-o.py)<=1)pts=[[o.x,o.y],[pinX,o.py]];
-    else pts=[[o.x,o.y],[o.lx,o.y],[o.lx,o.py],[pinX,o.py]];
+    const st=o.inner?[[o.x,o.cy],[o.x,o.y]]:[[o.x,o.y]];let pts;
+    if(o.far)pts=[...st,[o.fx,o.y],[o.fx,o.by],[o.lx,o.by],[o.lx,o.py],[pinX,o.py]];
+    else if(Math.abs(o.y-o.py)<=1)pts=[...st,[pinX,o.py]];
+    else pts=[...st,[o.lx,o.y],[o.lx,o.py],[pinX,o.py]];
     s+=draw(pts,o);
   });
   stubs.forEach(o=>{
@@ -2501,22 +2539,27 @@ function boardPinId(label){
   return null;
 }
 function boardSVG(use){
-  const W=800,top=24,rh=34,y0=top+30,n=15,bh=(n-1)*rh+60,H=top+bh+14,BX=300,BW=180;
+  const M=bdModel(),dk=!BRD.cur||BRD.cur==='devkit';
+  const U={};
+  if(dk)Object.assign(U,use);
+  else for(const k in use){const id=/^\d+$/.test(k)?realOf(k,null):k;if(id!=null)U[id]=(U[id]||[]).concat(use[k])}
+  const rh=M.n>16?26:34,BW=M.four?300:180,IN=60,W=800,top=24,y0=top+30,bh=(M.n-1)*rh+60,H=top+bh+14,BX=(W-BW)/2,gap=rh/2,mw=M.four?72:68;
+  const pxOf=p=>p.side==='L'?(p.col?BX+IN:BX):(p.col?BX+BW-IN:BX+BW);
   let s=`<svg viewBox="0 0 ${W} ${H}" class="board-svg" role="img" aria-label="${esc(bdName())} pin map">`;
   s+=`<rect class="bd" x="${BX}" y="${top}" width="${BW}" height="${bh}" rx="22"/>`;
-  s+=`<rect class="mod" x="356" y="${top+10}" width="68" height="112" rx="8"/><text class="mt" x="390" y="${top+70}" text-anchor="middle">${esc(bdChip())}</text>`;
-  s+=`<rect class="mod" x="360" y="${top+bh-40}" width="60" height="34" rx="8"/><text class="mt" x="390" y="${top+bh-18}" text-anchor="middle">USB</text>`;
-  const side=(arr,left)=>arr.forEach(([id,t],i)=>{
-    const y=y0+i*rh,u=use[id];
-    s+=`<circle class="${u?'pu':'pf'}" cx="${left?BX:BX+BW}" cy="${y}" r="5"/>`;
-    s+=`<text class="pl${u?' u':''}" x="${left?BX+12:BX+BW-12}" y="${y+4}" text-anchor="${left?'start':'end'}">${esc(bdLab(id,t,!!u))}</text>`;
+  s+=`<rect class="mod" x="${BX+(BW-mw)/2}" y="${top+10}" width="${mw}" height="112" rx="8"/><text class="mt" x="${BX+BW/2}" y="${top+70}" text-anchor="middle">${esc(M.chip)}</text>`;
+  for(let u=0;u<M.usb;u++){const cx=BX+BW/2+(M.usb>1?(u?1:-1)*36:0),uw=M.usb>1?52:60;s+=`<rect class="mod" x="${cx-uw/2}" y="${top+bh-40}" width="${uw}" height="34" rx="8"/><text class="mt" x="${cx}" y="${top+bh-18}" text-anchor="middle">USB</text>`}
+  M.pins.forEach(p=>{
+    const left=p.side==='L',x=pxOf(p),cy=y0+p.row*rh,inner=p.col>0,y=cy+(inner?gap:0),u=U[p.id];
+    s+=`<circle class="${u?'pu':'pf'}" cx="${x}" cy="${cy}" r="5"/>`;
+    s+=`<text class="pl${u?' u':''}" x="${left?x+12:x-12}" y="${cy+4}" text-anchor="${left?'start':'end'}">${esc(p.lab)}</text>`;
     if(u){
-      const c=u.find(x=>x.c),off=c?28:12,sx=left?BX-18:BX+BW+18;
+      const c=u.find(q=>q.c),off=c?28:12,ex=left?BX-off:BX+BW+off,sx=left?BX-18:BX+BW+18;
+      if(inner)s+=`<polyline points="${x},${cy} ${x},${y} ${left?BX-18:BX+BW+18},${y}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="2 4"/>`;
       if(c)s+=`<circle cx="${sx}" cy="${y}" r="6" fill="${c.c}" stroke="${c.c==='#0A0A0B'?'#9A9AA6':c.c}" stroke-width="1.5"/>`;
-      s+=`<text class="an" x="${left?BX-off:BX+BW+off}" y="${y+4}" text-anchor="${left?'end':'start'}">${esc(u.map(x=>x.t).join(' + '))}</text>`;
+      s+=`<text class="an" x="${ex}" y="${y+4}" text-anchor="${left?'end':'start'}">${esc(u.map(q=>q.t).join(' + '))}</text>`;
     }
   });
-  side(BOARD_L,true);side(BOARD_R,false);
   return s+'</svg>';
 }
 function useFromRows(rows){
@@ -2535,7 +2578,7 @@ function mapView(id,qs){
     const o=PICK.find(x=>x.id===id);w=o.w();name=o.n;
     Object.assign(use,useFromRows(w.rows));
   }
-  const holder=el('div',{class:'mapbox'});holder.innerHTML=w?connSVG(w):boardSVG(use);
+  const holder=el('div',{class:'mapbox'});const pk=PARTS.find(x=>x.id===id);holder.innerHTML=w?connSVG(w,pk?BRD.plan(pk):(id==='trim'?BRD.plan(PARTS.find(x=>x.id==='servo')):null)):boardSVG(use);
   out.push(el('h4',{class:'mapname'},name),holder,
     el('div',{class:'row'},el('span',{class:'chip fill'},'pin in use'),el('span',{class:'chip dash'},'free pin'),
       el('span',{class:'hint'},BRD.ident()?'Drawn for the common 30-pin ESP32 DevKit V1, USB at the bottom. Match pins by the GPIO numbers printed on your board, not by position.':'Schematic only. Pins are labelled with this board\'s own numbers and names. Match them by the label printed on your board, not by position.')));
@@ -7702,6 +7745,13 @@ function preview(p){
   try{seed(p);const m=map;return l=>{const q=m[l];if(q==null)return null;const pad=by(cur).pad&&by(cur).pad[q];return 'GPIO'+q+(pad?' ('+pad+')':'')}}
   finally{quiet--;map=sm;usedP=su}
 }
+/* same plan as preview, but as real GPIO numbers: logical pin to real pin */
+function plan(p){
+  if(ident())return l=>l;
+  const sm=map,su=usedP;map={};usedP=new Set();quiet++;
+  try{seed(p);const m=map;return l=>m[l]==null?null:m[l]}
+  finally{quiet--;map=sm;usedP=su}
+}
 /* which words of a command are pins: the same table the firmware uses */
 function pinWords(c,a){
   c=c.toUpperCase();
@@ -7743,7 +7793,7 @@ function label(l){
 }
 function chipFam(s){s=String(s||'');return /S3/i.test(s)?'s3':/S2/i.test(s)?'s2':/C3/i.test(s)?'c3':/C6/i.test(s)?'c6':/ESP32/i.test(s)?'esp32':null}
 return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,onChange:f=>subs.push(f),famName:b=>CHIPS[b.fam].n,
-  ident,reset,alloc,seed,preview,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
+  ident,reset,alloc,seed,preview,plan,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
 })();
 /* ---- Board figures: every board in the picker, drawn with the Anatomy iso kit (ISO) like the DevKit in homefig.js.
    Shapes are schematic: sizes, ports, buttons, headers and the module are right in kind, not measured to the millimetre.
@@ -8143,8 +8193,7 @@ function homePage(b){
         btn('Try demo mode',async()=>{try{if(Link.mode!=='demo')await toggleDemo();show('led');window.scrollTo(0,0)}catch(e){toast(e.message)}}),
         btn('Search '+nAll+' parts',()=>palOpen(),'')),
       palRecent().length?el('div',{class:'hm-recent'},el('span',{},'Pick up where you left off'),...palRecent().slice(0,4).map(id=>{const p=PARTS.find(x=>x.id===id);return el('a',{href:'#'+id,class:'hm-chip',onclick:e=>{e.preventDefault();show(id);window.scrollTo(0,0)}},p.n.length>34?p.n.slice(0,32)+'…':p.n)})):null,
-      el('div',{class:'hm-facts'},fact(String(nParts),nParts===nAll?'parts with a test page':'of '+nAll+' parts fit this board'),fact('1','firmware, flashed once'),fact('0','lines of test code to write')),
-      el('p',{class:'hm-cue'},'Scroll to turn the board')),
+      el('div',{class:'hm-facts'},fact(String(nParts),nParts===nAll?'parts with a test page':'of '+nAll+' parts fit this board'),fact('1','firmware, flashed once'),fact('0','lines of test code to write'))),
     sec(1,'hm-idea','',
       kick('The idea'),
       el('h3',{class:'hm-h'},'Find the dead part first, not an hour into the build.'),
@@ -8197,7 +8246,7 @@ function homeStage(big,bd){
   const corner=(c,t,x)=>el('span',{class:'hm-c '+c,...(x||{})},t);
   const plate=el('div',{class:'hm-plate isoc'},svg,ov,call);
   const hit=el('div',{class:'hm-hit',tabindex:'0','aria-label':'Board view. Left and right arrow keys turn the board.'});
-  const node=el('figure',{class:'hm-stage'},plate,hit,corner('bl','Scroll to turn it. Drag to spin it.'),corner('br','',{'data-readout':''}));
+  const node=el('figure',{class:'hm-stage'},plate,hit,corner('rt','Scroll to turn, drag to spin'),corner('br','',{'data-readout':''}));
   const letters=[...big].map((c,i)=>el('span',{style:'--i:'+i},c));
   const intro=el('div',{class:'hm-intro','aria-hidden':'true'},
     el('p',{class:'hm-big',style:'font-size:clamp(96px,'+Math.min(28,140/big.length).toFixed(1)+'vw,'+Math.round(Math.min(480,2400/big.length))+'px)'},...letters),
@@ -8250,7 +8299,7 @@ function homeMount(root,S,FG,HM_CH){
   }
   function say(ch){
     if(ch===chNow)return;chNow=ch;const c=HM_CH[ch];lit=c.lit;
-    call.classList.add('sw');setTimeout(()=>{ct.textContent=c.t;cd.textContent=c.d;call.classList.remove('sw')},mq.matches?0:140);
+    call.classList.add('swp');setTimeout(()=>{ct.textContent=c.t;cd.textContent=c.d;call.classList.remove('swp')},mq.matches?0:140);
     dirty=true;
   }
   function render(now,lite){
