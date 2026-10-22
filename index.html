@@ -1199,6 +1199,19 @@ header.top{position:relative;z-index:6}
 @media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{height:max(30svh,215px)}}
 @media (max-width:640px){.hm-c.br{display:none}}
 @media (pointer:coarse){.hm-call,.hm-fab{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(20,22,26,.94)}}
+
+/* phones: the board is a small floating bubble, not a banner at the top. Text reads from the top down. */
+@media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){
+  .hm-stage,.hm.settled .hm-stage{position:fixed;top:auto;right:12px;left:auto;bottom:76px;width:88px;height:88px;margin:0;border-radius:50%;
+    background:color-mix(in srgb,var(--bg) calc(var(--pp,0)*100%),transparent);border:1px solid rgba(255,255,255,calc(var(--pp,0)*.16));
+    box-shadow:0 8px 26px rgba(0,0,0,calc(var(--pp,0)*.6))}
+  .hm-stage::after{display:none}
+  .hm-hit{border-radius:50%}
+  .hm-ln,.hm-ring,.hm-dot{display:none}
+  .hm-call{display:none}
+  .hm-call>:last-child{display:none}
+  .hm-spacer{height:6vh}
+}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -8431,7 +8444,7 @@ function homeMount(root,S,FG,HM_CH){
   }
   function size(){W=document.documentElement.clientWidth;H=innerHeight;park();svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
   function target(){
-    const sb=geo(),narrow=!hmWide(),top=narrow?sb.t+sb.h:0,mid=(top+innerHeight)/2;
+    const narrow=!hmWide(),mid=innerHeight/2;
     const cs=secs.map(s=>{const r=s.getBoundingClientRect();return r.top+r.height/2});
     let i=0;for(let k=0;k<cs.length;k++)if(cs[k]<=mid)i=k;
     let u=0;if(i<cs.length-1&&mid>cs[i])u=hmEase(hmClamp((mid-cs[i])/(cs[i+1]-cs[i]),0,1));
@@ -8446,13 +8459,13 @@ function homeMount(root,S,FG,HM_CH){
   function render(now,lite){
     const age=mq.matches?9:(now-t0)/1000,e=1-Math.pow(1-hmClamp(age/1.5,0,1),4);
     const az=st.az+user.az+(1-e)*-200,elv=hmClamp(st.el+user.el,12,70),sl=geo();
-    const nar=!hmWide(),rs=nar?Math.min(sl.h*.3,86):0;
+    const nar=!hmWide(),rs=0;
     const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*.5,sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*.64,sl.h-rs,pS);
     const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,nar?.8:1,pS),st.f,{cx,cy,fw,fh});
     const t1=performance.now(),html=FG.draw(P,{ex:st.ex,lit,t:now/1000,lite:lite||st.zoom<.75,W,H});
     builtAt=performance.now()-t1;g.innerHTML=html;
-    const R=Math.hypot(W,H),mk=lerp(R,sl.w*.55,pS).toFixed(0)+'px '+lerp(R,sl.h*.55,pS).toFixed(0)+'px at '+cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
-    if(mk!==maskKey){maskKey=mk;const m='radial-gradient(ellipse '+mk+',#000 64%,transparent 100%)';svg.style.webkitMaskImage=m;svg.style.maskImage=m}
+    const R=Math.hypot(W,H),kk=nar?.5:.55,mk=lerp(R,sl.w*kk,pS).toFixed(0)+'px '+lerp(R,sl.h*kk,pS).toFixed(0)+'px at '+cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
+    if(mk!==maskKey){maskKey=mk;const m='radial-gradient(ellipse '+mk+',#000 '+(nar?88:64)+'%,transparent 100%)';svg.style.webkitMaskImage=m;svg.style.maskImage=m}
     const cr=call,cw=cr.offsetWidth,chh=cr.offsetHeight;
     cr.style.left=Math.round(sl.l+16)+'px';cr.style.top=Math.round(sl.t+sl.h-chh-(hmWide()?46:12))+'px';
     const a=FG.proj(P,FG.anchor(HM_CH[chNow<0?0:chNow].a)),oT=sl.t+sl.h-chh-(hmWide()?46:12),oL=sl.l+16;
