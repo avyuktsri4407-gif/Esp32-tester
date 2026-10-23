@@ -8129,6 +8129,31 @@ function make(id,sp){
       if(r.st==='cast'){const sg=r.y>0?1:-1,px=m(x),py=m(r.y);cast.push(K.planOutline(R(px-1.1,py-1.9,px+1.1,py+1.9,.3),T,P,2));cd.push(at(P,px,py+sg*1.3,T))}
       else{pads.push(K.ring(m(x),m(r.y),1.9,T,P,10));holes.push(at(P,m(x),m(r.y),T))}
     }
+    if(!c.lite){
+      const tr=[],vi=[];
+      for(const r of rows){
+        const sg=r.y>0?-1:1,blocked=rows.some(o=>o!==r&&(o.y>0)===(r.y>0)&&Math.abs(o.y)<Math.abs(r.y)&&(Math.abs(r.y)-Math.abs(o.y))*2<9);
+        if(blocked)continue;
+        xs(r.x0,r.n).forEach((x,i)=>{if(r.lab&&r.lab[i])return;const px=m(x),py=m(r.y),a=py+sg*(r.st==='cast'?2.2:2.1),b=a+sg*(r.st==='cast'?5.5:5);tr.push(K.lineOnTop([px,a],[px,b],T,P));vi.push(at(P,px,b,T))});
+      }
+      s+=ln(tr.join(''),'faint')+dt(vi,.55,'mid');
+      if(!make.tr)make.tr={};
+      if(!make.tr[id]){const rr=rng(id.split('').reduce((a,ch)=>a*31+ch.charCodeAt(0),3)+99),want=Math.floor(L*W/60),mine=[],out=[];
+        for(let t=0;t<500&&out.length<want;t++){
+          const x=(rr()-.5)*(L-5),y=(rr()-.5)*(W-5),dx=rr()<.5?1:0,sg=rr()<.5?-1:1,l1=2.5+rr()*4,l2=1.5+rr()*3,x1=x+dx*sg*l1,y1=y+(1-dx)*sg*l1,x2=x1+(1-dx)*sg*l2*.7,y2=y1+dx*sg*l2*.7;
+          const bx=[Math.min(x,x2)-.9,Math.min(y,y2)-.9,Math.max(x,x2)+.9,Math.max(y,y2)+.9];
+          if(!free(bx[0],bx[1],bx[2],bx[3])||mine.some(o=>bx[0]<o[2]&&bx[2]>o[0]&&bx[1]<o[3]&&bx[3]>o[1]))continue;
+          mine.push(bx);out.push([x,y,x1,y1,x2,y2]);
+        }
+        make.tr[id]=out;
+      }
+      {const seg=[],ph=[],vr=[];
+        for(const [x,y,x1,y1,x2,y2] of make.tr[id]){seg.push(K.pathOf([at(P,m(x),m(y),T),at(P,m(x1),m(y1),T),at(P,m(x2),m(y2),T)]));ph.push(at(P,m(x2),m(y2),T));vr.push(at(P,m(x),m(y),T))}
+        s+=ln(seg.join(''),'faint')+dt(ph,.5,'mid')+dt(vr,.8,'mid');
+      }
+      if(L>=48){const mh=[];for(const sx of[-1,1])for(const sy of[-1,1]){const hx=sx*(L/2-2.6),hy=sy*(W/2-2.6);if(free(hx-1.8,hy-1.8,hx+1.8,hy+1.8))mh.push([hx,hy])}
+        for(const [hx,hy] of mh){s+=ln(K.ring(m(hx),m(hy),2.6,T,P,14),'mid','gold')+ln(K.ring(m(hx),m(hy),1.5,T,P,12),'faint')+dt([at(P,m(hx),m(hy),T)],1.1,'lo')}}
+    }
     if(pads.length)s+=ln(pads.join(''),'mid',c.litPins?'gold pinlit':'gold')+dt(holes,.9,'hi');
     if(cast.length)s+=ln(cast.join(''),'mid',c.litPins?'gold pinlit':'gold')+dt(cd,.8,'hi');
     if(!c.lite)for(const k of sp.silk||[])s+=K.faceTextSvg(K.topMatrix([m(k.x),m(k.y)],T,P,'x'),k.t,{size:k.s,tone:k.f?'faint':'lo'});
@@ -8161,18 +8186,19 @@ function make(id,sp){
   /* ---- USB connectors ---- */
   (sp.usb||[]).forEach((u,i)=>{
     const C=u.k==='c',len=m(C?7.2:5.9),w=m(C?8.8:7.5)/2,h=m(C?3.2:2.5),x0=-L-m(1.1),px=x0,y=m(u.y);
-    const plan=R(px,y-w,px+len,y+w,C?3:.8);
+    const plan=R(px,y-w,px+len,y+w,C?1.3:.6),fl=R(px+len*.62,y-w-1.1,px+len,y+w+1.1,.5);
     hold(u.x-1.2,u.y-(C?4.4:3.75)-.5,u.x+(C?3.6:3),u.y+(C?4.4:3.75)+.5);
     add('usb'+i,'usb',[px,y-w,T,px+len,y+w,T+h],(P,c)=>{
       const cam=K.cameraOf(P);
-      let s=sol(K.slabOf(plan,T,h,P,C?4:2,.5),'mm',{tone:'mid',lit:c.lit,inner:ln(K.sideSeam(plan,T+h/2,P,2),'faint')});
+      let s=sol(K.slabOf(fl,T,h*.4,P,2,.2),'mm',{tone:'lo',lit:c.lit});
+      s+=sol(K.slabOf(plan,T,h,P,C?4:2,.3),'mm',{tone:'mid',lit:c.lit,inner:ln(K.sideSeam(plan,T+h/2,P,2),'faint')});
       s+=ln(K.lineOnTop([px,y-w*.58],[px+len,y-w*.58],T+h,P),'lo')+ln(K.lineOnTop([px,y+w*.58],[px+len,y+w*.58],T+h,P),'lo');
       if(cam.cosA<0&&!c.plugged){
         const a=w*.8,z1=T+h*.82,z0=T+h*.2,zc=T+h*.5;
         const pts=(C?[[-a,z1],[a,z1],[a+.8,zc],[a,z0],[-a,z0],[-a-.8,zc]]:[[-a,z1],[a,z1],[a,zc],[a-1,z0],[-a+1,z0],[-a,zc]]).map(([yy,z])=>at(P,px,y+yy,z));
         s+=`<path class="hm-hole" d="${K.pathOf(pts,true)}"/>`+ln(K.pathOf([at(P,px,y-a*.6,zc),at(P,px,y+a*.6,zc)]),'mid');
       }
-      s+=dt([at(P,px+len*.3,y-w*.7,T+h),at(P,px+len*.3,y+w*.7,T+h),at(P,px+len*.7,y-w*.7,T+h),at(P,px+len*.7,y+w*.7,T+h)],.5,'mid');
+      s+=dt([at(P,px+len*.3,y-w*.7,T+h),at(P,px+len*.3,y+w*.7,T+h),at(P,px+len*.8,y-w*.7,T+h),at(P,px+len*.8,y+w*.7,T+h),at(P,px+len*.9,y-w-.5,T),at(P,px+len*.9,y+w+.5,T)],.5,'mid');
       return s;
     });
     if(i===0)A.usb=[px+len/2,y,T+h/2];
@@ -8347,7 +8373,7 @@ function make(id,sp){
       return false;
     };
     for(const r of labelled){
-      const px=xs(r.x0,r.n),ly=m(r.y)+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?6.2:4.4);
+      const px=xs(r.x0,r.n),ly=m(r.y)+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?4.1:4.4);
       px.forEach((x,i)=>{const t=r.lab[i],X=m(x);if(t&&!hidden(X,ly,t.length))s+=K.faceTextSvg(K.topMatrix([X-t.length*.7,ly-.6],T,Pl,'x'),t,{size:2.3,tone:'hi'})});
     }
     return `<g class="hm-pl">${s}</g>`;
