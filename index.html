@@ -1410,6 +1410,20 @@ header.top{position:relative;z-index:6}
   .pj-lb{width:100%}
 }
 @media (prefers-reduced-motion:reduce){.pj-gp>summary::after{transition:none}}
+/* erase flash (danger zone) and HC-12 link test */
+.fldanger{border-color:var(--fail)}
+.fldanger>summary{color:var(--fail)}
+.hcrxlog{max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+/* the board picker has no ground shadow under the boards; the home page keeps its own */
+.bpd-glow{display:none}
+#pbar{display:none}
+.irf540nsvg,.pc817svg{width:100%;max-width:380px;height:auto}
+.irf540nsvg .lead,.pc817svg .lead{stroke:var(--ctl);stroke-width:3;stroke-linecap:round;fill:none}
+.irf540nsvg .bar,.pc817svg .bar{stroke:var(--accent);stroke-width:4;stroke-linecap:round;fill:none}
+.irf540nsvg .tri,.pc817svg .tri{fill:var(--raise);stroke:var(--accent);stroke-width:2.5}
+.irf540nsvg .tg,.pc817svg .tg{stroke:var(--muted);stroke-width:1.5;fill:none}
+.irf540nsvg .tl,.pc817svg .tl{fill:var(--muted);font-size:12px;font-family:inherit}
+.irf540nsvg .ring,.pc817svg .ring{stroke:var(--muted);fill:none}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -4582,7 +4596,7 @@ defPart({id:'ds3231',grp:'Power',n:'DS3231 high-precision real-time clock',s:'I2
   cap:'Shows what the clock holds. The flag is set when the battery was empty or removed.',hint:'Press the button to copy your computer\'s time to the chip.',
   async ident(c){const s=(await rreg(c.addr,0x0F))[0];return {ok:true,note:'status '+hex(s)+((s&0x80)?', oscillator was stopped':', oscillator running')}},
   async read(c){const d=await rreg(c.addr,0x00,19),t=d[0x11]+((d[0x12]>>6)*.25);const sec=unbcd(d[0]&0x7F),mn=unbcd(d[1]),hr=unbcd(d[2]&0x3F),dy=unbcd(d[4]),mo=unbcd(d[5]&0x1F),yr=2000+unbcd(d[6]);
-    return {time:`${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}:${String(sec).padStart(2,'0')}`,date:`${yr}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`,tc:((t<<24)>>24)+(t&0x80?0:0),osf:(d[0x0F]&0x80)?'set (time not trusted)':'clear',sec}},
+    return {time:`${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}:${String(sec).padStart(2,'0')}`,date:`${yr}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`,tc:(((Math.floor(t))<<24)>>24)+(t-Math.floor(t)),osf:(d[0x0F]&0x80)?'set (time not trusted)':'clear',sec}},
   verify(reads){const a=reads[0].sec,b=reads[reads.length-1].sec,dt=(b-a+60)%60;return (dt>=1&&dt<=4)?null:'seconds moved by '+dt+' in 2.2 s, the clock is not running'},
   extra(c,h){return [row(btn('Set to this computer\'s time',async()=>{const n=new Date();await i2c(c.addr,hx(0x00,bcd(n.getSeconds()),bcd(n.getMinutes()),bcd(n.getHours()),n.getDay()||7,bcd(n.getDate()),bcd(n.getMonth()+1),bcd(n.getFullYear()%100)),0);const s=(await rreg(c.addr,0x0F))[0];await i2cW(c.addr,0x0F,s&0x7F);await h.read();toast('Clock set')}))]},
   sim:[{k:'tc',label:'Temperature',min:0,max:50,step:.25,val:27,unit:'°C'}],
@@ -4596,8 +4610,8 @@ defPart({id:'pca9685',grp:'Motors and drivers',n:'PCA9685 16-channel 12-bit PWM 
   page(b){
     const S=SPECS.pca9685;let alive=true,addr=0x40,ch=0,inited=false;
     const sim={};if(Link.mode==='demo'){const regs=new Uint8Array(256);regs[0]=0x11;Demo.i2c[0x40]=regDev(r=>regs[r&255],(r,d)=>{d.forEach((v,i)=>{regs[(r+i)&255]=v});if(r===0x00&&!(regs[0]&0x10)&&regs[0]&0x80)regs[0]&=0x7F})}
-    cleanups.push(()=>{alive=false;delete Demo.i2c[0x40];return i2c(addr,hx(0xFD,0,0,0,0x10),0).catch(()=>{})});
-    onStop(()=>i2c(addr,hx(0xFD,0,0,0,0x10),0).catch(()=>{}));
+    cleanups.push(()=>{alive=false;delete Demo.i2c[0x40];return i2c(addr,hx(0xFA,0,0,0,0x10),0).catch(()=>{})});
+    onStop(()=>i2c(addr,hx(0xFA,0,0,0,0x10),0).catch(()=>{}));
     const mR=readout('MODE1',{accent:true,init:'n/a'}),fR=readout('Frame rate',{right:true,init:'n/a'}),cR=readout('Channel 0 pulse',{right:true,init:'n/a'});
     const status=el('p',{class:'hint chk','aria-live':'polite'},'');
     const pulse=async(n,us)=>{const t=Math.round(us/20000*4096);await i2c(addr,hx(0x06+4*n,0,0,t&255,t>>8),0)};
@@ -4607,13 +4621,13 @@ defPart({id:'pca9685',grp:'Motors and drivers',n:'PCA9685 16-channel 12-bit PWM 
     us.addEventListener('input',async()=>{usO.textContent=us.value+' µs';await init();await pulse(ch,+us.value);cR.set(us.value+' µs','channel '+ch)});
     const chS=sel('pcaCh',[...Array(16)].map((_,i)=>[i,'Channel '+i]),0,v=>{ch=+v});
     b.append(stage({reads:[mR,fR,cR],visual:el('p',{class:'cap'},'Move the slider to set the pulse width of the chosen channel. 1500 µs is the servo centre.'),caption:'The PCA9685 keeps its 16 pulse widths in registers, so the page can check every channel without any servo.',
-      controls:[row(btn('Read the chip',async()=>{const r=await info();status.textContent='MODE1 '+hex(r.m)+', prescale '+r.pr+' ('+(25e6/(4096*(r.pr+1))).toFixed(1)+' Hz)'}),btn('Sweep channel',async()=>{await init();for(let k=0;k<2&&alive;k++){for(let u=1000;u<=2000&&alive;u+=50){await pulse(ch,u);await sleep(40)}for(let u=2000;u>=1000&&alive;u-=50){await pulse(ch,u);await sleep(40)}}await pulse(ch,1500)}),btn('All off',async()=>{await i2c(addr,hx(0xFD,0,0,0,0x10),0)})),
+      controls:[row(btn('Read the chip',async()=>{const r=await info();status.textContent='MODE1 '+hex(r.m)+', prescale '+r.pr+' ('+(25e6/(4096*(r.pr+1))).toFixed(1)+' Hz)'}),btn('Sweep channel',async()=>{await init();for(let k=0;k<2&&alive;k++){for(let u=1000;u<=2000&&alive;u+=50){await pulse(ch,u);await sleep(40)}for(let u=2000;u>=1000&&alive;u-=50){await pulse(ch,u);await sleep(40)}}await pulse(ch,1500)}),btn('All off',async()=>{await i2c(addr,hx(0xFA,0,0,0,0x10),0)})),
         row(el('span',{class:'lbl'},'Channel'),chS),row(el('span',{class:'lbl'},'Pulse'),us,usO),
         row(btn('Run check',async()=>{
           const r=await info();if(r.pr!==121){setResult('pca9685','fail','prescale reads '+r.pr+', expected 121');status.textContent='Fail: the prescale register did not take the value 121.';return}
           const bad=[];for(let n=0;n<16;n++){const v=(n*250+100)&0xFFF;await i2c(addr,hx(0x06+4*n,0,0,v&255,v>>8),0)}
           const d=await rreg(addr,0x06,64);for(let n=0;n<16;n++){const v=(n*250+100)&0xFFF,got=d[4*n+2]|((d[4*n+3]&15)<<8);if(got!==v)bad.push('ch'+n)}
-          await i2c(addr,hx(0xFD,0,0,0,0x10),0);
+          await i2c(addr,hx(0xFA,0,0,0,0x10),0);
           if(bad.length){setResult('pca9685','fail','channel(s) '+bad.join(', ')+' did not hold their value');status.textContent='Fail: '+bad.join(', ')+' did not read back.';return}
           setResult('pca9685','pass','prescale 121 (50 Hz), 16 of 16 channels read back');status.textContent='Pass: prescale 121 and all 16 channel registers read back what was written.';
         },'primary')),
@@ -4635,7 +4649,7 @@ const pn={
   }
 };
 defPart({id:'pn532',grp:'Input and interfaces',n:'PN532 NFC and RFID transceiver module',s:'I2C 0x24, 13.56 MHz, reads MIFARE and NFC tags',alias:'nfc rfid card tag reader mifare ntag adafruit elechouse',addrs:[0x24],
-  wiring:i2cWiring('PN532 on I2C','PN532',[['3V3','RSTO / IRQ (not used)','red','pwr']],['Set the two DIP switches (or solder pads) for I2C: SEL0 on, SEL1 off. On a blue Elechouse board that is SW1 = 1, SW2 = 0. The page cannot detect a wrong switch position: the chip just stays silent.','5 V power is fine on an Elechouse board; on a bare chip use 3.3 V.']),
+  wiring:i2cWiring('PN532 on I2C','PN532',[],['Set the two DIP switches (or solder pads) for I2C: SEL0 on, SEL1 off. On a blue Elechouse board that is SW1 = 1, SW2 = 0. The page cannot detect a wrong switch position: the chip just stays silent.','5 V power is fine on an Elechouse board; on a bare chip use 3.3 V.']),
   criteria:['Answers at 0x24 and GetFirmwareVersion returns IC 0x32.','Reads the UID of a MIFARE or NTAG card or tag held within 3 cm.'],
   notes:['The 7-bit address is 0x24 (0x48 in the 8-bit form some datasheets show).','Phone NFC emulation is not read by this simple scan. Use a plain card or sticker.','The whole exchange runs over I2C with the PN532\'s ready-bit protocol and takes about 100 ms.'],
   fields:[{k:'fw',label:'Firmware',text:true,main:true},{k:'uid',label:'Card UID',text:true},{k:'sak',label:'Card type',text:true}],ms:1500,reads:1,
@@ -4643,7 +4657,7 @@ defPart({id:'pn532',grp:'Input and interfaces',n:'PN532 NFC and RFID transceiver
   async init(c){await pn.cmd(c.addr,[0x14,0x01,0x14,0x01],1500,12)},
   async ident(c){const r=await pn.cmd(c.addr,[0x02],1500,12);return r[0]===0x03&&r[1]===0x32?{ok:true,note:'IC 0x32 firmware '+r[2]+'.'+r[3]+', PN532'}:{ok:false,note:'unexpected reply '+B2H(r)}},
   async read(c){const f=await pn.cmd(c.addr,[0x02],1500,12);let uid='no card',sak='';
-    try{const r=await pn.cmd(c.addr,[0x4A,0x01,0x00],900,28);if(r[2]>0){const n=r[7];uid=B2H(r.slice(8,8+n)).toUpperCase().replace(/(..)(?!$)/g,'$1 ');const k=r[6];sak=k===0x08?'MIFARE Classic 1K':k===0x18?'MIFARE Classic 4K':k===0x00?'NTAG / Ultralight':'SAK '+hex(k)}}catch(e){if(!/timeout/.test(e.message))throw e}
+    try{const r=await pn.cmd(c.addr,[0x4A,0x01,0x00],900,28);if(r[2]>0){const n=r[6];uid=B2H(r.slice(7,7+n)).toUpperCase().replace(/(..)(?!$)/g,'$1 ');const k=r[5];sak=k===0x08?'MIFARE Classic 1K':k===0x18?'MIFARE Classic 4K':k===0x00?'NTAG / Ultralight':'SAK '+hex(k)}}catch(e){if(!/timeout/.test(e.message))throw e}
     return {fw:'IC 0x32 v'+f[2]+'.'+f[3],uid,sak}},
   stim:{prompt:'Hold a card or tag against the antenna.',secs:12,key:'n',rise:0,name:'card',gap:200,optional:true},
   sim:[{k:'card',label:'Card on the antenna',min:0,max:1,step:1,val:1,unit:'0 no, 1 yes'}],
@@ -4730,7 +4744,7 @@ Object.assign(DI,{
     hint:'Turn the blue trimmer until the module LED sits at the edge of switching, then a tap flips it. Many modules read LOW at rest and HIGH on vibration, some the other way round. The check only needs to see both levels. It senses shaking, not acceleration or direction.'},
   xkby25:{pin:39,pull:0,low:false,on:'Liquid present',off:'No liquid',name:'Liquid',cap:'A non-contact capacitive level sensor. It senses liquid through the wall of a plastic or glass container.',
     chk:{prompt:'Hold the flat tip against the outside of a glass of water, then remove it.',secs:12},sim:'Liquid at the tip',
-    hint:'It works from 5 to 24 V and the output voltage equals the supply: with a 5 V supply use a 1 kΩ + 2 kΩ divider before GPIO39, never connect it straight. The tip must touch the container wall flat, no air gap, wall thickness up to 20 mm. It cannot sense through metal. Cutting the red wire reverses the logic.'}
+    hint:'It works from 5 to 24 V and the output voltage equals the supply: with a 5 V supply use a 1 kΩ + 2 kΩ divider before GPIO39, never connect it straight. The tip must touch the container wall flat, no air gap, wall thickness up to 20 mm. It cannot sense through metal. Wire colours vary by maker: check yours. Usual: brown VCC, blue GND, yellow OUT, black selects the output polarity (leave it open for output HIGH when liquid is present).'}
 });
 
 /* ---- solid state relay: reuses the relay page ---- */
@@ -4858,8 +4872,8 @@ function ioRgb(b){
   const sl=(i,l)=>{const r=el('input',{type:'range',min:0,max:255,value:col[i],'aria-label':l});r.addEventListener('input',()=>{col[i]=+r.value;send().catch(e=>toast(e.message))});return row(el('span',{class:'lbl'},l),r)};
   const sls=[sl(0,'Red'),sl(1,'Green'),sl(2,'Blue')];
   const setAll=c=>{col=c.slice();sls.forEach((r,i)=>r.querySelector('input').value=col[i]);return send()};
-  async function off(){col=[0,0,0];sls.forEach(r=>r.querySelector('input').value=0);paint();for(const p of PINS)await dev(`PWMM ${p} 0 0`)}
-  cleanups.push(()=>{alive=false;if(Link.mode!=='none')return Promise.all(PINS.map(p=>dev(`PWMM ${p} 0 0`).catch(()=>{})))});
+  async function off(){col=[0,0,0];sls.forEach(r=>r.querySelector('input').value=0);paint();for(const p of PINS)await dev(inv?`OUT ${p} 1`:`PWMM ${p} 0 0`)}
+  cleanups.push(()=>{alive=false;if(Link.mode!=='none')return Promise.all(PINS.map(p=>dev(inv?`OUT ${p} 1`:`PWMM ${p} 0 0`).catch(()=>{})))});
   onStop(()=>off().catch(()=>{}));paint();
   b.append(stage({reads:[cR,hR],visual:sw,caption:'Three PWM pins mix red, green and blue. A common-anode LED is driven the other way round, tick the box if the colours are inverted.',
     controls:[...sls,row(...[['Red',[255,0,0]],['Green',[0,255,0]],['Blue',[0,0,255]],['Yellow',[255,200,0]],['White',[255,255,255]]].map(([n,c])=>btn(n,()=>setAll(c),'sm')),btn('Off',off,'sm')),
@@ -5029,7 +5043,7 @@ ioD('sw420','Motion and position','SW-420 vibration sensor module','Output on GP
   'vibration shock tilt knock sensor sw-420 sw420',IO_ADC_WIRE('SW-420 on GPIO15','SW-420 module',[['3V3','VCC','red','pwr'],['GND','GND','black','gnd'],['GPIO15','DO','green','sig']],['AO does not exist on this module.']),
   ['Both output levels are seen, with vibration and at rest.'],['It detects shaking, not the direction or strength.'],15,0);
 ioD('xkby25','Water, soil and flow','XKC-Y25 non-contact liquid level sensor','Output on GPIO39 through a divider, 5 V',
-  'liquid level non-contact capacitive water tank sensor xkc-y25 xkc y25',IO_ADC_WIRE('XKC-Y25 on GPIO39','XKC-Y25-V',[['5V (VIN)','VCC (red)','red','pwr'],['GND','GND (black)','black','gnd'],['GPIO39','OUT (yellow), via 1 kΩ and 2 kΩ to GND','green','sig']],['The output voltage equals the supply: 5 V needs the divider (1 kΩ in series, 2 kΩ from the pin to GND).','The blue wire is not used here (it sets the mode on some versions).']),
+  'liquid level non-contact capacitive water tank sensor xkc-y25 xkc y25',IO_ADC_WIRE('XKC-Y25 on GPIO39','XKC-Y25-V',[['5V (VIN)','VCC (usually brown)','red','pwr'],['GND','GND (usually blue)','black','gnd'],['GPIO39','OUT (usually yellow), via 1 kΩ and 2 kΩ to GND','green','sig']],['The output voltage equals the supply: 5 V needs the divider (1 kΩ in series, 2 kΩ from the pin to GND).','The black wire (polarity select) stays unconnected here. Check the colours against the label on your cable.']),
   ['The output changes when you press the tip against a wet container wall.'],['It senses through plastic and glass up to about 20 mm, not through metal.'],39,0);
 defPart({id:'ssr',grp:'Relays and lamps',n:'Solid state relay SSR-25DA (3 to 32 V DC in, 24 to 380 V AC out)',s:'Input on GPIO4, no mains in the test',alias:'ssr solid state relay fotek ssr-25da triac ac switch',cmds:['OUT'],
   wiring:{title:'SSR-25DA input side',part:'SSR-25DA',rows:[['GPIO4','Input 3 (+)','orange','sig'],['GND','Input 4 (−)','black','gnd']],notes:['Only the DC input side is wired. The two screw terminals on the other side (1 and 2) are the AC output: do not connect mains to them in this test.','If the input LED does not light at 3.3 V, power the input from VIN through a transistor.']},
@@ -5208,7 +5222,7 @@ defPart({id:'tmc2209',grp:'Motors and drivers',n:'TMC2209 SilentStepStick steppe
   fields:[{k:'ver',label:'Chip version',text:true,main:true},{k:'ioin',label:'IOIN register',text:true},{k:'gstat',label:'Status flags (GSTAT)',text:true},{k:'ifcnt',label:'Write counter (IFCNT)',u:'',d:0,lo:0,hi:255,opt:true}],reads:1,ms:1500,
   cap:'Reads the IOIN, GSTAT and IFCNT registers over the one-wire UART. IOIN carries the chip version in its top byte.',hint:'First test without the motor attached: version and CRC come back without it. Add the motor for the revolution test.',
   find:uFind(),
-  async ident(c){const v=await tmcRead(0x06);if(v==null)return {ok:false,note:'no valid reply. Check the 1 kΩ on TX, RX straight to PDN_UART, VIO 3.3 V and 115200 baud'};const ver=Math.floor(v/16777216);return ver===0x21?{ok:true,note:'IOIN version 0x21, TMC2209'}:{ok:false,note:'version '+hex(ver)+' (0x21 is TMC2209, 0x11 is TMC2208 or TMC2100)'}},
+  async ident(c){const v=await tmcRead(0x06);if(v==null)return {ok:false,note:'no valid reply. Check the 1 kΩ on TX, RX straight to PDN_UART, VIO 3.3 V and 115200 baud'};const ver=Math.floor(v/16777216);return ver===0x21?{ok:true,note:'IOIN version 0x21, TMC2209'}:{ok:false,note:'version '+hex(ver)+' (0x21 is TMC2209, 0x11 is TMC2130, 0x20 is TMC2208 or TMC2224)'}},
   async read(c){const before=await tmcRead(0x02);const gc=[0x05,0x00,0x80,0,0,1,0x41];gc.push(tmcCrc(gc));await utx(gc,100,32);const after=await tmcRead(0x02);const v=await tmcRead(0x06),g=await tmcRead(0x01);
     return {ver:v==null?'no reply':hex(Math.floor(v/16777216)),ioin:v==null?'n/a':'0x'+(v>>>0).toString(16).toUpperCase().padStart(8,'0'),gstat:g==null?'n/a':g===0?'clear':'0x'+g.toString(16),ifcnt:after==null||before==null?NaN:((after-before+256)%256)}},
   verify(reads){return reads[0].ifcnt===1||!Number.isFinite(reads[0].ifcnt)?null:'the write counter moved by '+reads[0].ifcnt+', expected 1'},
@@ -6211,6 +6225,50 @@ async function flFlash(which,ui,opts={}){
     }finally{try{await transport.disconnect()}catch(e){}}
   }finally{flBusy=false}
 }
+/* wipe the whole flash, then reset. Nothing runs on the board afterwards until firmware is installed again. */
+async function flEraseAll(ui){
+  if(!('serial' in navigator))throw new Error('This browser has no Web Serial. Use Chrome or Edge on a laptop.');
+  if(Link.mode==='demo')throw new Error('Demo mode has no board. Turn Demo mode off, then try again.');
+  if(flBusy)throw new Error('Already working on the board.');
+  flBusy=true;
+  try{
+    if(Link.mode==='serial'){ui.say('Closing the current connection...');await Link.disconnect()}
+    ui.say('Loading the installer...');const lib=await flLoad();
+    ui.say('Pick the ESP32 in the browser window.');
+    let port;try{port=await navigator.serial.requestPort()}catch(e){throw new Error(e.name==='NotFoundError'?'No board chosen. Plug the ESP32 in with a data USB cable, press the button again and pick its port in the list.':'This frame blocks Web Serial. Open the page in Chrome or Edge directly.')}
+    const transport=new lib.Transport(port,false);
+    const loader=new lib.ESPLoader({transport,baudrate:115200,romBaudrate:115200,terminal:{clean(){},writeLine(s){ui.log(s)},write(s){ui.log(s)}}});
+    try{
+      ui.say('Connecting to the ESP32 bootloader...');
+      let chip;try{chip=await loader.main()}catch(e){throw new Error('Could not talk to the ESP32. Hold the BOOT button, tap EN (reset), release BOOT, and try again. Close the Arduino Serial Monitor and other tabs that use the port.')}
+      ui.say('Found '+chip+'. Erasing the whole flash. This takes up to a minute. Do not unplug.');
+      await loader.eraseFlash();
+      ui.say('Resetting the board...');
+      await loader.after('hard_reset');
+      return {chip};
+    }finally{try{await transport.disconnect()}catch(e){}}
+  }finally{flBusy=false}
+}
+/* the guarded erase control: closed by default, needs the word ERASE typed, one place only */
+function eraseCard(){
+  const st=el('p',{class:'hint chk','aria-live':'polite'},''),logBox=el('pre',{class:'fllog',tabindex:0,'aria-label':'Erase log'});
+  const word=el('input',{class:'i',placeholder:'Type ERASE',style:'width:140px','aria-label':'Type ERASE to enable the erase button',autocomplete:'off',spellcheck:'false'});
+  const go=btn('Erase flash and reset',async()=>{
+    if(word.value.trim()!=='ERASE')return;
+    go.disabled=true;word.disabled=true;logBox.textContent='';
+    const ui={say:m=>{st.textContent=m},log:m=>{logBox.textContent=(logBox.textContent+String(m)+'\n').slice(-2000);logBox.scrollTop=1e6}};
+    try{const r=await flEraseAll(ui);ui.say('Done. The '+r.chip.split(' ')[0]+' flash is empty and the board was reset. It does nothing until you install firmware again (the card above).');toast('Flash erased')}
+    catch(e){if(e&&(e===ABORT||e.name==='AbortError'))return;ui.say('Failed: '+(e.message||e))}
+    finally{word.value='';word.disabled=false;go.disabled=true}
+  },'danger');
+  go.disabled=true;
+  word.addEventListener('input',()=>{go.disabled=word.value.trim()!=='ERASE'});
+  return el('details',{class:'flhelp fldanger'},el('summary',{},'Erase flash and reset (danger zone)'),
+    el('p',{class:'hint'},'Wipes everything on the ESP32: the tester firmware, your own sketches, saved WiFi passwords and stored data. It cannot be undone. Use it to recover a board that misbehaves or to hand it over clean.'),
+    el('p',{class:'hint'},'The board must be plugged in with a data cable. You pick it in the browser window. If it cannot connect, hold BOOT, tap EN, release BOOT, and try again.'),
+    row(word,go),st,
+    el('details',{class:'flhelp'},el('summary',{},'Erase log'),logBox));
+}
 /* the card shown on the Overview page and on the ESP32-CAM page */
 function flasherCard(which,o={}){
   if(!which||which==='tester')which=flImgOf();
@@ -6242,6 +6300,7 @@ function flasherCard(which,o={}){
         el('li',{},'No port in the list: install the driver for your board USB chip (CP2102 or CH340).'),
         el('li',{},bd?'This image is for the '+BRD.CHIPS[bd.fam].n+(bd.native&&bd.cdc?' with the USB port as the serial port':'')+'. A different chip is refused before anything is written.':'The installer refuses a chip the firmware was not built for.'))),
     el('details',{class:'flhelp'},el('summary',{},'Installer log'),logBox),
+    eraseCard(),
     el('p',{class:'hint'},'Firmware '+set.ver+(o.note?'. '+o.note:'. The same program as esp32_tester.ino, built for '+(bd?bd.ard:'the ESP32 Dev Module')+' with 4 MB flash'+(native?' and USB CDC on boot':'')+'.')+' Flasher: esptool-js 0.5.4 by Espressif, Apache-2.0.'));
 }
 /* ESP32-CAM (AI Thinker, OV2640). Own firmware and own serial link at 921600 baud, separate from the tester board. */
@@ -6762,7 +6821,7 @@ pinFix('ds3231',{n:'DS3231 module (ZS-042)',pins:['32K','SQW','SCL','SDA','VCC',
   note:'The 6-pin side of a ZS-042 reads 32K, SQW, SCL, SDA, VCC, GND. The opposite 4-pin side repeats SCL, SDA, VCC, GND. Online pin tables list VCC, GND, SDA, SCL, SQW, 32K, which is function order only.',refs:[PFR.ds32]});
 pinFix('pca9685',{n:'PCA9685 board',pins:['GND','OE','SCL','SDA','VCC','V+ (servo power, 5 to 6 V) from a separate supply'],ren:PFVCC,src:'t',
   note:'Control header on the 16-channel board: GND, OE, SCL, SDA, VCC, V+. OE low enables the outputs and is pulled low on the board. V+ powers the servos only.',refs:[PFR.aPCA]});
-pinFix('pn532',{n:'PN532 board',pins:['GND','VCC','SDA','SCL','RSTO / IRQ (not used)'],ren:PFVCC,src:'t',
+pinFix('pn532',{n:'PN532 board',pins:['GND','VCC','SDA','SCL'],ren:PFVCC,src:'t',
   note:'Elechouse V3 groups GND, VCC, SDA, SCL on one row. Adafruit prints 3.3Vin, SCK, MISO, MOSI, SSEL, GND, where SCK is SCL and MOSI is SDA in I2C mode. Read the printed labels.',refs:[PFR.aPN]});
 pinFix('ps2kb',{n:'Qwiic PS/2 adapter',pins:['GND','3.3V','SDA','SCL'],ren:{'VCC (3.3 V module)':'3.3V'},src:'t',
   note:'Qwiic order is GND, 3.3V, SDA, SCL (black, red, blue, yellow cable).',refs:[]});
@@ -8034,7 +8093,7 @@ const LIST=[
  {id:'c6dk',ard:'ESP32C6 Dev Module',cdc:false,img:'c6u',i2c:[6,7],n:'ESP32-C6 DevKitC-1',fam:'c6',mod:'ESP32-C6-WROOM-1',pins:[0,1,2,3,6,7,10,11,18,19,20,21,22,23],adc:[0,1,2,3,6],fw:'tester',
   usb:'Two USB-C ports: one through a USB-to-UART chip, one native',bridge:'USB-to-UART chip (on the UART port)',native:true,led:'RGB LED on GPIO8',btn:['BOOT','RESET'],hdr:16,
   boot:'Use the port marked UART. If it will not connect, hold BOOT, press RESET, release BOOT.',tag:'Wi-Fi 6, Thread and Zigbee. 14 usable pins.'},
- {id:'espcam',ard:'ESP32 Dev Module',cdc:false,img:'tester',n:'ESP32-CAM (AI-Thinker)',fam:'esp32',mod:'ESP32-S module with OV2640 camera',pins:[2,4,12,13,14,15],adc:[],fw:'tester',
+ {id:'espcam',ard:'ESP32 Dev Module',cdc:false,img:'tester',n:'ESP32-CAM (AI-Thinker)',fam:'esp32',mod:'ESP32-S module with OV2640 camera',pins:[2,4,13,14,15],adc:[],fw:'tester',
   usb:'None on the board: use the MB base or an FTDI adapter',bridge:'none on the board',native:false,led:'Flash LED on GPIO4, red LED on GPIO33',btn:['RESET'],hdr:8,
   boot:'Join IO0 to GND, then reset. Remove the jumper to run.',tag:'Camera board. Only 6 pins are free, so it tests the camera and a few simple parts.'}
 ];
@@ -8195,13 +8254,13 @@ const SPECS={
   silk:[{t:'MINI32 V1.0.0',x:-13,y:0,s:2,f:1}]},
  s3dk:{n:'ESP32-S3 DevKitC-1',big:'S3',L:70,W:25.4,r:2,
   rows:[{y:-11.43,x0:-20,n:22,st:'pin',lab:rv(S3_J1)},{y:11.43,x0:-20,n:22,st:'pin',lab:rv(S3_J3)}],
-  usb:[{x:-35,y:-6.5,k:'c'},{x:-35,y:6.5,k:'c'}],mod:{k:'wroom',x0:9.5,x1:35,y0:-9,y1:9,sx1:26.5,t:'ESP32-S3-WROOM-1',t2:'Wi-Fi + Bluetooth LE'},
-  bridge:{x:-24,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-18,y:-5.5},btn:[{x:-28.5,y:-9.8,s:3.2},{x:-28.5,y:9.8,s:3.2}],leds:[{x:-12,y:0,c:'b',rgb:1}],
+  usb:[{x:-35,y:-5.2,k:'c'},{x:-35,y:5.2,k:'c'}],mod:{k:'wroom',x0:9.5,x1:35,y0:-9,y1:9,sx1:26.5,t:'ESP32-S3-WROOM-1',t2:'Wi-Fi + Bluetooth LE'},
+  bridge:{x:-24,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-18,y:-5.5},btn:[{x:-28.5,y:-11.1,s:2.6},{x:-28.5,y:11.1,s:2.6}],leds:[{x:-12,y:0,c:'b',rgb:1}],
   silk:[{t:'ESP32-S3-DevKitC-1',x:-8,y:-7.5,s:2.4,f:1}]},
  xiaos3:{n:'XIAO ESP32-S3',big:'XIAO',L:21,W:17.8,r:1.4,
   rows:[{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
   usb:[{x:-10.5,y:0,k:'c'}],mod:{k:'can',x0:-1.5,x1:8.5,y0:-5.4,y1:5.4,t:'ESP32-S3'},
-  btn:[{x:-3.4,y:-2.8,s:2.2},{x:-3.4,y:2.8,s:2.2}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
+  btn:[{x:-8.6,y:-6.9,s:1.8},{x:-8.6,y:6.9,s:1.8}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
  c3dk:{n:'ESP32-C3 DevKitM-1',big:'C3',L:54.4,W:25.4,r:2,
   rows:[{y:-11.43,x0:-12,n:15,st:'pin',lab:rv(C3_J1)},{y:11.43,x0:-12,n:15,st:'pin',lab:rv(C3_J3)}],
   usb:[{x:-27.2,y:0,k:'micro'}],mod:{k:'wroom',x0:10.6,x1:27.2,y0:-6.6,y1:6.6,sx1:23.2,t:'ESP32-C3-MINI-1',t2:'Wi-Fi + Bluetooth LE'},
@@ -8210,19 +8269,19 @@ const SPECS={
  c3sm:{n:'ESP32-C3 SuperMini',big:'C3',L:22.5,W:18,r:1.2,
   rows:[{y:-7.7,x0:-8.9,n:8,st:'cast',lab:SM_R},{y:7.7,x0:-8.9,n:8,st:'cast',lab:SM_L}],
   usb:[{x:-11.25,y:0,k:'c'}],mod:{k:'can',x0:-3.2,x1:3.6,y0:-3.4,y1:3.4,t:'ESP32-C3'},ant:{x0:5.4,x1:10.6,y0:-4.5,y1:4.5},
-  reg:{x:-6.2,y:0},btn:[{x:-5.8,y:-5,s:2.2},{x:-5.8,y:5,s:2.2}],leds:[{x:0,y:-5.4,c:'b'}],silk:[]},
+  reg:{x:-6.2,y:0},btn:[{x:-10.2,y:-6.4,s:1.8},{x:-10.2,y:6.4,s:1.8}],leds:[{x:0,y:-5.4,c:'b'}],silk:[]},
  xiaoc3:{n:'XIAO ESP32-C3',big:'XIAO',L:21,W:17.8,r:1.4,
   rows:[{y:-7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_R},{y:7.9,x0:-7.62,n:7,st:'cast',lab:XIAO_L}],
   usb:[{x:-10.5,y:0,k:'c'}],mod:{k:'can',x0:-1.2,x1:7.2,y0:-4.8,y1:4.8,t:'ESP32-C3'},
-  btn:[{x:-3.4,y:-2.8,s:2.2},{x:-3.4,y:2.8,s:2.2}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
+  btn:[{x:-8.6,y:-6.9,s:1.8},{x:-8.6,y:6.9,s:1.8}],leds:[{x:-3.2,y:6,c:'r'}],silk:[]},
  s2mini:{n:'LOLIN S2 Mini',big:'S2',L:34.3,W:25.4,r:1.6,
   rows:[{y:-11.43,x0:-8.4,n:8,st:'pin',out:1,lab:rv(S2_OL)},{y:11.43,x0:-8.4,n:8,st:'pin',out:1,lab:rv(S2_OR)},{y:-8.89,x0:-8.4,n:8,st:'pin',lab:rv(S2_IL)},{y:8.89,x0:-8.4,n:8,st:'pin',lab:rv(S2_IR)}],
   usb:[{x:-17.15,y:0,k:'c'}],mod:{k:'can',x0:-4,x1:5,y0:-5,y1:5,t:'ESP32-S2'},ant:{x0:8.5,x1:16.2,y0:-5.4,y1:5.4},
-  reg:{x:-12.5,y:-3.2},btn:[{x:-13.8,y:-6.4,s:3},{x:-13.8,y:6.4,s:3}],leds:[{x:-10,y:3,c:'b'}],silk:[{t:'S2 MINI',x:-2,y:0,s:2.2,f:1},{t:'RST',x:-9.4,y:-6.4,s:1.4,f:1},{t:'0',x:-9.4,y:6.4,s:1.4,f:1}]},
+  reg:{x:-8.8,y:-3.2},btn:[{x:-13.8,y:-6.4,s:3},{x:-13.8,y:6.4,s:3}],leds:[{x:-8.8,y:3.4,c:'b'}],silk:[{t:'S2 MINI',x:-2,y:0,s:2.2,f:1},{t:'RST',x:-9.4,y:-6.4,s:1.4,f:1},{t:'0',x:-9.4,y:6.4,s:1.4,f:1}]},
  c6dk:{n:'ESP32-C6 DevKitC-1',big:'C6',L:51.9,W:25.4,r:2,
   rows:[{y:-11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J1)},{y:11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J3)}],
-  usb:[{x:-25.95,y:-6.5,k:'c'},{x:-25.95,y:6.5,k:'c'}],mod:{k:'wroom',x0:0.5,x1:25.95,y0:-9,y1:9,sx1:17,t:'ESP32-C6-WROOM-1',t2:'Wi-Fi 6 + Bluetooth LE'},
-  bridge:{x:-16.2,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-9.5,y:-5.5},btn:[{x:-21,y:-9.8,s:3.2},{x:-21,y:9.8,s:3.2}],leds:[{x:-10,y:2.2,c:'b',rgb:1}],
+  usb:[{x:-25.95,y:-5.2,k:'c'},{x:-25.95,y:5.2,k:'c'}],mod:{k:'wroom',x0:0.5,x1:25.95,y0:-9,y1:9,sx1:17,t:'ESP32-C6-WROOM-1',t2:'Wi-Fi 6 + Bluetooth LE'},
+  bridge:{x:-16.2,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-9.5,y:-5.5},btn:[{x:-22,y:-11.1,s:2.6},{x:-22,y:11.1,s:2.6}],leds:[{x:-10,y:2.2,c:'b',rgb:1}],
   silk:[{t:'ESP32-C6-DevKitC-1',x:-7,y:6.5,s:2.2,f:1}]},
  espcam:{n:'ESP32-CAM',big:'CAM',L:40,W:27,r:1,
   rows:[{y:-12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_L)},{y:12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_R)}],
@@ -8680,17 +8739,50 @@ async function decodeModel(name){
 }
 /* ---------- materials ---------- */
 const lin=(hex)=>new TH.Color(hex).convertSRGBToLinear();
+/* surface texture: set DETAIL=false to go back to smooth surfaces (the dep_x59 look) */
+const DETAIL=true;
+const GRAINS={
+  plastic:{f:[7,7,7],a:.10,r:.22,f2:[2.2,2.2,2.2]},
+  metal:{f:[9,9,9],a:.12,r:.18,f2:[2,2,2]},
+  brush:{f:[22,1.1,22],a:.22,r:.22,f2:[6,.6,6]},
+  brushz:{f:[22,22,1.1],a:.18,r:.2,f2:[6,6,.6]},
+  mask:{f:[5.5,5.5,5.5],a:.055,r:.12,f2:[1.6,1.6,1.6]},
+  raw:{f:[16,16,2],a:.34,r:.3,f2:[4,4,1]}
+};
+/* procedural bump and roughness variation in the part's own coordinates, so it sticks to the part as the camera moves */
+function grain(m,kind){
+  if(!DETAIL)return m;const g=typeof kind==='string'?GRAINS[kind]:kind;if(!g)return m;
+  const v3=a=>'vec3('+a.map(x=>x.toFixed(3)).join(',')+')',key='g'+JSON.stringify(g);
+  m.onBeforeCompile=sh=>{
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vGL;varying vec3 vAx;varying vec3 vAy;varying vec3 vAz;').replace('#include <begin_vertex>','#include <begin_vertex>\nvGL=transformed;vAx=normalMatrix*vec3(1.,0.,0.);vAy=normalMatrix*vec3(0.,1.,0.);vAz=normalMatrix*vec3(0.,0.,1.);');
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
+varying vec3 vGL;varying vec3 vAx;varying vec3 vAy;varying vec3 vAz;
+float h31(vec3 p){p=fract(p*.1031);p+=dot(p,p.yzx+33.33);return fract((p.x+p.y)*p.z);}
+float vn(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float gH(vec3 p){return vn(p*${v3(g.f)})*.65+vn(p*${v3(g.f2||g.f)}+7.3)*.35;}`)
+    .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+roughnessFactor=clamp(roughnessFactor*(1.+${g.r.toFixed(3)}*(gH(vGL)-.5)*2.),.04,1.);`)
+    .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+{float e=.012;float h0=gH(vGL);vec3 gr=vec3(gH(vGL+vec3(e,0.,0.))-h0,gH(vGL+vec3(0.,e,0.))-h0,gH(vGL+vec3(0.,0.,e))-h0)/e;
+ vec3 gv=(vAx*gr.x+vAy*gr.y+vAz*gr.z)*${(1/Math.max(...g.f)).toFixed(5)};
+ normal=normalize(normal-${g.a.toFixed(3)}*(gv-dot(gv,normal)*normal));}`);
+  };
+  m.customProgramCacheKey=()=>key;return m;
+}
 function mat(o){
   const m=new TH.MeshStandardMaterial({color:lin(o.c),metalness:o.m==null?0:o.m,roughness:o.r==null?.6:o.r,envMapIntensity:o.e==null?1:o.e});
   if(o.emi){m.emissive=lin(o.emi);m.emissiveIntensity=o.ei==null?1:o.ei}
   if(o.t){m.transparent=true;m.opacity=o.t}
   m.userData.base={emi:m.emissive.clone(),ei:m.emissiveIntensity};
+  if(o.g!==false&&!o.emi&&!o.t)grain(m,o.g||((o.m||0)>=.6?'metal':'plastic'));
   return m;
 }
 function kicadMat(p,over){
   const n=p.n,c=new TH.Color(p.c[0],p.c[1],p.c[2]);
   if(over&&over[n])return over[n]();
-  if(n==='None')return mat({c:0x8e9198,m:.9,r:.38});
+  if(n==='None')return mat({c:0x8e9198,m:.9,r:.38,g:'brush'});
   if(/^PIN-01/.test(n))return mat({c:0xc9ccd0,m:.95,r:.28});
   if(/^PIN-02/.test(n))return mat({c:0xd9b45a,m:.95,r:.3});
   if(/^MET-COPPER/.test(n))return mat({c:0xb7743c,m:.9,r:.35});
@@ -8859,8 +8951,8 @@ function buildPCB(fig,sp,B){
   const pos=geo.attributes.position,uv=new Float32Array(pos.count*2);
   for(let i=0;i<pos.count;i++){uv[2*i]=(pos.getX(i)+L/2)/L;uv[2*i+1]=1-(pos.getY(i)+W/2)/W}
   geo.setAttribute('uv',new TH.BufferAttribute(uv,2));
-  const top=new TH.MeshPhysicalMaterial({map:tex,roughness:.6,metalness:0,envMapIntensity:.55,clearcoat:.45,clearcoatRoughness:.3});
-  const side=mat({c:0x1b1f1d,r:.55,e:.5});B.userData.tex={lab:tex,no:null,make:()=>pcbTexture(fig,sp,ppm,false),mat:top};
+  const top=new TH.MeshPhysicalMaterial({map:tex,roughness:.6,metalness:0,envMapIntensity:.55,clearcoat:.45,clearcoatRoughness:.3});grain(top,'mask');
+  const side=mat({c:0x1b1f1d,r:.55,e:.5,g:'raw'});B.userData.tex={lab:tex,no:null,make:()=>pcbTexture(fig,sp,ppm,false),mat:top};
   const pcb=new TH.Mesh(geo,[top,side]);pcb.castShadow=pcb.receiveShadow=true;B.add(pcb);
   /* gold pads and castellations */
   const gold=()=>mat({c:palette.gold,m:1,r:.28,e:1.2}),ringG=new TH.RingGeometry(.5,.97,28),sqG=new TH.BoxGeometry(1.8,1.8,.03),caG=new TH.BoxGeometry(1.1,1.9,.03);
@@ -8895,11 +8987,13 @@ function buildHeaders(fig,sp,B,tags){
 /* ---------- USB ---------- */
 function stadium(w,h,r){return rrShape(-w/2,-h/2,w/2,h/2,r)}
 function usbC(len){
-  const g=new TH.Group(),M=mat({c:0xa9adb3,m:1,r:.34,e:1}),outer=stadium(8.94,3.26,1.5);
+  const g=new TH.Group(),M=mat({c:0xa9adb3,m:1,r:.34,e:1,g:'brushz'}),outer=stadium(8.94,3.26,1.5);
   outer.holes.push(rrPath(-4.34,-1.46,4.34,1.46,1.3));
   const eg=new TH.ExtrudeGeometry(outer,{depth:len,bevelEnabled:false,curveSegments:8});
   const shell=new TH.Mesh(eg,M);shell.castShadow=shell.receiveShadow=true;
   const sx=new TH.Group();sx.add(shell);
+  /* the closed back of the receptacle, so you cannot see through the tube */
+  const back=new TH.Mesh(new TH.ExtrudeGeometry(stadium(8.94,3.26,1.5),{depth:.35,bevelEnabled:false,curveSegments:8}),M);back.position.z=len-.35;back.castShadow=true;sx.add(back);
   /* the lip at the mating face */
   const lo=stadium(9.35,3.66,1.7);lo.holes.push(rrPath(-4.34,-1.46,4.34,1.46,1.3));
   const lg=new TH.Mesh(new TH.ExtrudeGeometry(lo,{depth:.35,bevelEnabled:false,curveSegments:8}),M);lg.position.z=0;lg.castShadow=true;sx.add(lg);
@@ -8952,7 +9046,7 @@ function buildModule(fig,sp,B,tags){
     const d=moduleDecal(sp,canLen-1.6,wd-2.6);d.position.set(canX,cy,T+3.1+.02);B.add(d);tags.module.push(d.material);
     if(canLen>16&&wd>15){const q=qrDecal(13,M.t.length*7,90);q.position.set(canX+(antRight?1:-1)*(canLen/2-3.6),cy+wd/2-3.6,T+3.1+.03);B.add(q)}
   }else{
-    const w=x1-x0,d=y1-y0,sub=mat({c:0x101216,r:.5}),lid=mat({c:0xb8bcc2,m:1,r:.34,e:1.3});
+    const w=x1-x0,d=y1-y0,sub=mat({c:0x101216,r:.5}),lid=mat({c:0xb8bcc2,m:1,r:.34,e:1.3,g:'brush'});
     const b0=box(w,d,.7,sub,(x0+x1)/2,cy,T,.4);B.add(b0);
     const sh=new TH.Mesh(new TH.ExtrudeGeometry(rrShape(-(w-.7)/2,-(d-.7)/2,(w-.7)/2,(d-.7)/2,.5),{depth:1.45,bevelEnabled:true,bevelThickness:.12,bevelSize:.12,bevelSegments:2,curveSegments:5}),lid);
     sh.position.set((x0+x1)/2,cy,T+.7);sh.castShadow=sh.receiveShadow=true;B.add(sh);
@@ -9059,6 +9153,7 @@ function board(S,id){
 function draw(S,P,o){
   const b=S.board;if(!b)return;
   sizeOf(S,o.W,o.H,o.dpr||1);aim(S,P,o.W,o.H);
+  S.floor.visible=S.blob.visible=o.floor!==false;
   {const tx=b.g.userData.tex;if(tx){const want=o.nolab?'no':'lab';if(want==='no'&&!tx.no)tx.no=tx.make();const m=tx[want];if(tx.mat.map!==m){tx.mat.map=m;tx.mat.needsUpdate=true}}}
   const t=o.t||0,pulse=.2+.06*Math.sin(t*3.1);
   for(const k in b.tags)for(const m of b.tags[k]){
@@ -9079,7 +9174,7 @@ function fig(id){return BD.glfig(id)}
 /* a still of one board as a PNG data URL, for the small picker cards */
 function snap(id,az,elv,zm,lab,t){
   const S=shared();board(S,id);const f=fig(id),W=400,H=300,P=f.cam(W,H,az,elv||34,zm||1.02,f.focus.hero);
-  draw(S,P,{W,H,dpr:2,t:t||0,lit:'',nolab:!lab});
+  draw(S,P,{W,H,dpr:2,t:t||0,lit:'',nolab:!lab,floor:false});
   return S.renderer.domElement.toDataURL('image/png');
 }
 return {fig,snap,get ok(){return DONE},ready,get TH(){return TH},stage,board,draw,place,mat,lin,palette,MODELS:()=>MODELS,canvas,shared,dpr};
@@ -10359,7 +10454,12 @@ PJ.stop=async function(gesture){
   const old=await pjDb.runs(pr.id);
   const s={id:pjUid(),pid:pr.id,n:r.name||('Run '+(old.length+1)),started:r.ms0,ended:Date.now(),seconds:+((performance.now()-r.t0)/1000).toFixed(1),
     mode:r.mode,simulated:r.mode==='demo',fw:r.fw,tester:(typeof Rec!=='undefined'&&Rec.who)||'',board:pjBoard(),parts:pr.parts.slice(),reads:r.reads,marks:r.marks,capped:r.capped};
-  await pjDb.put('sessions',s);await pjSave(pr);
+  try{await pjDb.put('sessions',s);await pjSave(pr)}
+  catch(e){
+    try{const blob=new Blob([JSON.stringify(s)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(pr.name||'project').replace(/[^\w.-]+/g,'_')+'-'+s.n.replace(/[^\w.-]+/g,'_')+'.json';document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},2000)}catch(_){}
+    toast('The browser could not store this run ('+(e&&e.message||e)+'). It was downloaded as a file instead.');
+    return s;
+  }
   let extra='';
   if(pr.autosave){
     try{const h=await pjDir(pr.id,!!gesture);if(h){await pjWriteRun(h,s,pr);extra=' Also saved to your folder.'}else extra=' The folder needs permission again. Open Runs and press Save to folder.'}
@@ -10372,9 +10472,11 @@ function pjBoard(){try{const b=BRD.cur&&BRD.by(BRD.cur);return b?b.n:'ESP32 DevK
 
 /* ---------- wiring: every wire of every part in one list, with pin and address clashes ---------- */
 const PJ_ADDR={mpu:[0x68],bmp180:[0x77],bmp280:[0x76]};
-function pjBus(n,pp){
-  if((n===21||n===22)&&/^(SDA|SCL)/i.test(pp.trim()))return 'I2C';
-  if((n===18||n===19||n===23)&&/^(SCK|CLK|SCLK|MOSI|MISO|DI\b|DO\b|SDI|SDO|DIN)/i.test(pp.trim()))return 'SPI';
+function pjBus(n,pp,part){
+  const t=pp.trim();
+  if(part==='tm1637'||part==='tm1638')return '';
+  if((n===21||n===22)&&/^(SDA|SCL)/i.test(t)&&!/MOSI|SCK/i.test(t))return 'I2C';
+  if((n===18||n===19||n===23)&&(/\b(SCK|SCLK|MOSI|MISO|SDI|SDO)\b/i.test(t)||/^(CLK|DI|DO|DIN)\b/i.test(t)))return 'SPI';
   return '';
 }
 function pjWiring(ids){
@@ -10389,7 +10491,7 @@ function pjWiring(ids){
       const m=/^GPIO(\d+)/.exec(esp);
       if(m&&kind!=='pwr'&&kind!=='gnd'){
         const n=+m[1],o=used.get(n)||{n,owners:[]};
-        if(!o.owners.some(x=>x.part===id))o.owners.push({part:id,pp,bus:pjBus(n,pp),opt:kind==='opt'});
+        if(!o.owners.some(x=>x.part===id))o.owners.push({part:id,pp,bus:pjBus(n,pp,id),opt:kind==='opt'});
         used.set(n,o);
       }
     }
@@ -10526,12 +10628,29 @@ async function pjRestore(text){
   for(const r of o.runs||[])await pjDb.put('sessions',{...r,id:pjUid(),pid:pr.id});
   return pr;
 }
+
+/* an unsaved run is parked in localStorage when the tab hides, and offered back as a saved run next time */
+addEventListener('pagehide',()=>{
+  try{const r=PJ.run;if(!r||!r.rec||!r.reads.length)return;
+    const keep=Object.assign({},r,{reads:r.reads.slice(-20000),ended:Date.now(),seconds:+((performance.now()-r.t0)/1000).toFixed(1)});
+    localStorage.setItem('cts.pj.crash',JSON.stringify(keep));}catch(e){}
+});
+async function pjRecover(){
+  let raw=null;try{raw=localStorage.getItem('cts.pj.crash');if(raw)localStorage.removeItem('cts.pj.crash')}catch(e){return null}
+  if(!raw)return null;
+  try{
+    const r=JSON.parse(raw),pr=await pjDb.get('projects',r.pid);if(!pr||!Array.isArray(r.reads)||!r.reads.length)return null;
+    const old=await pjDb.runs(pr.id);
+    const s={id:pjUid(),pid:pr.id,n:(r.name||('Run '+(old.length+1)))+' (recovered)',started:r.ms0,ended:r.ended||Date.now(),seconds:r.seconds||0,mode:r.mode,simulated:r.mode==='demo',fw:r.fw||'',tester:'',board:pjBoard(),parts:pr.parts.slice(),reads:r.reads,marks:r.marks||[],capped:!!r.capped};
+    await pjDb.put('sessions',s);toast('Recovered the run that was open when the page closed: '+s.n);return s;
+  }catch(e){return null}
+}
 /* ---- Projects, part 2: the pages. List, parts, wiring, dashboard, runs and compare. ---- */
 const PJ_PRESETS=[
   ['Weather station','Temperature, pressure, humidity and light.',['bme280','bh1750','ds18b20']],
   ['Air quality monitor','Gas, dust and CO2 side by side.',['mq135','pmsa003','scd30','sgp30']],
   ['Motion and altitude logger','Movement, heading, pressure and position.',['mpu','bmp280','hmc5883l','gps']],
-  ['Plant and soil monitor','Soil moisture, light and air.',['soil','ldr','dht']],
+  ['Plant and soil monitor','Soil moisture and air.',['soil','dht']],
   ['Distance and obstacle sensing','Three ways to measure how far away things are.',['sr04','vl53l0x','irobs']],
   ['Power and battery log','Voltage and current of a battery powered build.',['ina219','batt']]
 ];
@@ -10581,6 +10700,7 @@ async function pjLeave(){
 /* ---------- the project list ---------- */
 async function pjList(b,tok){
   pjHead('Projects','Combine parts, watch them on one dashboard and keep every run.');
+  await pjRecover();
   const prs=await pjProjects();
   const info=await Promise.all(prs.map(async p=>{const r=await pjDb.runs(p.id);return {n:r.length,last:r.reduce((m,x)=>Math.max(m,x.started),0)}}));
   if(tok!==PJ.tok)return;
@@ -10683,7 +10803,7 @@ function pjParts(body,pr){
     paint();
   }
   body.append(el('p',{class:'hint'},'Pick the parts that run together. The dashboard shows each part’s own live test, side by side.'),
-    count,chips,pr.parts.length?btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build()},'sm'):null,q,list);
+    count,chips,...(pr.parts.length?[btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build()},'sm')]:[]),q,list);
   build();
 }
 
@@ -10794,8 +10914,8 @@ function pjDash(body,pr,nRuns){
   async function toggle(){
     if(PJ.run){
       go.disabled=true;mkb.disabled=true;mk.disabled=true;
-      const s=await PJ.stop(true);
-      go.disabled=false;go.textContent='Start all';go.classList.add('primary');clock.textContent='00:00';
+      let s=null;try{s=await PJ.stop(true)}catch(e){toast(e&&e.message||String(e))}
+      go.disabled=false;mkb.disabled=false;mk.disabled=false;go.textContent='Start all';go.classList.add('primary');clock.textContent='00:00';
       if(s){next++;nameIn.value='Run '+next;const t=$('#pj-t-runs');if(t){t.textContent='Runs';t.append(el('span',{class:'pj-n'},String(next-1)))}}
       return;
     }
@@ -10874,7 +10994,7 @@ function pjCompare(body,pr,runs){
   body.append(el('div',{class:'pj-acts'},btn('All runs',()=>pjGo({pid:pr.id,view:'runs'}),'sm')));
   if(sets.length<2){body.append(pjEmpty('Pick at least two runs','Go back and tick two to four runs.'));return}
   const all=sets.map(s=>new Map(pjSeries(s).map(o=>[o.key,o])));
-  const keys=[...all[0].keys()].filter(k=>all.filter(m=>m.has(k)).length>=2);
+  const keys=[...new Set(all.flatMap(m=>[...m.keys()]))].filter(k=>all.filter(m=>m.has(k)).length>=2);
   body.append(el('h3',{class:'pj-h'},'Comparing '+sets.map(s=>s.n).join(', ')));
   if(new Set(sets.map(s=>!!s.simulated)).size>1)body.append(el('p',{class:'pj-warn',role:'status'},'These runs mix Demo data and a live board. Compare like with like for real conclusions.'));
   else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs are simulated Demo data.'));
@@ -10911,6 +11031,146 @@ function pjCompare(body,pr,runs){
     stDownload('esp32-project_'+pjSlug(pr.name)+'_comparison.csv',rows.join('\n')+'\n','text/csv;charset=utf-8');toast('Saved the comparison');
   },'sm')));
 }
+/* HC-12 link test: ESP32 sends over its radio, a second HC-12 on a USB-serial adapter receives on this laptop (second Web Serial port). */
+const HCRX={
+  port:null,reader:null,on:false,buf:'',timer:0,baud:9600,onMsg:null,onState:null,sim:false,
+  async open(baud){
+    if(this.on)return;
+    this.baud=baud;
+    if(Link.mode==='demo'){this.sim=true;this.on=true;this.onState&&this.onState();return}
+    if(!('serial' in navigator))throw new Error('This browser has no Web Serial. Use Chrome or Edge on a laptop.');
+    let p;try{p=await navigator.serial.requestPort()}catch(e){throw new Error(e.name==='NotFoundError'?'No port chosen. Pick the USB-serial adapter that holds the receiver HC-12.':'Web Serial is blocked here. Open the page in Chrome or Edge directly.')}
+    if(Link.port&&p===Link.port)throw new Error('That is the ESP32 port. Pick the adapter of the receiver HC-12 instead.');
+    try{await p.open({baudRate:baud})}catch(e){throw new Error('Could not open that port. Close any other program using it (Arduino Serial Monitor, PuTTY). '+(e.message||''))}
+    this.port=p;this.on=true;this.sim=false;this.buf='';
+    const dec=new TextDecoder();
+    this.reader=p.readable.getReader();
+    (async()=>{
+      try{for(;;){const{value,done}=await this.reader.read();if(done)break;if(value&&value.length)this.feed(dec.decode(value,{stream:true}))}}
+      catch(e){}
+      finally{if(this.on){this.on=false;this.onState&&this.onState('lost')}}
+    })();
+    this.onState&&this.onState();
+  },
+  feed(t){
+    this.buf+=t.replace(/\r/g,'');
+    let i;while((i=this.buf.indexOf('\n'))>=0){const m=this.buf.slice(0,i);this.buf=this.buf.slice(i+1);if(m.length)this.onMsg&&this.onMsg(m)}
+    clearTimeout(this.timer);
+    if(this.buf.length)this.timer=setTimeout(()=>{const m=this.buf;this.buf='';if(m.length)this.onMsg&&this.onMsg(m)},120);
+  },
+  async write(text){
+    if(!this.on)throw new Error('Open the receiver port first.');
+    if(this.sim)return;
+    const w=this.port.writable.getWriter();try{await w.write(new TextEncoder().encode(text))}finally{w.releaseLock()}
+  },
+  async close(){
+    clearTimeout(this.timer);const was=this.on;this.on=false;
+    try{if(this.reader){await this.reader.cancel().catch(()=>{});try{this.reader.releaseLock()}catch(e){}}}catch(e){}
+    try{if(this.port)await this.port.close()}catch(e){}
+    this.reader=null;this.port=null;this.sim=false;if(was)this.onState&&this.onState();
+  }
+};
+
+function hcLinkBlock(){
+  const R={on:false,sent:0,got:0,t0:{},seen:new Set(),lat:[],running:false,stop:false};
+  const kS=readout('Sent',{right:true,init:'0'}),kG=readout('Received',{right:true,init:'0'}),kL=readout('Lost',{right:true,init:'n/a'}),kT=readout('Delay',{right:true,init:'n/a'});
+  const log=el('pre',{class:'rxlog hcrxlog',tabindex:0,'aria-label':'Receiver log'},'Receiver closed.');
+  const lines=[];
+  const stamp=()=>new Date().toLocaleTimeString([], {hour12:false});
+  const add=(txt,kind)=>{lines.push((kind||'rx')+' '+stamp()+'  '+txt);if(lines.length>200)lines.shift();log.textContent=lines.join('\n');log.scrollTop=1e6};
+  const status=el('p',{class:'hint chk','aria-live':'polite'},'');
+  const baud=el('select',{class:'i','aria-label':'Receiver baud rate'},...[1200,2400,4800,9600,19200,38400,57600,115200].map(b=>el('option',{value:b,selected:b===9600},b+' baud')));
+  const openB=btn('Open receiver port',async()=>{
+    if(HCRX.on){await HCRX.close();return}
+    await HCRX.open(+baud.value);
+  },'primary');
+  openB.setAttribute('aria-pressed','false');
+  const refresh=why=>{
+    openB.textContent=HCRX.on?'Close receiver port':'Open receiver port';openB.setAttribute('aria-pressed',String(HCRX.on));
+    status.textContent=HCRX.on?(HCRX.sim?'Demo receiver is open (simulated, no real radio).':'Receiver open at '+HCRX.baud+' baud. Anything the HC-12 hears shows below.'):(why==='lost'?'The receiver port went away. Unplug and replug the adapter, then open it again.':'Closed.');
+    if(!HCRX.on&&!lines.length)log.textContent='Receiver closed.';
+  };
+  HCRX.onState=refresh;
+  const upd=()=>{
+    kS.set(String(R.sent));kG.set(String(R.got));
+    const lost=R.sent-R.got;
+    kL.set(R.sent?lost+' of '+R.sent:'n/a',R.sent?Math.round(100*lost/R.sent)+' %':'');
+    if(R.lat.length){const a=R.lat.reduce((x,y)=>x+y,0)/R.lat.length;kT.set(Math.round(a)+' ms','max '+Math.round(Math.max(...R.lat))+' ms')}else kT.set('n/a','');
+  };
+  HCRX.onMsg=m=>{
+    add(m,'rx');
+    const g=/T(\d{1,5})\b/.exec(m);
+    if(g){const n=+g[1];if(R.t0[n]!=null&&!R.seen.has(n)){R.seen.add(n);R.got++;R.lat.push(performance.now()-R.t0[n]);upd()}}
+  };
+  /* demo: the simulated receiver hears 92 % of what the ESP32 sends */
+  const simHear=(n,text)=>{if(!HCRX.on||!HCRX.sim)return;if(Math.random()<.92)setTimeout(()=>HCRX.onMsg&&HCRX.onMsg(text),90+Math.random()*160)};
+  /* send from the laptop to the ESP32 (the ESP32 radio port prints it as received) */
+  const txIn=el('input',{class:'i',value:'PING FROM LAPTOP',style:'width:min(100%,260px)','aria-label':'Text to send from the laptop'});
+  const txB=btn('Send from laptop',async()=>{await HCRX.write(txIn.value);add(txIn.value,'tx')});
+  /* packet test: ESP32 sends numbered packets */
+  const cnt=el('input',{class:'i',type:'number',min:1,max:200,value:20,style:'width:80px','aria-label':'Packets to send'});
+  const gap=el('input',{class:'i',type:'number',min:150,max:5000,step:50,value:500,style:'width:90px','aria-label':'Milliseconds between packets'});
+  const pay=el('input',{class:'i',value:'hello',style:'width:min(100%,160px)','aria-label':'Packet text'});
+  const sum=el('p',{class:'hint chk','aria-live':'polite'},'');
+  const runB=btn('Run packet test',async()=>{
+    if(R.running){R.stop=true;return}
+    if(!HCRX.on)throw new Error('Open the receiver port first.');
+    if(Link.mode==='none')throw new Error('Connect the ESP32 (or turn on Demo mode) so it can send.');
+    const N=Math.max(1,Math.min(200,+cnt.value||20)),G=Math.max(150,+gap.value||500);
+    R.running=true;R.stop=false;R.sent=0;R.got=0;R.t0={};R.seen=new Set();R.lat=[];upd();sum.textContent='Sending...';runB.textContent='Stop test';
+    try{
+      await dev('HC 1');
+      for(let n=1;n<=N&&!R.stop;n++){
+        const text='T'+n+' '+pay.value;
+        R.t0[n]=performance.now();
+        await dev('HCTX '+text,3000);R.sent++;add(text,'tx');simHear(n,text);upd();
+        sum.textContent='Sent '+n+' of '+N+'...';
+        await sleep(G);
+      }
+      sum.textContent='Waiting for the last packets...';await sleep(1500);
+    }finally{
+      R.running=false;runB.textContent='Run packet test';
+    }
+    const lost=[];for(let n=1;n<=R.sent;n++)if(!R.seen.has(n))lost.push(n);
+    upd();
+    sum.textContent=R.sent+' sent, '+R.got+' received'+(lost.length?', lost: '+(lost.length>12?lost.slice(0,12).join(', ')+' and '+(lost.length-12)+' more':lost.join(', ')):', none lost')+'. The delay counts the serial hop from the page to the ESP32 too, so read it as an upper bound.';
+  });
+  cleanups.push(async()=>{R.stop=true;HCRX.onMsg=null;HCRX.onState=null;await HCRX.close()});
+  /* AT commands for the receiver module (SET pin to GND) */
+  const AT=[['AT','Test: answers OK'],['AT+V','Firmware version'],['AT+RX','Read all settings'],['AT+B9600','Baud 9600 (default)'],['AT+C001','Channel 1 (433.4 MHz)'],['AT+FU3','Mode FU3: default, up to 1 km at 9600 baud'],['AT+P8','Power level 8: 100 mW, the maximum (P1 is 0.8 mW)'],['AT+DEFAULT','Back to factory settings']];
+  const atRow=el('div',{class:'row'},...AT.map(([c,t])=>{const b=btn(c,async()=>{await HCRX.write(c);add(c,'tx')});b.title=t;return b}));
+  const atIn=el('input',{class:'i',placeholder:'AT+C002',style:'width:min(100%,160px)','aria-label':'Custom AT command'});
+  const wiring=el('details',{class:'flhelp'},el('summary',{},'Wire the receiver HC-12 to the USB adapter'),
+    el('ul',{class:'plain'},
+      el('li',{},'HC-12 VCC to the adapter 5V (or 3V3), HC-12 GND to GND.'),
+      el('li',{},'HC-12 TXD to the adapter RX, HC-12 RXD to the adapter TX. TX and RX cross over.'),
+      el('li',{},'Leave SET open for normal receiving. To change settings, join SET to GND, then press the AT buttons below. Open SET again after.'),
+      el('li',{},'Both radios need the same baud, channel and mode. Factory settings are 9600 baud, channel 1, FU3, so two new modules already match.'),
+      el('li',{},'Fit the antenna on both modules before sending.'),
+      el('li',{},'Keep the two modules at least 1 m apart on the bench. Side by side they overload each other and drop packets.')));
+  const blkEl=blk('Link test: ESP32 sends, this laptop receives',
+    el('p',{class:'hint'},'Connect the ESP32 as usual (top right). Then plug the adapter with the second HC-12 into this laptop and open it here. The page talks to both at once.'),
+    el('div',{class:'reads',style:'--n:4'},kS.el,kG.el,kL.el,kT.el),
+    row(baud,openB),status,
+    el('div',{class:'lbl'},'Receiver log (rx is heard, tx is sent)'),log,
+    row(btn('Clear log',()=>{lines.length=0;log.textContent=HCRX.on?'Waiting for a message...':'Receiver closed.'})),
+    el('h4',{},'Packet test'),
+    el('p',{class:'hint'},'The ESP32 sends numbered packets (T1, T2, ...). The receiver counts what arrives, so you see lost packets and delay.'),
+    row(el('label',{class:'stchk'},'Packets ',cnt),el('label',{class:'stchk'},'Every (ms) ',gap),pay,runB),sum,
+    el('h4',{},'Laptop to ESP32'),
+    row(txIn,txB),
+    el('p',{class:'hint'},'The ESP32 prints what it hears in Received above, once its radio port is open.'),
+    el('h4',{},'Receiver settings (AT mode)'),
+    el('p',{class:'hint'},'Only works with SET joined to GND on the receiver, at 9600 baud. Answers appear in the log.'),
+    atRow,row(atIn,btn('Send AT',async()=>{if(atIn.value.trim()){await HCRX.write(atIn.value.trim());add(atIn.value.trim(),'tx')}})),
+    wiring);
+  upd();refresh();
+  return blkEl;
+}
+NEWTESTS.hc12=function(b){
+  pHc(b);
+  b.append(hcLinkBlock());
+};
 /* ---- hook every new part into the page. Must be the last file of the NEW block. ---- */
 const NEWFN={};
 function specSource(sp){
@@ -11042,7 +11302,7 @@ async function show(id){
   panel.append(jump,
     sec('circuit','Circuit',wiringView(p)),
     sec('test','Live test',tb,PART_CMDS[p.id]?monitorPanel(p):null,verdictBar(p)),
-    p.id==='power'?null:sec('code','Your code',codePanel(p)),
+    ...(p.id==='power'?[]:[sec('code','Your code',codePanel(p))]),
     sec('notes','Pass criteria and notes',notes));
   tabSpy(jump,p);
 }
