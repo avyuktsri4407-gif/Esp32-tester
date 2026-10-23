@@ -8282,7 +8282,7 @@ const SPECS={
   rows:[{y:-11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J1)},{y:11.43,x0:-18,n:16,st:'pin',lab:rv(C6_J3)}],
   usb:[{x:-25.95,y:-5.2,k:'c'},{x:-25.95,y:5.2,k:'c'}],mod:{k:'wroom',x0:0.5,x1:25.95,y0:-9,y1:9,sx1:17,t:'ESP32-C6-WROOM-1',t2:'Wi-Fi 6 + Bluetooth LE'},
   bridge:{x:-16.2,y:0,w:5,d:5,t:'CP2102N'},reg:{x:-9.5,y:-5.5},btn:[{x:-22,y:-11.1,s:2.6},{x:-22,y:11.1,s:2.6}],leds:[{x:-10,y:2.2,c:'b',rgb:1}],
-  silk:[{t:'ESP32-C6-DevKitC-1',x:-7,y:6.5,s:2.2,f:1}]},
+  silk:[{t:'ESP32-C6-DevKitC-1',x:-14.5,y:6.6,s:1.7,f:1}]},
  espcam:{n:'ESP32-CAM',big:'CAM',L:40,W:27,r:1,
   rows:[{y:-12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_L)},{y:12.1,x0:-6,n:8,st:'pad',lab:rv(CAM_R)}],
   mod:{k:'wroom',x0:-20,x1:4,y0:-8,y1:8,sx0:-12.5,sx1:4,t:'ESP-32S',t2:'AI-Thinker',ant:1},cam:{x:11.5,y:0},
@@ -8295,7 +8295,7 @@ const GLSPECS={devkit:{n:'ESP32 DevKit V1',big:'ESP32',L:55,W:28,r:1.75,
   rows:[{y:-12.7,x0:-20.65,n:15,st:'pin',lab:rv(DK_L)},{y:12.7,x0:-20.65,n:15,st:'pin',lab:rv(DK_R)}],
   usb:[{x:-27.5,y:0,k:'micro'}],mod:{k:'wroom',x0:1.75,x1:27.25,y0:-9,y1:9,sx1:20.5,t:'ESP32-WROOM-32',t2:'Wi-Fi + Bluetooth'},
   bridge:{x:-15.5,y:0,w:5,d:5,t:'CP2102'},reg:{x:-8.75,y:-6.75},btn:[{x:-22,y:8.25,s:3.2},{x:-22,y:-8.25,s:3.2}],leds:[{x:-15,y:7,c:'r'},{x:-15,y:-7,c:'b'}],
-  silk:[{t:'DEVKIT V1',x:-18,y:-10.4,s:2.2,f:1},{t:'EN',x:-25.2,y:11.2,s:2.3},{t:'BOOT',x:-26.2,y:-11.2,s:2.3}]}};
+  silk:[{t:'DEVKIT V1',x:-21.5,y:-4.9,s:2.2,f:1},{t:'EN',x:-25.2,y:11.2,s:2.3},{t:'BOOT',x:-26.2,y:-11.2,s:2.3}]}};
 function make(id,sp){
   const L=sp.L,W=sp.W,objs=[],occ=[];
   const add=(oid,tag,b,draw)=>objs.push({id:oid,tag,grp:'b',o:BO,box:[b[0]+BO[0],b[1]+BO[1],b[2]+BO[2],b[3]+BO[0],b[4]+BO[1],b[5]+BO[2]],draw,after:[]});
@@ -8893,6 +8893,8 @@ function aim(S,P,W,H){
   S.key.position.copy(dir(-.7,.78,.42));S.key.target.position.copy(at);
   S.fill.position.copy(dir(.9,.25,.35));S.fill.target.position.copy(at);
   S.rim.position.copy(dir(.1,.5,-.9));S.rim.target.position.copy(at);
+  /* the rim light mirrors into the lens between about 8 and 28 degrees and washes the board white, so fade it out there */
+  {const f=Math.min(1,Math.max(0,(P.elevation-26)/10));S.rim.intensity=1.1*f*f*(3-2*f)}
   const e2=S.ext,sc=S.key.shadow.camera;sc.left=-e2;sc.right=e2;sc.top=e2;sc.bottom=-e2;sc.near=1;sc.far=700;sc.updateProjectionMatrix();
 }
 /* ---------- the PCB: outline, top texture, pads ---------- */
@@ -8934,9 +8936,14 @@ function pcbTexture(fig,sp,ppm,labels){
     for(const r of sp.rows){
       if(!r.lab||labels===false)continue;
       const ly=r.y+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?2.05:2.2);
-      xs(r.x0,r.n).forEach((px,i)=>{const t=r.lab[i];if(t)silkText(x,t,px,ly+.55,1.15,palette.silk,'center')});
+      const pxs=xs(r.x0,r.n),pitch=pxs.length>1?Math.abs(pxs[1]-pxs[0]):2.54;
+      pxs.forEach((px,i)=>{const t=r.lab[i];if(!t)return;setFont(x,1,700);const w=x.measureText(t).width||.6*t.length,sz=Math.min(1.15,pitch*.9/w);silkText(x,t,px,ly+.55,sz,palette.silk,'center')});
     }
-    for(const k of sp.silk||[])silkText(x,k.t,k.x,k.y+k.s*.17,k.s*.6,k.f?palette.silkDim:palette.silk,'left');
+    const lbox=[];for(const r of sp.rows){if(!r.lab)continue;const ly=r.y+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?2.05:2.2);r.lab.forEach(t=>{if(t)lbox.push([ly-.6,ly+.8])});}
+    const lxs=sp.rows.map(r=>r.lab?xs(r.x0,r.n):[]);
+    for(const k of sp.silk||[]){const sz=k.s*.6;setFont(x,sz,700);const w=x.measureText(k.t).width||sz*.6*k.t.length,y0=k.y+k.s*.17-sz,y1=k.y+k.s*.17+.2;
+      let hit=false;sp.rows.forEach((r,ri)=>{if(!r.lab)return;const ly=r.y+(r.out?1:-1)*(r.y>0?1:-1)*(r.st==='cast'?2.05:2.2),a=ly-.6,b=ly+.8;if(y1>a&&y0<b)lxs[ri].forEach((px,i)=>{if(r.lab[i]&&k.x<px+1.1&&k.x+w>px-1.1)hit=true})});
+      if(!hit)silkText(x,k.t,k.x,k.y+k.s*.17,sz,k.f?palette.silkDim:palette.silk,'left')}
     /* fiducials */
     x.fillStyle='rgba(200,205,212,.8)';for(const f of fig.lay.fid){x.beginPath();x.arc(f.x,f.y,.5,0,7);x.fill();x.fillStyle=palette.mask;x.beginPath();x.arc(f.x,f.y,.28,0,7);x.fill();x.fillStyle='rgba(200,205,212,.8)'}
     /* drill holes under the pads */
@@ -9154,6 +9161,7 @@ function draw(S,P,o){
   const b=S.board;if(!b)return;
   sizeOf(S,o.W,o.H,o.dpr||1);aim(S,P,o.W,o.H);
   S.floor.visible=S.blob.visible=o.floor!==false;
+  {const tx=b.g.userData.tex;if(tx){const f=clamp((P.elevation-6)/30,0,1),sm=f*f*(3-2*f);tx.mat.clearcoat=.45*sm;tx.mat.envMapIntensity=.55*(.12+.88*sm)}}
   {const tx=b.g.userData.tex;if(tx){const want=o.nolab?'no':'lab';if(want==='no'&&!tx.no)tx.no=tx.make();const m=tx[want];if(tx.mat.map!==m){tx.mat.map=m;tx.mat.needsUpdate=true}}}
   const t=o.t||0,pulse=.2+.06*Math.sin(t*3.1);
   for(const k in b.tags)for(const m of b.tags[k]){
