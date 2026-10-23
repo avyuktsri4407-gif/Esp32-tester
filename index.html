@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ESP32 Live Tester</title>
+<script>document.documentElement.lang='en'</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1945,7 +1946,7 @@ const Link={
     setStatus();runCleanups();
   }
 };
-const dev=(line,t)=>aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t));
+const dev=(line,t)=>aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t)).catch(e=>{const m=e&&e.message!=null?e.message:String(e);if(/UOPEN first/.test(m)){const f=new Error('The serial port is not open yet. Press "Find the part" first.');f.stack=e&&e.stack;throw f}throw e});
 
 /* ---------- demo device ---------- */
 const Demo={t0:Date.now(),gps:false,gpsT:null,gpsStart:0,hc:false};
@@ -2255,7 +2256,7 @@ const svOpts=()=>svPins().map((p,i)=>[p,`GPIO${p} servo ${i+1}`]);
 function servoSVG(kind){
   const MG=kind==='mg';
   const cx=200,cy=196,R=150,P=a=>{const t=(180-a)*Math.PI/180;return[cx+R*Math.cos(t),cy-R*Math.sin(t)]};
-  const s=svgEl('0 0 400 290','servosvg');
+  const s=svgEl('0 0 400 290','servosvg');s.removeAttribute('aria-hidden');s.setAttribute('role','group');s.setAttribute('aria-label','Servo angle dial');
   let g='';
   for(let a=0;a<=180;a+=5){const t=(180-a)*Math.PI/180,big=a%30===0,r1=R+14,r2=R+(big?24:a%10===0?20:17);g+=`<line class="${big?'tk b':'tk'}" x1="${cx+r1*Math.cos(t)}" y1="${cy-r1*Math.sin(t)}" x2="${cx+r2*Math.cos(t)}" y2="${cy-r2*Math.sin(t)}"/>`;
     if(big){const r3=R+38,edge=a===0||a===180;g+=`<text class="tkl" x="${edge?cx+(R+19)*Math.cos(t):cx+r3*Math.cos(t)}" y="${edge?cy+22:cy-r3*Math.sin(t)+4}" text-anchor="middle">${a}°</text>`}}
@@ -3079,7 +3080,7 @@ function codePanel(p){
   if(!MODES.some(m=>m[0]===mode))mode='cmd';
   const key=m=>'cts.code.'+p.id+'.'+m;
   const evalOk=canEval();
-  const con=el('pre',{class:'con',tabindex:'0','aria-label':'Console output'});
+  const con=el('pre',{class:'con',tabindex:'0',role:'log','aria-live':'off','aria-label':'Console output'});
   const conState=el('span',{class:'cstate'},'Idle');
   const print=(...a)=>{con.append(a.map(x=>typeof x==='object'&&x!==null?JSON.stringify(x):String(x)).join(' ')+'\n');con.scrollTop=con.scrollHeight};
   const ta=el('textarea',{class:'edit',spellcheck:'false',autocapitalize:'off','aria-label':'Code editor'});
@@ -3147,10 +3148,11 @@ function codePanel(p){
     if(cm){cm.setOption('mode',CM_MODE[m]);cm.setValue(v)}else ta.value=v;
     con.textContent='';paintBar();
   }
-  document.addEventListener('click',function close(e){
+  const closeMenu=function close(e){
     if(!bar.isConnected){document.removeEventListener('click',close);return}
     if(menuOpen&&!e.target.closest('.mwrap')){menuOpen=false;paintBar()}
-  });
+  };
+  document.addEventListener('click',closeMenu);cleanups.push(()=>document.removeEventListener('click',closeMenu));
   ta.addEventListener('input',()=>store.set(key(mode),ta.value));
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run()}});
   paintBar();
@@ -3313,7 +3315,7 @@ function codeUnderTest(p){
   pre.textContent=srcOf(sel);
   if(cmReady())requestAnimationFrame(()=>{
     if(!host.isConnected)return;
-    cm=CodeMirror(c=>{host.replaceChildren(c)},{value:srcOf(sel),mode:modeOf(sel),readOnly:true,lineNumbers:false,lineWrapping:matchMedia('(max-width:640px)').matches,theme:'bench',screenReaderLabel:'Code under test, read only'});
+    cm=CodeMirror(c=>{host.replaceChildren(c)},{value:srcOf(sel),mode:modeOf(sel),readOnly:true,lineNumbers:false,lineWrapping:matchMedia('(max-width:640px)').matches,theme:'bench',screenReaderLabel:'Code under test, read only',extraKeys:{Tab:false,'Shift-Tab':false}});
   });
   paintTabs();paintCap();
   return {
@@ -5516,7 +5518,7 @@ defPart({id:'ps2kb',grp:'Buttons, knobs and touch',n:'PS/2 to I2C keyboard adapt
   cap:'The adapter holds the typed keys in a buffer. The page reads 4 bytes from it every cycle.',hint:'Press "Typing test" and type on the keyboard. The bytes change with each key.',
   async find(c){const sc=await dev('SCAN'),known=new Set([0x3C,0x3D,0x27,0x3F,0x68,0x69,0x76,0x77,0x23,0x5C,0x29,0x39,0x49,0x44,0x45,0x38,0x40,0x41,0x48,0x1E,0x53,0x1D,0x6A,0x6B,0x57,0x52,0x29,0x5A,0x61,0x5B,0x5D,0x28,0x24,0x2C]),cand=sc.a.filter(a=>!known.has(a));
     c.dyn=cand[0];return c.dyn?{ok:true,note:'unknown device at '+hex(c.dyn)}:{ok:false,note:'no unknown device on the bus. Found: '+(sc.a.map(hex).join(' ')||'nothing')+'. Check the Qwiic cable and the keyboard power'}},
-  async read(c){const a=c.dyn;const r=await i2c(a,'-',4);let code=NaN;for(const x of r)if(x){code=x;break}return {code:Number.isFinite(code)?code:0,hexs:B2H(r),asc:asText(r).replace(/\n/g,'.')}},
+  async read(c){if(!c.dyn){const f=await this.find(c);if(!f.ok)throw new Error(f.note)}const a=c.dyn;const r=await i2c(a,'-',4);let code=NaN;for(const x of r)if(x){code=x;break}return {code:Number.isFinite(code)?code:0,hexs:B2H(r),asc:asText(r).replace(/\n/g,'.')}},
   stim:{prompt:'Type some letters on the keyboard.',secs:12,key:'code',rise:1,d:0,name:'key code',gap:120,optional:true,btn:'Typing test'},
   sim:[{k:'key',label:'Key pressed (ASCII code, 0 for none)',min:0,max:126,step:1,val:0,unit:''}],demoAddrs:[0x5F],
   demo(sv){return {i2c:{95:(w,n)=>{const o=new Uint8Array(n);o[0]=sv.key;return o}}}},
@@ -9285,7 +9287,7 @@ function homeStage(big,bd){
   const corner=(c,t,x)=>el('span',{class:'hm-c '+c,...(x||{})},t);
   const gl=GLH.canvas();gl.hidden=true;
   const plate=el('div',{class:'hm-plate isoc'},gl,svg,ov,call);
-  const hit=el('div',{class:'hm-hit',tabindex:'0','aria-label':'Board view. Left and right arrow keys turn the board.'});
+  const hit=el('div',{class:'hm-hit',tabindex:'0',role:'group','aria-label':'Board view. Left and right arrow keys turn the board.'});
   const node=el('figure',{class:'hm-stage'},plate,hit,corner('rt','Scroll to turn, drag to spin'),corner('br','',{'data-readout':''}));
   const letters=[...big].map((c,i)=>el('span',{style:'--i:'+i},c));
   const intro=el('div',{class:'hm-intro','aria-hidden':'true'},
@@ -10012,7 +10014,7 @@ const Rec={
   syncBtns(){},
   page(p){this.canRec=!!p&&!p.home&&!p.overview&&!p.projects;this.fabShow()},
   mount(nav){
-    const b=el('button',{type:'button',class:'rec-tab','aria-label':'Record this test so you can download the data',onclick:()=>this.start()},el('span',{class:'rdot','aria-hidden':'true'}),'Record test');
+    const b=el('button',{type:'button',class:'rec-tab','aria-label':'Record test, then download the data',onclick:()=>this.start()},el('span',{class:'rdot','aria-hidden':'true'}),'Record test');
     b.dataset.tip='Record the readings and serial traffic, then download a report to send to a teammate, a CSV or a raw log.';
     nav.append(b);this.fab=b;this.fabShow();
   },
@@ -11068,7 +11070,10 @@ const HCRX={
   },
   async write(text){
     if(!this.on)throw new Error('Open the receiver port first.');
-    if(this.sim)return;
+    if(this.sim){
+      const t=text.trim();if(!/^AT/i.test(t)){return}
+      const rep=/^AT$/i.test(t)?'OK':/^AT\+V$/i.test(t)?'HC-12_V2.4':/^AT\+RX$/i.test(t)?'OK+B9600\r\nOK+RC001\r\nOK+RP:+20dBm\r\nOK+FU3':/^AT\+DEFAULT$/i.test(t)?'OK+DEFAULT':'OK+'+t.slice(3);
+      setTimeout(()=>this.onMsg&&this.onMsg(rep),60);return}
     const w=this.port.writable.getWriter();try{await w.write(new TextEncoder().encode(text))}finally{w.releaseLock()}
   },
   async close(){
@@ -11082,7 +11087,7 @@ const HCRX={
 function hcLinkBlock(){
   const R={on:false,sent:0,got:0,t0:{},seen:new Set(),lat:[],running:false,stop:false};
   const kS=readout('Sent',{right:true,init:'0'}),kG=readout('Received',{right:true,init:'0'}),kL=readout('Lost',{right:true,init:'n/a'}),kT=readout('Delay',{right:true,init:'n/a'});
-  const log=el('pre',{class:'rxlog hcrxlog',tabindex:0,'aria-label':'Receiver log'},'Receiver closed.');
+  const log=el('pre',{class:'rxlog hcrxlog',tabindex:0,role:'log','aria-live':'off','aria-label':'Receiver log'},'Receiver closed.');
   const lines=[];
   const stamp=()=>new Date().toLocaleTimeString([], {hour12:false});
   const add=(txt,kind)=>{lines.push((kind||'rx')+' '+stamp()+'  '+txt);if(lines.length>200)lines.shift();log.textContent=lines.join('\n');log.scrollTop=1e6};
@@ -11271,7 +11276,7 @@ function navReveal(){
   if(r.top<n.top+30||r.bottom>n.bottom-30)nav.scrollTop+=r.top-n.top-(n.height-r.height)/2;
 }
 function refreshHead(){
-  if(headChip&&!noRes(PARTS.find(x=>x.id===cur))){headChip.replaceWith(resultChip(cur));headChip=$('#hc');}
+  if(headChip&&!noRes(PARTS.find(x=>x.id===cur))){const n=resultChip(cur);n.id='hc';headChip.replaceWith(n);headChip=n;}
 }
 (function(){
   const paint=n=>{const e=(n.nodeType===1?n:n.parentElement);const c=e&&e.closest&&e.closest('.chk');if(!c)return;
