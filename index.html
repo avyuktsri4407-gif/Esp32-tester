@@ -1298,6 +1298,118 @@ header.top{position:relative;z-index:6}
 
 /* the no-Web-Serial notice sits above the fixed hero title instead of under it (dep_x54) */
 #frameNote,.top+.notice{position:relative;z-index:30}
+
+/* projects */
+.pj{display:flex;flex-direction:column;gap:0;min-width:0}
+.pj-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
+.pj-new{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 18px}
+.pj-new[hidden]{display:none}
+.pj-in{font:400 15px var(--f-body);min-height:40px;padding:8px 14px;border:1px solid var(--hair2);border-radius:var(--r-sm);background:var(--bg);color:var(--fg);min-width:0}
+.pj-new .pj-in{flex:1 1 260px}
+.pj-in:focus-visible,.pj-title:focus-visible,.pj-link:focus-visible,.pj-tab:focus-visible,.pj-pr input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pj-h{font:600 16px var(--f-body);margin:30px 0 10px;color:var(--fg)}
+.pj-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.pj-card{display:flex;flex-direction:column;gap:10px;padding:16px 18px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);min-width:0}
+.pj-card h3{margin:0;font:600 17px var(--f-body)}
+.pj-card .pj-acts{margin-top:auto;padding-top:4px}
+.pj-link{all:unset;cursor:pointer;color:var(--fg);font:inherit;font-weight:600;text-decoration:underline;text-decoration-color:var(--hair2);text-underline-offset:3px;border-radius:4px}
+.pj-link:hover{text-decoration-color:var(--accent)}
+.pj-meta{margin:0;font:400 13px var(--f-body);color:var(--muted)}
+.pj-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pj-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 4px}
+.pj-warn{margin:0 0 14px;padding:10px 14px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft);font:400 14px var(--f-body);color:var(--fg)}
+.btn.danger{border-color:var(--fail);color:var(--fail)}
+.pj-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 10px}
+.pj-title{flex:1 1 220px;min-width:0;font:600 22px var(--f-body);color:var(--fg);background:transparent;border:0;border-bottom:1px solid transparent;padding:4px 2px}
+.pj-title:hover,.pj-title:focus{border-bottom-color:var(--hair2)}
+.pj-tabs{display:flex;gap:2px;border-bottom:1px solid var(--hair);overflow-x:auto;scrollbar-width:none;margin:0 0 20px}
+.pj-tabs::-webkit-scrollbar{display:none}
+.pj-tab{flex:0 0 auto;font:500 14px var(--f-body);color:var(--muted);background:none;border:0;border-bottom:2px solid transparent;padding:11px 16px;min-height:44px;cursor:pointer;margin-bottom:-1px;display:inline-flex;gap:7px;align-items:center}
+.pj-tab:hover{color:var(--fg)}
+.pj-tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.pj-n{font:500 11.5px var(--f-mono);padding:1px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-hi)}
+.pj-body{min-width:0}
+.pj-empty{padding:28px 20px;border:1px dashed var(--hair2);border-radius:var(--r-md);text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.pj-empty h3{margin:0;font:600 17px var(--f-body)}
+.pj-empty p{margin:0;color:var(--muted);max-width:46ch;font:400 14px/1.5 var(--f-body)}
+.pj-count{margin:10px 0 8px;font:500 14px var(--f-body)}
+.pj-sel{margin-bottom:10px}
+.pj-x{cursor:pointer;min-height:32px;background:var(--accent-soft);white-space:normal;text-align:left;max-width:100%;line-height:1.3}
+.pj-x:hover{border-color:var(--fail);color:var(--fail)}
+.pj-pl{margin-top:14px;border:1px solid var(--hair);border-radius:var(--r-md);overflow:hidden}
+.pj-gp{border-top:1px solid var(--hair)}
+.pj-gp:first-child{border-top:0}
+.pj-gp>summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:13px 16px;font:600 14px var(--f-body);list-style:none;min-height:44px;align-items:center;background:var(--raise)}
+.pj-gp>summary::-webkit-details-marker{display:none}
+.pj-gp>summary::after{content:'';width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform .15s;margin-left:auto;flex:none}
+.pj-gp[open]>summary::after{transform:rotate(-135deg)}
+.pj-gn{font:500 12px var(--f-mono);color:var(--accent-hi);margin-left:auto;padding-right:10px}
+.pj-pr{display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:12px;row-gap:1px;align-items:center;padding:9px 16px;min-height:48px;cursor:pointer;border-top:1px solid var(--hair)}
+.pj-pr:hover{background:var(--hover)}
+.pj-pr input{grid-row:1/3;width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.pj-pn{font:500 14px var(--f-body)}
+.pj-ps{font:400 12.5px var(--f-body);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pj-pr.nok .pj-pn{color:var(--muted)}
+.pj-sum{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:12px 16px;border:1px solid var(--hair2);border-radius:var(--r-md);font:400 14px var(--f-body);margin:0 0 12px}
+.pj-sum.good{border-color:var(--pass)}
+.pj-sum.bad{border-color:var(--fail)}
+.pj-sum.warn{border-color:var(--accent-line)}
+.pj-sum.good strong{color:var(--pass)}.pj-sum.bad strong{color:var(--fail)}
+.pj-cf li.conflict::marker{color:var(--fail)}
+.pj-tb2 td,.pj-tb2 th{vertical-align:top}
+.pj-dim{color:var(--muted)}
+.pj-tbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:14px 16px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);margin:0 0 8px;position:sticky;top:0;z-index:5}
+.pj-ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;min-width:0}
+.pj-clock{font:500 22px var(--f-mono);font-variant-numeric:tabular-nums;min-width:3.4ch}
+.pj-lb{display:flex;flex-direction:column;gap:4px;font:500 12px var(--f-body);color:var(--muted)}
+.pj-lb .pj-in{color:var(--fg);font-size:14px;min-height:36px}
+.pj-rn{width:150px;max-width:100%}
+.pj-mk{width:220px;max-width:100%}
+.pj-ck{display:inline-flex;gap:8px;align-items:center;font:500 14px var(--f-body);min-height:36px;cursor:pointer}
+.pj-ck input{width:18px;height:18px;accent-color:var(--accent)}
+.pj-live{margin-bottom:6px}
+.pj-lt td,.pj-lt th{white-space:nowrap}
+.pj-pt{color:var(--muted);margin-right:8px;font-size:12.5px}
+.pj-sp{width:120px;height:28px;display:block}
+.pj-sp path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.pj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:16px;align-items:start}
+.pj-tile{border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--bg);min-width:0;overflow:hidden}
+.pj-th{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--hair);background:var(--raise)}
+.pj-th h3{margin:0;font:600 16px var(--f-body)}
+.pj-ts{margin:2px 0 0;font:400 12.5px var(--f-body);color:var(--muted)}
+.pj-tc{display:flex;gap:6px;align-items:center;flex:none}
+.pj-tb{padding:12px 14px 14px;min-width:0;overflow-x:auto}
+.pj-tb .stagewrap{margin:0}
+.pj-runs{border:1px solid var(--hair);border-radius:var(--r-md);overflow:hidden}
+.pj-run{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 16px;border-top:1px solid var(--hair)}
+.pj-run:first-child{border-top:0}
+.pj-run input{width:18px;height:18px;accent-color:var(--accent)}
+.pj-ri{display:flex;flex-direction:column;gap:2px;flex:1 1 200px;min-width:0}
+.pj-rt{margin:0 0 12px}
+.pj-folder{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);margin:0 0 16px}
+.pj-folder .hint{margin:4px 0 0}
+.pj-fn{font:500 13px var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.pj-fig{margin:0 0 16px}
+.pj-fig figcaption{font:500 14px var(--f-body);margin:0 0 4px}
+.pj-cw{min-width:0}
+.pj-ch{width:100%;height:auto;display:block}
+.pj-g{stroke:var(--hair);stroke-width:1}
+.pj-t{fill:var(--muted);font:11px var(--f-mono)}
+.pj-m{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.pj-leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 4px;font:500 13px var(--f-body)}
+.pj-lg{display:inline-flex;gap:8px;align-items:center}
+@media (max-width:640px){
+  .pj-tbar{position:static;padding:12px}
+  .pj-title{font-size:20px}
+  .pj-tab{padding:11px 11px}
+  .pj-grid{grid-template-columns:minmax(0,1fr)}
+  .pj-tb{padding:10px 8px 12px}
+  .pj-th{padding:12px}
+  .pj-pr{padding:9px 12px}
+  .pj-rn,.pj-mk{width:100%}
+  .pj-lb{width:100%}
+}
+@media (prefers-reduced-motion:reduce){.pj-gp>summary::after{transition:none}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1900,6 +2012,7 @@ const KNOWN={0x68:'MPU6050 (AD0 low)',0x69:'MPU6050 (AD0 high)',0x2C:'QMC5883P c
 const PARTS=[
 {id:'home',n:'Home',s:'What this is, and how to start',home:true},
 {id:'overview',n:'Pin map and parts',s:'Every supported part, every GPIO',overview:true},
+{id:'projects',n:'Projects',s:'Combine parts, record data, compare runs',projects:true},
 {id:'esp',get n(){const b=BRD.cur&&BRD.cur!=='devkit'?BRD.by(BRD.cur):null;return b?b.n+' ('+BRD.famName(b)+')':'ESP32 DevKit (ESP-WROOM-32)'},
   get s(){const b=BRD.cur&&BRD.cur!=='devkit'?BRD.by(BRD.cur):null;return b?'Your '+b.n+' over USB serial':'Any ESP32 DevKit V1 board over USB serial'},
   wiring:null,criteria:['Replies to PING and INFO.'],
@@ -1945,7 +2058,7 @@ const PARTS=[
   wiring:{title:'Button on a free pin',part:'Push button',rows:[['GPIO (pick one)','Button leg 1','green','sig'],['GND','Button leg 2','black','gnd']],notes:['Input with pull-up: pressed reads LOW.','Allowed pins: outputs {OUT}. Inputs add {IN}.']},
   criteria:['Output toggles a meter or LED. Input follows a button.']}
 ];
-const noRes=p=>p.overview||p.home;
+const noRes=p=>p.overview||p.home||p.projects;
 const subOf=p=>typeof p.s==='function'?p.s():p.s;
 const GROUPS=[{n:'Start',ids:['home','overview']},{n:'Board',ids:['esp','gpio','i2c']},{n:'Passive and discrete',ids:['resistor','capacitor','diode','transistor']},{n:'Switches and analog inputs',ids:['button','joystick','pot','ldr','ntc','lm35','soil']},{n:'Sensors',ids:['mpu','mag','bmp180','bmp280','dht','sr04','pir','irobs']},{n:'Outputs',ids:['led','servo','abuzz','pbuzz','relay','motor','neo']},{n:'Displays',ids:['oled','lcd']},{n:'Storage and radio',ids:['sd','gps','hc12']},{n:'Power',ids:['batt','power']}];
 
@@ -1990,7 +2103,7 @@ function bar(label,unit,range){
   return {el:r,set(x){const w=Math.min(Math.abs(x)/range,1)*50;f.style.width=w+'%';f.style.left=(x>=0?50:50-w)+'%';v.textContent=x.toFixed(2)}};
 }
 function makeLive(fn,ms,onchange){
-  let on=false,t=null;
+  let on=false,t=null;const own=PJO;
   const o={
     get on(){return on},
     async loop(){
@@ -2003,6 +2116,7 @@ function makeLive(fn,ms,onchange){
     toggle(){on?o.stop():o.start()}
   };
   cleanups.push(()=>o.stop());
+  if(own)own.lives.push(o);
   return o;
 }
 function liveBtn(live,label='Live'){
@@ -2034,7 +2148,8 @@ function readout(label,opts={}){
   const v=el('div',{class:'v'+(opts.accent?' accent':'')},opts.init??'n/a'),s=el('div',{class:'s'},opts.note||'');
   const e=el('div',{class:'read'+(opts.right?' r':'')},el('div',{class:'k'},label),v,s);
   try{const t=typeof readTip==='function'?readTip(label):'';if(t){e.dataset.tip=t;e.dataset.tipDelay='1200'}}catch(_){}
-  return {el:e,set(val,note){v.textContent=val;if(note!=null)s.textContent=note;if(typeof Rec!=='undefined'&&Rec.on)Rec.read(label,val,s.textContent)}};
+  const own=PJO;
+  return {el:e,set(val,note){v.textContent=val;if(note!=null)s.textContent=note;if(own)own.read(label,val,s.textContent);else if(typeof Rec!=='undefined'&&Rec.on)Rec.read(label,val,s.textContent)}};
 }
 /* the instrument plate: readouts on top, the drawing in the middle, a caption, then the control card */
 function stage({reads=[],visual,caption,controls=[],title='Controls'}){
@@ -7938,7 +8053,7 @@ function need(p){
 }
 /* does this part fit the chosen board? Returns {ok, why}. A board with no choice means everything fits. */
 function fit(p,id){
-  const b=by(id||cur);if(!b||!p||p.home||p.overview)return {ok:true,why:''};
+  const b=by(id||cur);if(!b||!p||p.home||p.overview||p.projects)return {ok:true,why:''};
   const n=need(p);
   if(p.id==='esp32cam'||p.id==='esp32cammb')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.'};
   if(n.gpio>b.pins.length)return {ok:false,why:'Needs '+n.gpio+' GPIO pins. '+b.n+' has '+b.pins.length+' free.'};
@@ -8631,7 +8746,7 @@ function homeIndex(){
   return el('section',{class:'hm-index',id:'hm-index'},
     el('div',{class:'hm-ih'},el('div',{},el('h3',{class:'hm-h'},'Pick a part to test.')),q),none,
     el('div',{class:'hm-grid'},cards),
-    el('div',{class:'hm-foot'},btn('Pin map and parts table',()=>{show('overview');window.scrollTo(0,0)}),btn('Back to the top',()=>{window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})})));
+    el('div',{class:'hm-foot'},btn('Start a project',()=>{show('projects');window.scrollTo(0,0)}),btn('Pin map and parts table',()=>{show('overview');window.scrollTo(0,0)}),btn('Back to the top',()=>{window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})})));
 }
 const kick0=t=>el('p',{class:'hm-k'},t);
 const hmWide=()=>matchMedia('(min-width:900px),(min-width:640px) and (orientation:landscape)').matches;
@@ -8748,15 +8863,15 @@ function homeMount(root,S,FG,HM_CH){
 /* ---- Search palette: Ctrl+K or / from anywhere, and the Search parts button in the header ---- */
 const PAL_KEY='cts.recent';
 const palKey=()=>/Mac|iPhone|iPad/.test(navigator.platform||'')?'⌘K':'Ctrl K';
-function palRecent(){const a=store.get(PAL_KEY,[]);return Array.isArray(a)?a.filter(id=>PARTS.some(p=>p.id===id&&!p.home&&!p.overview)):[]}
-function palRemember(id){const p=PARTS.find(x=>x.id===id);if(!p||p.home||p.overview)return;store.set(PAL_KEY,[id,...palRecent().filter(x=>x!==id)].slice(0,8))}
+function palRecent(){const a=store.get(PAL_KEY,[]);return Array.isArray(a)?a.filter(id=>PARTS.some(p=>p.id===id&&!p.home&&!p.overview&&!p.projects)):[]}
+function palRemember(id){const p=PARTS.find(x=>x.id===id);if(!p||p.home||p.overview||p.projects)return;store.set(PAL_KEY,[id,...palRecent().filter(x=>x!==id)].slice(0,8))}
 let palEl=null,palPrev=null;
 function palOpen(){
   if(palEl)return;
   if(BRD.locked()){toast('Pick your board first. Search opens once you have chosen one.');return}palPrev=document.activeElement;
   const gOf={};for(const g of GROUPS)for(const id of g.ids)gOf[id]=g.n;
   const items=PARTS.filter(p=>!p.home).map(p=>({id:p.id,n:p.n,g:gOf[p.id]||'',hay:(p.n+' '+(()=>{try{return subOf(p)}catch(e){return ''}})()+' '+p.id+' '+(ALIAS[p.id]||'')+' '+(gOf[p.id]||'')).toLowerCase()}));
-  const count=items.filter(i=>!PARTS.find(p=>p.id===i.id).overview).length;
+  const count=items.filter(i=>{const q=PARTS.find(p=>p.id===i.id);return !q.overview&&!q.projects}).length;
   const q=el('input',{type:'text',class:'pal-q',placeholder:'Search '+count+' parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',spellcheck:'false',role:'combobox','aria-expanded':'true','aria-controls':'pal-list'});
   const list=el('div',{class:'pal-list',id:'pal-list',role:'listbox'});
   const foot=el('div',{class:'pal-foot'},el('span',{},el('kbd',{},'↑'),el('kbd',{},'↓'),' move'),el('span',{},el('kbd',{},'Enter'),' open'),el('span',{},el('kbd',{},'Esc'),' close'));
@@ -8773,7 +8888,7 @@ function palOpen(){
       const rec=palRecent().map(id=>items.find(i=>i.id===id)).filter(Boolean);
       if(rec.length){kids.push(head('Recent'));rec.forEach(i=>kids.push(row(i)))}
       const seen=new Set(rec.map(i=>i.id));
-      for(const g of GROUPS){const its=g.ids.map(id=>items.find(i=>i.id===id)).filter(i=>i&&!seen.has(i.id)&&(g.n!=='Start'||i.id==='overview'));if(!its.length)continue;kids.push(head(g.n));its.forEach(i=>kids.push(row(i)))}
+      for(const g of GROUPS){const its=g.ids.map(id=>items.find(i=>i.id===id)).filter(i=>i&&!seen.has(i.id)&&(g.n!=='Start'||i.id==='overview'||i.id==='projects'));if(!its.length)continue;kids.push(head(g.n));its.forEach(i=>kids.push(row(i)))}
     }else{
       const hit=items.map((i,k)=>{if(!t.every(w=>i.hay.includes(w)))return null;const n=i.n.toLowerCase();return {i,k,s:n.startsWith(t[0])?0:n.includes(t[0])?1:2}}).filter(Boolean).sort((a,b)=>a.s-b.s||a.k-b.k);
       hit.forEach(h=>kids.push(row(h.i)));
@@ -9213,7 +9328,7 @@ const Rec={
   },
   visit(id){
     if(!this.on)return;
-    const p=PARTS.find(x=>x.id===id);if(!p||p.home||p.overview)return;
+    const p=PARTS.find(x=>x.id===id);if(!p||p.home||p.overview||p.projects)return;
     if(!this.visits.some(x=>x.id===id))this.visits.push({id,name:p.n,t:this.now()});
   },
   verdict(id,v,note){
@@ -9229,7 +9344,7 @@ const Rec={
   parts(){
     const ids=this.visits.map(v=>v.id);
     for(const r of this.reads)if(!ids.includes(r.part))ids.push(r.part);
-    return ids.map(id=>PARTS.find(p=>p.id===id)).filter(p=>p&&!p.home&&!p.overview);
+    return ids.map(id=>PARTS.find(p=>p.id===id)).filter(p=>p&&!p.home&&!p.overview&&!p.projects);
   },
   info(){
     const res=Link.mode==='demo'?demoResults:results;
@@ -9317,7 +9432,7 @@ const Rec={
   },
   /* ---------- interface ---------- */
   syncBtns(){},
-  page(p){this.canRec=!!p&&!p.home&&!p.overview;this.fabShow()},
+  page(p){this.canRec=!!p&&!p.home&&!p.overview&&!p.projects;this.fabShow()},
   mount(nav){
     const b=el('button',{type:'button',class:'rec-tab','aria-label':'Record this test so you can download the data',onclick:()=>this.start()},el('span',{class:'rdot','aria-hidden':'true'}),'Record test');
     b.dataset.tip='Record the readings and serial traffic, then download a report to send to a teammate, a CSV or a raw log.';
@@ -9647,6 +9762,680 @@ const RDTIPS=[
   [/^(channel \d.*)$/i,'Whether the level shifter passed the signal in that direction.']
 ];
 function readTip(label){const l=String(label||'').trim();for(const [r,t] of RDTIPS)if(r.test(l))return t;return ''}
+/* ---- Projects, part 1: storage, the run recorder, statistics, charts and exports. The pages are in projects_ui.js. ---- */
+let PJO=null;   /* the dashboard tile being built; readout() and makeLive() report to it */
+const PJ={pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:12,rec:true};
+const pjPart=id=>PARTS.find(p=>p.id===id);
+const pjName=id=>{const p=pjPart(id);return p?p.n:id};
+const pjShort=id=>{let n=String(pjName(id)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28)}return n};
+const pjUid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pjSlug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'project';
+const pjZ=n=>String(n).padStart(2,'0');
+const pjStamp=ms=>{const d=new Date(ms);return d.getFullYear()+pjZ(d.getMonth()+1)+pjZ(d.getDate())+'-'+pjZ(d.getHours())+pjZ(d.getMinutes())+pjZ(d.getSeconds())};
+const pjWhen=ms=>{try{return new Date(ms).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})}catch(e){return new Date(ms).toISOString()}};
+const pjSpan=t=>t<90?Math.round(t)+' s':Math.floor(t/60)+' min '+pjZ(Math.round(t%60))+' s';
+const pjClock=t=>pjZ(Math.floor(t/60))+':'+pjZ(Math.floor(t%60));
+const pjAx=t=>t<90?(Math.round(t*10)/10)+' s':Math.floor(t/60)+':'+pjZ(Math.round(t%60));
+const pjFmt=(v,span)=>{const a=Math.abs(span||v);return Number(v).toFixed(a>=100?0:a>=10?1:a>=1?2:a>=.1?3:4)};
+
+/* ---------- storage: IndexedDB, with a memory fallback when the browser blocks it ---------- */
+const pjDb=(()=>{
+  const mem={projects:new Map(),sessions:new Map(),meta:new Map()};
+  let db=null,tried=null,persistent=true;
+  const open=()=>tried||(tried=new Promise(res=>{
+    try{
+      const rq=indexedDB.open('esp32-live-tester-projects',1);
+      rq.onupgradeneeded=()=>{const d=rq.result;d.createObjectStore('projects',{keyPath:'id'});d.createObjectStore('sessions',{keyPath:'id'}).createIndex('pid','pid');d.createObjectStore('meta',{keyPath:'k'})};
+      rq.onsuccess=()=>{db=rq.result;db.onversionchange=()=>db.close();res(db)};
+      rq.onerror=rq.onblocked=()=>{persistent=false;res(null)};
+    }catch(e){persistent=false;res(null)}
+  }));
+  const isRq=r=>typeof IDBRequest!=='undefined'&&r instanceof IDBRequest;
+  const op=async(st,mode,f)=>{
+    const d=await open();
+    if(!d)return f(null,mem[st]);
+    return new Promise((res,rej)=>{
+      let r;try{const t=d.transaction(st,mode);r=f(t.objectStore(st),null);t.oncomplete=()=>res(isRq(r)?r.result:r);t.onerror=t.onabort=()=>rej(t.error||new Error('Storage failed'))}catch(e){rej(e)}
+    });
+  };
+  return {
+    get persistent(){return persistent&&!!db},
+    ready:()=>open().then(()=>true),
+    all:st=>op(st,'readonly',(s,m)=>s?s.getAll():[...m.values()]),
+    get:(st,k)=>op(st,'readonly',(s,m)=>s?s.get(k):m.get(k)),
+    put:(st,v)=>op(st,'readwrite',(s,m)=>{if(s)return s.put(v);m.set(v.id||v.k,v);return v}),
+    del:(st,k)=>op(st,'readwrite',(s,m)=>s?s.delete(k):m.delete(k)),
+    runs:pid=>op('sessions','readonly',(s,m)=>s?s.index('pid').getAll(pid):[...m.values()].filter(x=>x.pid===pid)),
+    delRuns:async pid=>{const a=await pjDb.runs(pid);for(const r of a)await pjDb.del('sessions',r.id)}
+  };
+})();
+async function pjAsk(){try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist()}catch(e){}}
+const pjProjects=async()=>(await pjDb.all('projects')).sort((a,b)=>b.updated-a.updated);
+async function pjNew(name,parts){
+  const p={id:pjUid(),name:String(name||'').trim()||'Untitled project',parts:(parts||[]).filter(id=>pjPart(id)).slice(0,PJ.max),created:Date.now(),updated:Date.now(),autosave:false};
+  await pjDb.put('projects',p);pjAsk();return p;
+}
+const pjSave=async p=>{p.updated=Date.now();await pjDb.put('projects',p);return p};
+
+/* ---------- numbers: which readings can be charted ---------- */
+function pjNum(v){
+  const s=String(v).trim();if(/^0x/i.test(s))return null;
+  const m=s.match(/^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*(.*)$/i);if(!m)return null;
+  const x=parseFloat(m[1]);if(!Number.isFinite(x))return null;
+  const u=m[2].trim();let unit='';
+  if(u){const um=u.match(/^([%°µμΩA-Za-z][%°µμΩA-Za-z0-9\/²³·.\-]*(?:\s[A-Za-z%]{1,4})?)/);if(!um)return null;unit=um[1]}
+  return {x,u:unit};
+}
+function pjStats(a){
+  const n=a.length;if(!n)return {n:0,min:NaN,max:NaN,mean:NaN,std:NaN,first:NaN,last:NaN};
+  let mn=Infinity,mx=-Infinity,s=0;for(const v of a){if(v<mn)mn=v;if(v>mx)mx=v;s+=v}
+  const mean=s/n;let q=0;for(const v of a)q+=(v-mean)*(v-mean);
+  return {n,min:mn,max:mx,mean,std:Math.sqrt(q/n),first:a[0],last:a[n-1]};
+}
+function pjSeries(s){
+  const by=new Map();
+  for(const r of s.reads){const n=pjNum(r.v);if(!n)continue;const k=r.part+'|'+r.label;let o=by.get(k);if(!o){o={key:k,part:r.part,label:r.label,units:{},pts:[]};by.set(k,o)}o.units[n.u]=(o.units[n.u]||0)+1;o.pts.push([r.t,n.x])}
+  const out=[];
+  for(const o of by.values()){
+    if(o.pts.length<2)continue;
+    o.unit=Object.keys(o.units).sort((a,b)=>o.units[b]-o.units[a])[0]||'';
+    o.name=pjShort(o.part)+': '+o.label;o.st=pjStats(o.pts.map(p=>p[1]));out.push(o);
+  }
+  return out;
+}
+
+/* ---------- the live buffer and the run recorder. readout() calls PJ.sample through the tile's owner. ---------- */
+PJ.sample=function(part,label,val,note){
+  const k=part+'|'+label,v=String(val),nt=note==null?'':String(note),now=performance.now()/1000;
+  let b=PJ.buf[k];if(!b)b=PJ.buf[k]={part,label,pts:[],last:'',note:'',unit:'',seen:PJ.seq=(PJ.seq||0)+1,t:0,v:'',n:''};
+  b.last=v;b.note=nt;
+  const n=pjNum(v);
+  if(n){b.unit=n.u;b.pts.push([now,n.x]);if(b.pts.length>240)b.pts.shift()}
+  const r=PJ.run;
+  if(r&&r.rec){
+    if(b.v===v&&b.n===nt&&now-b.t<.25)return;
+    b.t=now;b.v=v;b.n=nt;
+    if(r.reads.length>=200000){r.capped=true;return}
+    r.reads.push({t:+((performance.now()-r.t0)/1000).toFixed(3),part,label,v,note:nt});
+  }
+};
+PJ.owner=function(pid,part){const o={pid,part,lives:[],read:(label,val,note)=>PJ.sample(part,label,val,note)};return o};
+PJ.live=()=>PJ.tiles.some(t=>t.lives.some(l=>l.on));
+PJ.mark=function(text){
+  const r=PJ.run;text=String(text||'').trim();if(!r||!text)return false;
+  r.marks.push({t:+((performance.now()-r.t0)/1000).toFixed(3),text});return true;
+};
+PJ.start=function(name,rec){
+  if(PJ.run)return;
+  if(Link.mode==='none'){toast('Turn on Demo mode or connect a board first.');return}
+  PJ.buf={};
+  PJ.run={name:name||'Run',rec:rec!==false,t0:performance.now(),ms0:Date.now(),reads:[],marks:[],mode:Link.mode,fw:Link.fw||'',capped:false,pid:PJ.pid};
+  for(const t of PJ.tiles)for(const l of t.lives)l.start();
+};
+/* stops every instrument and saves the run. Returns the saved run, or null if nothing was recorded. */
+PJ.stop=async function(gesture){
+  const r=PJ.run;
+  for(const t of PJ.tiles)for(const l of t.lives)l.stop();
+  if(!r)return null;
+  PJ.run=null;
+  if(!r.rec)return null;
+  if(!r.reads.length){toast('Stopped. Nothing was recorded.');return null}
+  const pr=await pjDb.get('projects',r.pid);if(!pr)return null;
+  const old=await pjDb.runs(pr.id);
+  const s={id:pjUid(),pid:pr.id,n:r.name||('Run '+(old.length+1)),started:r.ms0,ended:Date.now(),seconds:+((performance.now()-r.t0)/1000).toFixed(1),
+    mode:r.mode,simulated:r.mode==='demo',fw:r.fw,tester:(typeof Rec!=='undefined'&&Rec.who)||'',board:pjBoard(),parts:pr.parts.slice(),reads:r.reads,marks:r.marks,capped:r.capped};
+  await pjDb.put('sessions',s);await pjSave(pr);
+  let extra='';
+  if(pr.autosave){
+    try{const h=await pjDir(pr.id,!!gesture);if(h){await pjWriteRun(h,s,pr);extra=' Also saved to your folder.'}else extra=' The folder needs permission again. Open Runs and press Save to folder.'}
+    catch(e){extra=' The folder save failed: '+(e.message||e)}
+  }
+  toast('Saved '+s.n+', '+s.reads.length+' readings.'+extra);
+  return s;
+};
+function pjBoard(){try{const b=BRD.cur&&BRD.by(BRD.cur);return b?b.n:'ESP32 DevKit'}catch(e){return ''}}
+
+/* ---------- wiring: every wire of every part in one list, with pin and address clashes ---------- */
+const PJ_ADDR={mpu:[0x68],bmp180:[0x77],bmp280:[0x76]};
+function pjBus(n,pp){
+  if((n===21||n===22)&&/^(SDA|SCL)/i.test(pp.trim()))return 'I2C';
+  if((n===18||n===19||n===23)&&/^(SCK|CLK|SCLK|MOSI|MISO|DI\b|DO\b|SDI|SDO|DIN)/i.test(pp.trim()))return 'SPI';
+  return '';
+}
+function pjWiring(ids){
+  const rows=[],used=new Map(),conflicts=[],addrs=new Map(),nowire=[];
+  for(const id of ids){
+    const p=pjPart(id);if(!p)continue;
+    let w=null;try{w=p.wiring?W(p.wiring):null}catch(e){}
+    if(!w||!w.rows){nowire.push(id);continue}
+    for(const r of w.rows){
+      const esp=String(r[0]),pp=String(r[1]),kind=r[3]||'sig';
+      rows.push({part:id,esp,pp,wire:r[2]||'',kind});
+      const m=/^GPIO(\d+)/.exec(esp);
+      if(m&&kind!=='pwr'&&kind!=='gnd'){
+        const n=+m[1],o=used.get(n)||{n,owners:[]};
+        if(!o.owners.some(x=>x.part===id))o.owners.push({part:id,pp,bus:pjBus(n,pp),opt:kind==='opt'});
+        used.set(n,o);
+      }
+    }
+    const A=(typeof SPECS!=='undefined'&&SPECS[id]&&SPECS[id].addrs)||PJ_ADDR[id];
+    if(A&&A.length){const a=A[0];addrs.set(a,[...(addrs.get(a)||[]),id])}
+  }
+  const pins=[...used.values()].sort((a,b)=>a.n-b.n);
+  for(const o of pins){
+    o.state='ok';
+    if(o.owners.length>1){
+      const bus=o.owners[0].bus;
+      if(bus&&o.owners.every(x=>x.bus===bus))o.state='shared';
+      else if(o.owners.filter(x=>!x.opt).length>1)o.state='conflict';
+      else o.state='maybe';
+    }
+    o.bus=o.owners[0].bus;
+    if(o.state==='conflict'||o.state==='maybe')conflicts.push({kind:'pin',sev:o.state,pin:o.n,parts:o.owners.map(x=>x.part)});
+  }
+  for(const [a,list] of addrs)if(list.length>1)conflicts.push({kind:'addr',sev:'maybe',addr:a,parts:list});
+  const take=new Set(pins.map(o=>o.n));
+  const free=(typeof FW_OUT!=='undefined'?FW_OUT:[]).filter(n=>!take.has(n));
+  return {rows,pins,conflicts,free,nowire,hard:conflicts.filter(c=>c.sev==='conflict').length,soft:conflicts.filter(c=>c.sev!=='conflict').length};
+}
+function pjConflictText(c){
+  const names=c.parts.map(pjShort);const list=names.length>2?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names.join(' and ');
+  if(c.kind==='addr')return list+' both answer at '+hex(c.addr)+' by default. Change the address pin on one of them.';
+  const pin=(typeof BRD!=='undefined'&&BRD.label&&BRD.label(c.pin))||('GPIO'+c.pin);
+  return c.sev==='conflict'?pin+' is used by '+list+'. They cannot be tested together on one pin.':pin+' is used by '+list+' (one of them optional). Check you do not wire both.';
+}
+
+/* ---------- charts: plain SVG, so the same markup works in the page and in a saved report ---------- */
+const PJ_COL=['#5aa9ff','#f2a33a','#4fd18b','#e07bf0','#ff6b6b','#3fd0d0'];
+const PJ_DASH=['','7 4','2 4','9 4 2 4','','7 4'];
+function pjChart(lines,o={}){
+  const w=o.w||640,h=o.h||190,L=54,R=12,T=10,B=26;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const l of lines)for(const p of l.pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
+  if(!Number.isFinite(x0))return '';
+  if(x1-x0<1e-9)x1=x0+1;
+  if(y1-y0<1e-9){y0-=.5;y1+=.5}
+  const pad=(y1-y0)*.08;y0-=pad;y1+=pad;
+  const X=t=>L+(w-L-R)*(t-x0)/(x1-x0),Y=v=>T+(h-T-B)*(1-(v-y0)/(y1-y0));
+  let g='';
+  for(let k=0;k<=4;k++){const v=y0+(y1-y0)*k/4,y=Y(v);g+=`<line class="pj-g" x1="${L}" x2="${w-R}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/><text class="pj-t" x="${L-7}" y="${(y+4).toFixed(1)}" text-anchor="end">${pjFmt(v,y1-y0)}</text>`}
+  for(let k=0;k<=4;k++){const t=x0+(x1-x0)*k/4;g+=`<text class="pj-t" x="${X(t).toFixed(1)}" y="${h-7}" text-anchor="${k===0?'start':k===4?'end':'middle'}">${pjAx(t)}</text>`}
+  for(const m of o.marks||[]){if(m<x0||m>x1)continue;const x=X(m).toFixed(1);g+=`<line class="pj-m" x1="${x}" x2="${x}" y1="${T}" y2="${h-B}"/>`}
+  lines.forEach(l=>{
+    const stride=Math.max(1,Math.ceil(l.pts.length/700));let d='';
+    l.pts.forEach((p,j)=>{if(j%stride&&j!==l.pts.length-1)return;d+=(d?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)});
+    g+=`<path d="${d}" fill="none" stroke="${l.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${l.dash?` stroke-dasharray="${l.dash}"`:''}/>`;
+  });
+  return `<svg class="pj-ch" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label||'Chart')}">${g}</svg>`;
+}
+function pjSpark(pts){
+  if(pts.length<2)return '';
+  const a=pts.slice(-60);let lo=Infinity,hi=-Infinity;for(const p of a){if(p[1]<lo)lo=p[1];if(p[1]>hi)hi=p[1]}
+  if(hi-lo<1e-9){lo-=.5;hi+=.5}
+  const t0=a[0][0],t1=a[a.length-1][0]||t0+1,sp=Math.max(1e-6,t1-t0);
+  return 'M'+a.map(p=>(2+116*(p[0]-t0)/sp).toFixed(1)+' '+(25-22*(p[1]-lo)/(hi-lo)).toFixed(1)).join('L');
+}
+
+/* ---------- exports ---------- */
+const pjQ=s=>{s=String(s);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+function pjCSV(s,pr){
+  const rows=['time_s,date_time,project,run,part,reading,value,number,unit,note,simulated'];
+  for(const r of s.reads){const n=pjNum(r.v);rows.push([r.t,new Date(s.started+r.t*1000).toISOString(),pjQ(pr?pr.name:''),pjQ(s.n),r.part,pjQ(r.label),pjQ(r.v),n?n.x:'',pjQ(n?n.u:''),pjQ(r.note),s.simulated?'yes':'no'].join(','))}
+  for(const m of s.marks||[])rows.push([m.t,new Date(s.started+m.t*1000).toISOString(),pjQ(pr?pr.name:''),pjQ(s.n),'','marker',pjQ(m.text),'','','',s.simulated?'yes':'no'].join(','));
+  return rows.join('\n')+'\n';
+}
+function pjJSON(s,pr){
+  return JSON.stringify({schema:'esp32-live-tester/project-run@1',app:'ESP32 Live Tester',project:pr?{id:pr.id,name:pr.name,parts:pr.parts}:null,
+    run:{id:s.id,name:s.n,started:new Date(s.started).toISOString(),ended:new Date(s.ended).toISOString(),seconds:s.seconds,mode:s.mode==='demo'?'demo (simulated, no board)':s.mode==='serial'?'live board':s.mode,simulated:!!s.simulated,firmware:s.fw,board:s.board,tester:s.tester},
+    stats:pjSeries(s).map(o=>({part:o.part,reading:o.label,unit:o.unit,...o.st})),readings:s.reads,markers:s.marks||[]},null,1);
+}
+function pjReport(s,pr){
+  const ser=pjSeries(s),wr=pjWiring(s.parts||[]);
+  const e=esc,f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
+  const charts=ser.map((o,i)=>`<section><h3>${e(o.name)}${o.unit?' <small>('+e(o.unit)+')</small>':''}</h3>${pjChart([{pts:o.pts,color:PJ_COL[i%PJ_COL.length],dash:''}],{label:o.name,marks:(s.marks||[]).map(m=>m.t)})}</section>`).join('');
+  const stats=ser.map(o=>`<tr><td>${e(o.name)}</td><td>${o.st.n}</td><td>${f(o.st.min)}</td><td>${f(o.st.max)}</td><td>${f(o.st.mean)}</td><td>${f(o.st.std)}</td><td>${e(o.unit)}</td></tr>`).join('');
+  const wires=wr.rows.map(r=>`<tr><td>${e(pjName(r.part))}</td><td>${e(r.esp)}</td><td>${e(r.pp)}</td><td>${e(r.wire)}</td></tr>`).join('');
+  const marks=(s.marks||[]).map(m=>`<tr><td>${pjAx(m.t)}</td><td>${e(m.text)}</td></tr>`).join('');
+  const sim=s.simulated?'<p class="sim">Simulated data from Demo mode. No board was connected.</p>':'';
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e((pr?pr.name+' ':'')+s.n)}</title>
+<style>:root{color-scheme:light dark;--bg:#fff;--fg:#14181f;--mu:#5b6573;--hl:#d9dee6}@media (prefers-color-scheme:dark){:root{--bg:#10141a;--fg:#e8ecf2;--mu:#98a2b3;--hl:#2b333f}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}main{max-width:860px;margin:0 auto;padding:28px 18px 60px}h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:34px 0 8px}h3{font-size:14px;margin:18px 0 4px}h3 small{color:var(--mu);font-weight:400}
+.meta{color:var(--mu);margin:0 0 6px}.sim{margin:12px 0;padding:8px 12px;border:1px solid var(--hl);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:13.5px}th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--hl)}th{color:var(--mu);font-weight:500}td:nth-child(n+2){font-variant-numeric:tabular-nums}
+.pj-ch{width:100%;height:auto}.pj-g{stroke:var(--hl);stroke-width:1}.pj-t{fill:var(--mu);font:11px system-ui,sans-serif}.pj-m{stroke:var(--mu);stroke-width:1;stroke-dasharray:3 3}.tw{overflow-x:auto}</style></head><body><main>
+<h1>${e(pr?pr.name:'Project')}, ${e(s.n)}</h1><p class="meta">${e(pjWhen(s.started))}, ${e(pjSpan(s.seconds))}, ${s.reads.length} readings. ${e(s.board||'')}${s.fw?', firmware '+e(s.fw):''}${s.tester?', tester '+e(s.tester):''}.</p>${sim}
+<h2>Summary</h2><div class="tw"><table><thead><tr><th>Reading</th><th>Samples</th><th>Min</th><th>Max</th><th>Mean</th><th>Std dev</th><th>Unit</th></tr></thead><tbody>${stats||'<tr><td colspan="7">No numeric readings.</td></tr>'}</tbody></table></div>
+<h2>Charts</h2>${charts||'<p class="meta">No numeric readings.</p>'}
+${marks?`<h2>Markers</h2><div class="tw"><table><tbody>${marks}</tbody></table></div>`:''}
+<h2>Wiring</h2><div class="tw"><table><thead><tr><th>Part</th><th>ESP32 pin</th><th>Part pin</th><th>Wire</th></tr></thead><tbody>${wires}</tbody></table></div>
+<p class="meta">Made with ESP32 Live Tester.</p></main></body></html>`;
+}
+function pjDownload(s,pr,kind){
+  const base='esp32-project_'+pjSlug(pr?pr.name:'project')+'_'+pjStamp(s.started)+'_'+pjSlug(s.n);
+  const T={csv:['text/csv','csv',pjCSV],json:['application/json','json',pjJSON],html:['text/html','html',pjReport]}[kind];
+  stDownload(base+'.'+T[1],T[2](s,pr),T[0]+';charset=utf-8');toast('Saved '+base+'.'+T[1]);
+}
+
+/* ---------- save to a folder on the PC (Chrome and Edge). The folder handle is kept per project. ---------- */
+PJ.canFolder=typeof window.showDirectoryPicker==='function';
+async function pjPickDir(pid){
+  const h=await window.showDirectoryPicker({mode:'readwrite',id:'esp32projects'});
+  await pjDb.put('meta',{k:'dir:'+pid,h,name:h.name});return h;
+}
+async function pjDirInfo(pid){try{return await pjDb.get('meta','dir:'+pid)}catch(e){return null}}
+async function pjDir(pid,ask){
+  const rec=await pjDirInfo(pid);if(!rec||!rec.h)return null;
+  const h=rec.h;let st='granted';
+  if(h.queryPermission){st=await h.queryPermission({mode:'readwrite'});if(st!=='granted'&&ask&&h.requestPermission)st=await h.requestPermission({mode:'readwrite'})}
+  return st==='granted'?h:null;
+}
+async function pjWriteRun(h,s,pr){
+  const d=await h.getDirectoryHandle(pjSlug(pr.name),{create:true});
+  const base=pjStamp(s.started)+'_'+pjSlug(s.n);
+  for(const [ext,fn] of [['csv',pjCSV],['json',pjJSON],['html',pjReport]]){
+    const f=await d.getFileHandle(base+'.'+ext,{create:true}),w=await f.createWritable();await w.write(fn(s,pr));await w.close();
+  }
+}
+
+/* ---------- backup: one JSON file with the project and all its runs ---------- */
+async function pjBackup(pr){
+  const runs=await pjDb.runs(pr.id);
+  stDownload('esp32-project_'+pjSlug(pr.name)+'_backup.json',JSON.stringify({schema:'esp32-live-tester/project-backup@1',project:pr,runs}),'application/json;charset=utf-8');
+  toast('Backup saved. It holds the project and '+runs.length+' run'+(runs.length===1?'':'s')+'.');
+}
+async function pjRestore(text){
+  const o=JSON.parse(text);
+  if(!o||o.schema!=='esp32-live-tester/project-backup@1'||!o.project)throw new Error('This is not a project backup file.');
+  const pr={...o.project,id:pjUid(),created:Date.now(),updated:Date.now(),autosave:false};
+  pr.parts=(pr.parts||[]).filter(id=>pjPart(id));
+  await pjDb.put('projects',pr);
+  for(const r of o.runs||[])await pjDb.put('sessions',{...r,id:pjUid(),pid:pr.id});
+  return pr;
+}
+/* ---- Projects, part 2: the pages. List, parts, wiring, dashboard, runs and compare. ---- */
+const PJ_PRESETS=[
+  ['Weather station','Temperature, pressure, humidity and light.',['bme280','bh1750','ds18b20']],
+  ['Air quality monitor','Gas, dust and CO2 side by side.',['mq135','pmsa003','scd30','sgp30']],
+  ['Motion and altitude logger','Movement, heading, pressure and position.',['mpu','bmp280','hmc5883l','gps']],
+  ['Plant and soil monitor','Soil moisture, light and air.',['soil','ldr','dht']],
+  ['Distance and obstacle sensing','Three ways to measure how far away things are.',['sr04','vl53l0x','irobs']],
+  ['Power and battery log','Voltage and current of a battery powered build.',['ina219','batt']]
+];
+const PJ_TABS=[['dash','Dashboard'],['parts','Parts'],['wire','Wiring'],['runs','Runs']];
+const pjHead=(t,s)=>{const h=$('.ph h2'),u=$('.ph .sub');if(h)h.textContent=t;if(u)u.textContent=s||''};
+const pjPlural=(n,w)=>n+' '+w+(n===1?'':'s');
+function pjSeed(ids){try{BRD.reset();ids.forEach(id=>BRD.seed(pjPart(id)))}catch(e){}}
+const pjPin=s=>{try{return BRD.ident()?s:String(s).replace(/GPIO(\d+)/g,(m,n)=>BRD.label(+n)||m)}catch(e){return s}};
+function pjEmpty(title,text,...acts){return el('div',{class:'pj-empty'},el('h3',{},title),el('p',{},text),el('div',{class:'pj-acts'},...acts))}
+function pjTwoStep(label,confirm,fn,cls){
+  const b=btn(label,()=>{
+    if(b.dataset.arm){clearTimeout(+b.dataset.arm);delete b.dataset.arm;return fn()}
+    b.textContent=confirm;b.classList.add('danger');
+    b.dataset.arm=setTimeout(()=>{delete b.dataset.arm;b.textContent=label;b.classList.remove('danger')},3500);
+  },cls||'sm');
+  return b;
+}
+
+/* ---------- routing. Every move goes through pjGo so instruments always stop and a running recording is saved first. ---------- */
+async function projectsPage(b){
+  PJ.box=b;const go=PJ.pending;PJ.pending=null;
+  await pjGo(go?{pid:go}:{});
+}
+async function pjGo(o){
+  const tok=++PJ.tok;
+  await runCleanups();
+  if(tok!==PJ.tok)return;
+  cleanups.push(pjLeave);
+  PJ.pid=o.pid||null;PJ.view=o.view||'dash';PJ.openRun=o.run||null;PJ.cmp=o.cmp||null;PJ.tiles=[];PJ.buf={};
+  clearInterval(PJ.timer);PJ.timer=0;
+  const b=PJ.box;if(!b||!b.isConnected)return;
+  b.replaceChildren();
+  await pjDb.ready();
+  if(tok!==PJ.tok)return;
+  if(!PJ.pid){await pjList(b,tok);return}
+  const pr=await pjDb.get('projects',PJ.pid);
+  if(tok!==PJ.tok)return;
+  if(!pr){PJ.pid=null;await pjList(b,tok);return}
+  await pjProject(b,pr,tok);
+}
+async function pjLeave(){
+  clearInterval(PJ.timer);PJ.timer=0;
+  try{if(PJ.run)await PJ.stop(false)}catch(e){}
+  PJ.tiles=[];
+}
+
+/* ---------- the project list ---------- */
+async function pjList(b,tok){
+  pjHead('Projects','Combine parts, watch them on one dashboard and keep every run.');
+  const prs=await pjProjects();
+  const info=await Promise.all(prs.map(async p=>{const r=await pjDb.runs(p.id);return {n:r.length,last:r.reduce((m,x)=>Math.max(m,x.started),0)}}));
+  if(tok!==PJ.tok)return;
+  const form=el('form',{class:'pj-new',hidden:true,onsubmit:async e=>{
+    e.preventDefault();const p=await pjNew(nm.value,[]);pjGo({pid:p.id,view:'parts'});
+  }});
+  const nm=el('input',{type:'text',class:'pj-in',placeholder:'Project name, such as Greenhouse monitor','aria-label':'Project name',maxlength:'60',required:true});
+  form.append(nm,el('button',{type:'submit',class:'btn primary'},'Create project'),btn('Cancel',()=>{form.hidden=true;newB.hidden=false},'sm'));
+  const newB=btn('New project',()=>{form.hidden=false;newB.hidden=true;nm.focus()},'primary');
+  const file=el('input',{type:'file',accept:'application/json,.json',hidden:true,onchange:async()=>{
+    const f=file.files[0];if(!f)return;
+    try{const p=await pjRestore(await f.text());toast('Restored '+p.name);pjGo({pid:p.id,view:'runs'})}catch(e){toast(e.message||'Could not read that file.')}
+    file.value='';
+  }});
+  b.append(el('div',{class:'pj-top'},newB,btn('Restore a backup',()=>file.click(),'sm'),file),form);
+  if(!pjDb.persistent)b.append(el('p',{class:'pj-warn',role:'status'},'This browser blocks saved storage, so projects last only until you close the page. Download a backup after each run, or choose a folder.'));
+  if(prs.length){
+    const grid=el('div',{class:'pj-cards'});
+    prs.forEach((p,i)=>{
+      const inf=info[i];
+      const names=p.parts.map(pjShort);
+      const open=()=>pjGo({pid:p.id,view:inf.n&&!p.parts.length?'runs':'dash'});
+      grid.append(el('article',{class:'pj-card'},
+        el('h3',{},el('button',{type:'button',class:'pj-link',onclick:open},p.name)),
+        el('p',{class:'pj-meta'},pjPlural(p.parts.length,'part')+', '+pjPlural(inf.n,'run')+(inf.last?', last '+pjWhen(inf.last):'')),
+        el('div',{class:'pj-chips'},...names.slice(0,5).map(n=>el('span',{class:'chip'},n)),names.length>5?el('span',{class:'chip dash'},'+'+(names.length-5)):null,!names.length?el('span',{class:'chip dash'},'No parts yet'):null),
+        el('div',{class:'pj-acts'},btn('Open',open,'sm primary'),pjTwoStep('Delete','Delete project and runs?',async()=>{await pjDb.delRuns(p.id);await pjDb.del('projects',p.id);await pjDb.del('meta','dir:'+p.id);pjGo({})}))));
+    });
+    b.append(el('h3',{class:'pj-h'},'Your projects'),grid);
+  }
+  const have=new Set(PARTS.map(p=>p.id));
+  const tpl=el('div',{class:'pj-cards'});
+  for(const [n,d,ids] of PJ_PRESETS){
+    const ok=ids.filter(i=>have.has(i));if(ok.length<2)continue;
+    tpl.append(el('article',{class:'pj-card'},el('h3',{},n),el('p',{class:'pj-meta'},d),
+      el('div',{class:'pj-chips'},...ok.map(i=>el('span',{class:'chip'},pjShort(i)))),
+      el('div',{class:'pj-acts'},btn('Use this template',async()=>{const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'))));
+  }
+  b.append(el('h3',{class:'pj-h'},prs.length?'Start from a template':'Start with a template or a blank project'),
+    el('p',{class:'hint'},'A project is a set of parts that run together. You can change the parts afterwards.'),tpl);
+}
+
+/* ---------- one project ---------- */
+async function pjProject(b,pr,tok){
+  const runs=await pjDb.runs(pr.id);
+  if(tok!==PJ.tok)return;
+  pjHead('Projects',pjPlural(pr.parts.length,'part')+', '+pjPlural(runs.length,'saved run'));
+  const nameIn=el('input',{type:'text',class:'pj-title',value:pr.name,maxlength:'60','aria-label':'Project name',onchange:async()=>{
+    const v=nameIn.value.trim();if(!v){nameIn.value=pr.name;return}pr.name=v;await pjSave(pr);toast('Renamed')}});
+  const tabs=el('div',{class:'pj-tabs',role:'tablist','aria-label':'Project sections'});
+  for(const [k,l] of PJ_TABS)tabs.append(el('button',{type:'button',role:'tab',class:'pj-tab',id:'pj-t-'+k,'aria-selected':String(k===PJ.view),'aria-controls':'pj-panel',tabindex:k===PJ.view?'0':'-1',onclick:()=>pjGo({pid:pr.id,view:k})},l,k==='runs'&&runs.length?el('span',{class:'pj-n'},String(runs.length)):null));
+  tabs.addEventListener('keydown',e=>{
+    const bs=[...tabs.children],i=bs.indexOf(document.activeElement);if(i<0)return;
+    const j=e.key==='ArrowRight'?i+1:e.key==='ArrowLeft'?i-1:e.key==='Home'?0:e.key==='End'?bs.length-1:-1;
+    if(j<0)return;e.preventDefault();bs[(j+bs.length)%bs.length].focus();
+  });
+  const body=el('div',{class:'pj-body',role:'tabpanel',id:'pj-panel','aria-labelledby':'pj-t-'+PJ.view});
+  b.append(el('div',{class:'pj-bar'},btn('All projects',()=>pjGo({}),'sm'),nameIn),tabs,body);
+  if(PJ.view==='parts')pjParts(body,pr);
+  else if(PJ.view==='wire')pjWire(body,pr);
+  else if(PJ.view==='runs')await pjRuns(body,pr,runs,tok);
+  else pjDash(body,pr,runs.length);
+}
+
+/* ---------- Parts: pick what is in the project ---------- */
+function pjParts(body,pr){
+  const chips=el('div',{class:'pj-chips'}),count=el('p',{class:'pj-count',role:'status'}),list=el('div',{class:'pj-pl'});
+  const q=el('input',{type:'search',class:'pj-in',placeholder:'Search parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',oninput:()=>build()});
+  const boxes=new Map();
+  const paint=()=>{
+    count.textContent=pr.parts.length?pjPlural(pr.parts.length,'part')+' in this project (up to '+PJ.max+')':'No parts yet. Tick the parts below.';
+    chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),onclick:()=>toggle(id,false)},pjName(id)+' ×')));
+    for(const [id,c] of boxes)c.checked=pr.parts.includes(id);
+    list.querySelectorAll('.pj-gp').forEach(g=>{const n=[...g.querySelectorAll('input')].filter(i=>i.checked).length;g.querySelector('.pj-gn').textContent=n?n+' selected':''});
+  };
+  const toggle=async(id,on)=>{
+    const has=pr.parts.includes(id);
+    if(on&&!has){if(pr.parts.length>=PJ.max){toast('A dashboard holds up to '+PJ.max+' parts. Remove one first.');paint();return}pr.parts.push(id)}
+    else if(!on&&has)pr.parts=pr.parts.filter(x=>x!==id);
+    await pjSave(pr);paint();pjHead('Projects',pjPlural(pr.parts.length,'part'));
+  };
+  function build(){
+    boxes.clear();list.replaceChildren();
+    const t=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);let any=false;
+    for(const g of GROUPS){
+      if(g.n==='Start')continue;
+      const ps=g.ids.map(pjPart).filter(p=>p&&!p.home&&!p.overview&&!p.projects&&(!t.length||t.every(w=>navHay(p).includes(w))));
+      if(!ps.length)continue;any=true;
+      const d=el('details',{class:'pj-gp'},el('summary',{},el('span',{},g.n),el('span',{class:'pj-gn'})));
+      if(t.length||ps.some(p=>pr.parts.includes(p.id)))d.open=true;
+      for(const p of ps){
+        const fx=BRD.cur?BRD.fit(p):{ok:true};
+        const c=el('input',{type:'checkbox',onchange:()=>toggle(p.id,c.checked)});boxes.set(p.id,c);
+        const lab=el('label',{class:'pj-pr'+(fx.ok?'':' nok'),title:fx.ok?null:fx.why},c,el('span',{class:'pj-pn'},p.n),el('span',{class:'pj-ps'},subOfB(p)),fx.ok?null:el('span',{class:'vh'},', does not fit this board'));
+        d.append(lab);
+      }
+      list.append(d);
+    }
+    if(!any)list.append(el('p',{class:'hint'},'No part matches. Try a part number or a type, such as sensor.'));
+    paint();
+  }
+  body.append(el('p',{class:'hint'},'Pick the parts that run together. The dashboard shows each part’s own live test, side by side.'),
+    count,chips,pr.parts.length?btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build()},'sm'):null,q,list);
+  build();
+}
+
+/* ---------- Wiring: every wire in one list, with clashes ---------- */
+function pjWire(body,pr){
+  if(!pr.parts.length){body.append(pjEmpty('No parts to wire','Add parts first, then this page lists every wire and checks for clashes.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
+  pjSeed(pr.parts);
+  const w=pjWiring(pr.parts);
+  const ok=!w.conflicts.length;
+  body.append(el('div',{class:'pj-sum '+(w.hard?'bad':ok?'good':'warn'),role:'status'},
+    el('strong',{},w.hard?pjPlural(w.hard,'pin clash'):ok?'No clashes':pjPlural(w.soft,'thing')+' to check'),
+    el('span',{},w.hard?' Parts on the same pin cannot be tested together.':ok?' Every part has its own pins, or shares a bus.':' These may be fine, check them against your build.')));
+  if(w.conflicts.length)body.append(el('ul',{class:'plain pj-cf'},...w.conflicts.map(c=>el('li',{class:c.sev},pjConflictText(c)))));
+  if(w.free.length)body.append(el('p',{class:'hint'},'Free output pins: '+w.free.map(n=>pjPin('GPIO'+n)).join(', ')+'.'));
+  if(w.nowire.length)body.append(el('p',{class:'hint'},w.nowire.map(pjName).join(', ')+(w.nowire.length>1?' have':' has')+' no external wires.'));
+  /* pins */
+  const st={ok:'Free',shared:'Shared bus',conflict:'Clash',maybe:'Check'};
+  if(w.pins.length)body.append(el('h3',{class:'pj-h'},'Pins used'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},
+    el('thead',{},el('tr',{},...['Pin','Used by','State'].map(h=>el('th',{},h)))),
+    el('tbody',{},...w.pins.map(o=>el('tr',{},el('td',{class:'m'},pjPin('GPIO'+o.n)+(o.bus?' ('+o.bus+')':'')),el('td',{},o.owners.map(x=>pjName(x.part)).join(', ')),
+      el('td',{},el('span',{class:'chip '+(o.state==='conflict'?'fail':o.state==='maybe'?'dash':o.state==='shared'?'fill':'pass')},o.owners.length>1?st[o.state]:'One part'))))))));
+  /* power rails */
+  const rails={};
+  for(const r of w.rows)if(r.kind==='pwr'){const k=/3V3|3\.3/i.test(r.esp)?'3V3':/5V|VIN|VBUS/i.test(r.esp)?'5V':r.esp;(rails[k]=rails[k]||new Set()).add(r.part)}
+  const rk=Object.keys(rails);
+  if(rk.length)body.append(el('h3',{class:'pj-h'},'Power rails'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},el('th',{},'Rail'),el('th',{},'Parts on it'))),
+    el('tbody',{},...rk.map(k=>el('tr',{},el('td',{class:'m'},k),el('td',{},[...rails[k]].map(pjName).join(', '))))))));
+  /* every wire */
+  const by=new Map();for(const r of w.rows){if(!by.has(r.part))by.set(r.part,[]);by.get(r.part).push(r)}
+  const trs=[];
+  for(const [id,rs] of by)rs.forEach((r,i)=>trs.push(el('tr',{},el('td',{class:i?'pj-dim':''},i?'':pjName(id)),el('td',{class:'m'},pjPin(r.esp)),el('td',{class:'m'},r.pp),el('td',{},swatch(r.wire),r.wire+(r.kind==='opt'?' (optional)':'')))));
+  body.append(el('h3',{class:'pj-h'},'Every wire'),
+    el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},...['Part','ESP32 pin','Part pin','Wire'].map(h=>el('th',{},h)))),el('tbody',{},...trs))),
+    el('p',{class:'hint'},'Each tile on the dashboard drives the pins listed here. For a full diagram of one part, open it from the sidebar.'));
+}
+
+/* ---------- Dashboard: every part’s own live test, one clock, one recording ---------- */
+function pjDash(body,pr,nRuns){
+  if(!pr.parts.length){body.append(pjEmpty('Pick the parts for this project','The dashboard shows each part’s live test side by side and records them together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
+  pjSeed(pr.parts);
+  const wr=pjWiring(pr.parts);
+  let next=nRuns+1;
+  const clock=el('span',{class:'pj-clock','aria-live':'off'},'00:00');
+  const nameIn=el('input',{type:'text',class:'pj-in pj-rn',value:'Run '+next,maxlength:'40','aria-label':'Run name'});
+  const recCk=el('input',{type:'checkbox',id:'pj-rec',checked:true,onchange:()=>{PJ.rec=recCk.checked}});
+  const go=btn('Start all',()=>toggle(),'primary');
+  const mk=el('input',{type:'text',class:'pj-in pj-mk',placeholder:'Marker, such as lid closed','aria-label':'Marker text',disabled:true,onkeydown:e=>{if(e.key==='Enter'){e.preventDefault();mkb.click()}}});
+  const mkb=btn('Add marker',()=>{if(PJ.mark(mk.value)){toast('Marker added');mk.value=''}},'sm');mkb.disabled=true;
+  const pill=el('span',{class:'linkp '+Link.mode},linkText());
+  const tbar=el('div',{class:'pj-tbar'},
+    el('div',{class:'pj-ctl'},go,clock,pill),
+    el('div',{class:'pj-ctl'},el('label',{class:'pj-lb'},'Run name',nameIn),el('label',{class:'pj-ck'},recCk,'Record data')),
+    el('div',{class:'pj-ctl'},mk,mkb));
+  if(Link.mode==='none')tbar.append(el('div',{class:'pj-ctl'},el('p',{class:'hint'},'Not connected. Turn on Demo mode or connect your ESP32 to run the dashboard.'),btn('Turn on Demo mode',()=>$('#bDemo').click(),'sm')));
+  if(wr.hard)body.append(el('p',{class:'pj-warn',role:'status'},pjPlural(wr.hard,'pin clash')+' in the wiring. Parts on one pin cannot run together. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'wire'})},'See the wiring')));
+  body.append(tbar,el('p',{class:'hint'},'Start all turns on the Live mode of every part. A tile marked Manual has no live mode, so use its own buttons while recording. Everything it reads is added to the run.'));
+  /* the combined readings table */
+  const lt=el('tbody',{});
+  const order=new Map(pr.parts.map((id,i)=>[id,i]));
+  const rows=new Map();
+  const live=el('div',{class:'tw pj-live'},el('table',{class:'t pj-lt'},el('thead',{},el('tr',{},...['Reading','Now','Min','Max','Mean','Trend'].map(h=>el('th',{},h)))),lt));
+  const empty=el('p',{class:'hint'},'Readings from every part appear here as soon as they come in.');
+  body.append(el('h3',{class:'pj-h'},'Live readings'),live,empty);
+  const stat=(b)=>{const v=b.pts.map(p=>p[1]);return v.length?pjStats(v):null};
+  function paintLive(){
+    const keys=Object.keys(PJ.buf).sort((a,b)=>(order.get(PJ.buf[a].part)??99)-(order.get(PJ.buf[b].part)??99)||PJ.buf[a].seen-PJ.buf[b].seen);
+    empty.hidden=keys.length>0;live.hidden=!keys.length;
+    keys.forEach((k,i)=>{
+      const b=PJ.buf[k];let r=rows.get(k);
+      if(!r){
+        r={tr:el('tr',{}),c:[0,1,2,3].map(()=>el('td',{class:'m'}))};
+        r.sv=document.createElementNS(SVGNS,'svg');r.sv.setAttribute('viewBox','0 0 120 28');r.sv.setAttribute('class','pj-sp');r.sv.setAttribute('aria-hidden','true');
+        r.pa=document.createElementNS(SVGNS,'path');r.sv.append(r.pa);
+        r.tr.append(el('td',{},el('span',{class:'pj-pt'},pjShort(b.part)),b.label),...r.c,el('td',{},r.sv));
+        rows.set(k,r);
+      }
+      if(lt.children[i]!==r.tr)lt.insertBefore(r.tr,lt.children[i]||null);
+      const s=stat(b),f=v=>pjFmt(v,Math.max(Math.abs(v),1));
+      r.c[0].textContent=b.last;
+      r.c[1].textContent=s?f(s.min):'';r.c[2].textContent=s?f(s.max):'';r.c[3].textContent=s?f(s.mean):'';
+      r.pa.setAttribute('d',s?pjSpark(b.pts):'');
+    });
+  }
+  /* the tiles */
+  const grid=el('div',{class:'pj-grid'});HL='h4';
+  for(const id of pr.parts){
+    const p=pjPart(id),own=PJ.owner(pr.id,id);PJ.tiles.push(own);
+    const tb=el('div',{class:'pj-tb'}),prev=PJO;PJO=own;
+    try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
+    finally{PJO=prev}
+    own.st=el('span',{class:'chip dash'},'Manual');own.res=el('span',{class:'pj-res'});
+    grid.append(el('section',{class:'pj-tile','aria-label':p.n},
+      el('header',{class:'pj-th'},el('div',{},el('h3',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'pj-tc'},own.st,own.res)),tb));
+  }
+  body.append(el('h3',{class:'pj-h'},'Parts'),grid);
+  function tick(){
+    if(!body.isConnected){clearInterval(PJ.timer);PJ.timer=0;return}
+    if(PJ.run)clock.textContent=pjClock((performance.now()-PJ.run.t0)/1000);
+    paintLive();
+    for(const t of PJ.tiles){
+      const n=t.lives.length,on=t.lives.some(l=>l.on);
+      const cls=!n?'chip dash':on?'chip fill':'chip',txt=!n?'Manual':on?'Live':'Live off';
+      if(t.st.textContent!==txt){t.st.className=cls;t.st.textContent=txt}
+      const r=R()[t.part],key=r?r.v:'';
+      if(t.res.dataset.k!==key){t.res.dataset.k=key;t.res.replaceChildren(resultChip(t.part))}
+    }
+  }
+  async function toggle(){
+    if(PJ.run){
+      go.disabled=true;mkb.disabled=true;mk.disabled=true;
+      const s=await PJ.stop(true);
+      go.disabled=false;go.textContent='Start all';go.classList.add('primary');clock.textContent='00:00';
+      if(s){next++;nameIn.value='Run '+next;const t=$('#pj-t-runs');if(t){t.textContent='Runs';t.append(el('span',{class:'pj-n'},String(next-1)))}}
+      return;
+    }
+    PJ.start(nameIn.value.trim()||'Run '+next,recCk.checked);
+    if(!PJ.run)return;
+    go.textContent='■ Stop and save';mk.disabled=!PJ.run.rec;mkb.disabled=!PJ.run.rec;
+    if(!PJ.live()&&PJ.tiles.every(t=>!t.lives.length))toast('These parts have no live mode. Use each tile’s buttons; readings are still recorded.');
+  }
+  PJ.timer=setInterval(tick,500);tick();
+}
+
+/* ---------- Runs: saved recordings, one at a time or side by side ---------- */
+async function pjRuns(body,pr,runs,tok){
+  runs.sort((a,b)=>b.started-a.started);
+  if(PJ.cmp){pjCompare(body,pr,runs);return}
+  if(PJ.openRun){const s=runs.find(r=>r.id===PJ.openRun);if(s){await pjRunView(body,pr,s,tok);return}}
+  /* folder panel */
+  const dir=await pjDirInfo(pr.id);
+  if(tok!==PJ.tok)return;
+  const fbox=el('div',{class:'pj-folder'});
+  if(PJ.canFolder){
+    const nameEl=el('span',{class:'pj-fn'},dir&&dir.name?dir.name:'No folder chosen');
+    const ck=el('input',{type:'checkbox',checked:!!pr.autosave,disabled:!dir,onchange:async()=>{pr.autosave=ck.checked;await pjSave(pr);toast(pr.autosave?'Each new run is also saved to the folder.':'Auto-save off')}});
+    fbox.append(el('div',{},el('strong',{},'Save to your PC'),el('p',{class:'hint'},'Pick a folder once. Each run is written there as CSV, JSON and an HTML report, in a folder named after the project.')),
+      el('div',{class:'pj-acts'},nameEl,btn(dir?'Change folder':'Choose folder',async()=>{
+        try{const h=await pjPickDir(pr.id);nameEl.textContent=h.name;ck.disabled=false;ck.checked=pr.autosave=true;await pjSave(pr);toast('Folder set. New runs save there automatically.')}catch(e){if(e&&e.name!=='AbortError')toast(e.message||'Could not use that folder.')}
+      },'sm'),el('label',{class:'pj-ck'},ck,'Save every new run there')));
+  }else fbox.append(el('div',{},el('strong',{},'Save to your PC'),el('p',{class:'hint'},'This browser cannot write to a folder. Use Download on each run, or open the page in Chrome or Edge to save straight to a folder.')));
+  body.append(fbox);
+  if(!runs.length){body.append(pjEmpty('No runs yet','Open the Dashboard, press Start all, then Stop and save. Each run appears here.',btn('Open the dashboard',()=>pjGo({pid:pr.id,view:'dash'}),'primary')),
+    el('div',{class:'pj-acts'},btn('Back up this project',()=>pjBackup(pr),'sm')));return}
+  const picked=new Set();
+  const cmpB=btn('Compare selected',()=>pjGo({pid:pr.id,view:'runs',cmp:[...picked]}),'sm primary');cmpB.disabled=true;
+  const note=el('span',{class:'hint',role:'status'},'Tick two to four runs to compare them.');
+  const upd=()=>{cmpB.disabled=picked.size<2||picked.size>4;cmpB.textContent=picked.size>1?'Compare '+picked.size+' runs':'Compare selected';note.textContent=picked.size>4?'Pick at most four runs.':picked.size<2?'Tick two to four runs to compare them.':''};
+  body.append(el('div',{class:'pj-acts pj-rt'},cmpB,note,btn('Back up this project',()=>pjBackup(pr),'sm')));
+  const list=el('div',{class:'pj-runs'});
+  for(const s of runs){
+    const c=el('input',{type:'checkbox','aria-label':'Select '+s.n,onchange:()=>{c.checked?picked.add(s.id):picked.delete(s.id);upd()}});
+    list.append(el('div',{class:'pj-run'},c,
+      el('div',{class:'pj-ri'},el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'runs',run:s.id})},s.n),
+        el('span',{class:'pj-meta'},pjWhen(s.started)+', '+pjSpan(s.seconds)+', '+s.reads.length+' readings')),
+      el('span',{class:'chip '+(s.simulated?'dash':'fill')},s.simulated?'Demo':'Live board'),
+      el('div',{class:'pj-acts'},btn('Open',()=>pjGo({pid:pr.id,view:'runs',run:s.id}),'sm'),btn('CSV',()=>pjDownload(s,pr,'csv'),'sm'))));
+  }
+  body.append(list);
+}
+async function pjRunView(body,pr,s,tok){
+  const ser=pjSeries(s);
+  const nameIn=el('input',{type:'text',class:'pj-in',value:s.n,maxlength:'40','aria-label':'Run name',onchange:async()=>{const v=nameIn.value.trim();if(!v){nameIn.value=s.n;return}s.n=v;await pjDb.put('sessions',s);toast('Renamed')}});
+  body.append(el('div',{class:'pj-acts'},btn('All runs',()=>pjGo({pid:pr.id,view:'runs'}),'sm'),nameIn),
+    el('p',{class:'pj-meta'},pjWhen(s.started)+', '+pjSpan(s.seconds)+', '+s.reads.length+' readings'+(s.board?', '+s.board:'')+(s.fw?', firmware '+s.fw:'')+(s.tester?', tester '+s.tester:'')+'.'));
+  if(s.simulated)body.append(el('p',{class:'pj-warn',role:'status'},'Simulated data from Demo mode. No board was connected, so these numbers show the workflow, not real parts.'));
+  const folder=btn('Save to folder',async()=>{
+    let h=await pjDir(pr.id,true);
+    if(!h){try{h=await pjPickDir(pr.id)}catch(e){if(e&&e.name!=='AbortError')toast(e.message||'Could not use that folder.');return}}
+    await pjWriteRun(h,s,pr);toast('Saved to '+h.name+'/'+pjSlug(pr.name));
+  },'sm');
+  body.append(el('div',{class:'pj-acts'},btn('Download CSV',()=>pjDownload(s,pr,'csv'),'sm'),btn('Download JSON',()=>pjDownload(s,pr,'json'),'sm'),btn('Download report',()=>pjDownload(s,pr,'html'),'sm'),PJ.canFolder?folder:null,
+    pjTwoStep('Delete run','Delete this run?',async()=>{await pjDb.del('sessions',s.id);pjGo({pid:pr.id,view:'runs'})})));
+  const f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
+  if(!ser.length)body.append(pjEmpty('No numeric readings','This run has readings, but none are numbers that can be charted. The CSV still has every one.'));
+  else{
+    body.append(el('h3',{class:'pj-h'},'Summary'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},
+      el('thead',{},el('tr',{},...['Reading','Samples','Min','Max','Mean','Std dev','Unit'].map(h=>el('th',{},h)))),
+      el('tbody',{},...ser.map(o=>el('tr',{},el('td',{},o.name),...[o.st.n,f(o.st.min),f(o.st.max),f(o.st.mean),f(o.st.std)].map(v=>el('td',{class:'m'},String(v))),el('td',{},o.unit)))))));
+    body.append(el('h3',{class:'pj-h'},'Charts'));
+    ser.forEach((o,i)=>{const c=el('figure',{class:'pj-fig'},el('figcaption',{},o.name+(o.unit?' ('+o.unit+')':'')));const h=el('div',{class:'pj-cw'});h.innerHTML=pjChart([{pts:o.pts,color:PJ_COL[i%PJ_COL.length],dash:''}],{label:o.name,marks:(s.marks||[]).map(m=>m.t)});c.append(h);body.append(c)});
+  }
+  if((s.marks||[]).length)body.append(el('h3',{class:'pj-h'},'Markers'),el('ul',{class:'plain'},...s.marks.map(m=>el('li',{},pjAx(m.t)+': '+m.text))));
+}
+
+/* ---------- Compare: the same reading in several runs, on one time axis ---------- */
+function pjCompare(body,pr,runs){
+  const sets=PJ.cmp.map(id=>runs.find(r=>r.id===id)).filter(Boolean).sort((a,b)=>a.started-b.started);
+  body.append(el('div',{class:'pj-acts'},btn('All runs',()=>pjGo({pid:pr.id,view:'runs'}),'sm')));
+  if(sets.length<2){body.append(pjEmpty('Pick at least two runs','Go back and tick two to four runs.'));return}
+  const all=sets.map(s=>new Map(pjSeries(s).map(o=>[o.key,o])));
+  const keys=[...all[0].keys()].filter(k=>all.filter(m=>m.has(k)).length>=2);
+  body.append(el('h3',{class:'pj-h'},'Comparing '+sets.map(s=>s.n).join(', ')));
+  if(new Set(sets.map(s=>!!s.simulated)).size>1)body.append(el('p',{class:'pj-warn',role:'status'},'These runs mix Demo data and a live board. Compare like with like for real conclusions.'));
+  else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs are simulated Demo data.'));
+  if(!keys.length){body.append(pjEmpty('Nothing in common','These runs have no numeric reading that appears in more than one of them. Record both with the same parts to compare.'));return}
+  const f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
+  const label=k=>{const o=all.find(m=>m.has(k)).get(k);return o.name+(o.unit?' ('+o.unit+')':'')};
+  const legend=el('div',{class:'pj-leg'},...sets.map((s,i)=>{const sv=`<svg viewBox="0 0 26 8" width="26" height="8" aria-hidden="true"><path d="M1 4H25" stroke="${PJ_COL[i]}" stroke-width="2.5"${PJ_DASH[i]?` stroke-dasharray="${PJ_DASH[i]}"`:''}/></svg>`;const e=el('span',{class:'pj-lg'});e.innerHTML=sv;e.append(s.n);return e}));
+  const chart=el('div',{class:'pj-cw'}),tbl=el('tbody',{});
+  const pick=sel('pj-ser',keys.map(k=>[k,label(k)]),keys[0],v=>draw(v));
+  pick.setAttribute('aria-label','Reading to compare');
+  function draw(k){
+    const lines=[],rows=[];let base=null;
+    sets.forEach((s,i)=>{
+      const o=all[i].get(k);if(!o){rows.push(el('tr',{},el('td',{},s.n),el('td',{class:'m',colspan:'6'},'Not recorded in this run')));return}
+      lines.push({pts:o.pts,color:PJ_COL[i],dash:PJ_DASH[i]});
+      let vs='baseline';
+      if(!base)base=o.st;
+      else{const d=o.st.mean-base.mean,pc=base.mean?d/Math.abs(base.mean)*100:NaN;vs=(d>=0?'+':'')+f(d)+(Number.isFinite(pc)?' ('+(pc>=0?'+':'')+pc.toFixed(1)+'%)':'')}
+      rows.push(el('tr',{},el('td',{},s.n),...[o.st.n,f(o.st.min),f(o.st.max),f(o.st.mean),f(o.st.std)].map(v=>el('td',{class:'m'},String(v))),el('td',{class:'m'},vs)));
+    });
+    chart.innerHTML=pjChart(lines,{label:label(k)});tbl.replaceChildren(...rows);
+  }
+  body.append(el('label',{class:'pj-lb'},'Reading',pick),legend,chart,
+    el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},...['Run','Samples','Min','Max','Mean','Std dev','Mean vs first run'].map(h=>el('th',{},h)))),tbl)));
+  draw(keys[0]);
+  /* every shared reading at a glance */
+  body.append(el('h3',{class:'pj-h'},'Every shared reading, mean per run'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},
+    el('thead',{},el('tr',{},el('th',{},'Reading'),...sets.map(s=>el('th',{},s.n)),el('th',{},'Last vs first'))),
+    el('tbody',{},...keys.map(k=>{const ms=all.map(m=>m.has(k)?m.get(k).st.mean:NaN);const a=ms.find(Number.isFinite),z=[...ms].reverse().find(Number.isFinite);
+      return el('tr',{},el('td',{},label(k)),...ms.map(v=>el('td',{class:'m'},f(v))),el('td',{class:'m'},ms.filter(Number.isFinite).length>1?(z-a>=0?'+':'')+f(z-a):''))})))));
+  body.append(el('div',{class:'pj-acts'},btn('Download comparison CSV',()=>{
+    const q=pjQ,rows=['reading,unit,run,started,samples,min,max,mean,std_dev,simulated'];
+    for(const k of keys)sets.forEach((s,i)=>{const o=all[i].get(k);if(o)rows.push([q(o.name),q(o.unit),q(s.n),new Date(s.started).toISOString(),o.st.n,o.st.min,o.st.max,o.st.mean,o.st.std,s.simulated?'yes':'no'].join(','))});
+    stDownload('esp32-project_'+pjSlug(pr.name)+'_comparison.csv',rows.join('\n')+'\n','text/csv;charset=utf-8');toast('Saved the comparison');
+  },'sm')));
+}
 /* ---- hook every new part into the page. Must be the last file of the NEW block. ---- */
 const NEWFN={};
 function specSource(sp){
@@ -9675,7 +10464,7 @@ Object.assign(ALIAS,{servo:'sg90 motor mg996r',mpu:'mpu6050 imu gyro acceleromet
 
 /* ---- sidebar groups, in the order of the parts list ---- */
 const GROUP_PLAN=[
-  ['Start',['home','overview']],
+  ['Start',['home','overview','projects']],
   ['Board and bench',['esp','gpio','preflight','i2c','esp32cam','esp32cammb','breadboard','jumper']],
   ['Passive and discrete',['resistor','capacitor','diode','transistor','irf540n','pc817','levelshift','led','rgb']],
   ['Buttons, knobs and touch',['button','ttp223','joystick','pot','keypad','ec11','mpr121','ps2kb']],
@@ -9755,7 +10544,7 @@ async function show(id){
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
   const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
-  panel.className=p.overview||p.home?'':'w2';
+  panel.className=p.overview||p.home||p.projects?'':'w2';
   document.body.classList.toggle('is-home',!!p.home);
   document.body.classList.remove('has-tabs');if(spyOff){spyOff();spyOff=null}phoneBar(null);
   headChip=chip;
@@ -9763,6 +10552,7 @@ async function show(id){
   renderNav();navReveal();
   if(p.home){HL='h3';const b=el('div',{class:'home'});homePage(b);panel.replaceChildren(b);return}
   if(p.overview){HL='h3';const b=el('div',{class:'ov'});overview(b);panel.append(b);return}
+  if(p.projects){HL='h3';const b=el('div',{class:'pj'});panel.append(b);await projectsPage(b);return}
   HL='h4';
   {const bn=boardNote(p);if(bn)panel.append(bn)}
   const secs=[['circuit','Circuit'],['test','Live test'],p.id==='power'?null:['code','Your code'],['notes','Pass criteria and notes']].filter(Boolean);
