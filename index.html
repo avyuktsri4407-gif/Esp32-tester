@@ -7687,9 +7687,11 @@ for(const sg of [-1,1]){
     return s;
   });
 }
-add('usb','usb','b',BO,[-57,-7.5,T,-46,7.5,T+5.4],(P,c)=>{
+add('usb','usb','b',BO,[-57,-9.3,T,-46,9.3,T+5.4],(P,c)=>{
   const plan=R(-57,-7.5,-46,7.5,.8),cam=K.cameraOf(P);
-  let s=sol(K.slabOf(plan,T,5.4,P,2,.5),'mm',{tone:'mid',lit:c.lit,inner:ln(K.sideSeam(plan,T+2.7,P,2),'faint')});
+  let s='';
+  for(const t0 of[-9.3,7.5])s+=sol(K.slabOf(R(-55,t0,-51.4,t0+1.8,.3),T,.7,P,2,0),'mg',{tone:'lo',crease:'none'});
+  s+=sol(K.slabOf(plan,T,5.4,P,2,.5),'mm',{tone:'mid',lit:c.lit,inner:ln(K.sideSeam(plan,T+2.7,P,2),'faint')});
   s+=ln(K.lineOnTop([-57,-4.6],[-46,-4.6],T+5.4,P),'lo')+ln(K.lineOnTop([-57,4.6],[-46,4.6],T+5.4,P),'lo');
   if(cam.cosA<0&&!c.plugged){
     const pts=[[-5.2,T+4.3],[5.2,T+4.3],[5.2,T+2.2],[4.2,T+1.1],[-4.2,T+1.1],[-5.2,T+2.2]].map(([y,z])=>at(P,-57,y,z));
@@ -7701,9 +7703,11 @@ add('usb','usb','b',BO,[-57,-7.5,T,-46,7.5,T+5.4],(P,c)=>{
   s+=dt([at(P,-53,-5.2,T+5.4),at(P,-53,5.2,T+5.4),at(P,-48.5,-5.2,T+5.4),at(P,-48.5,5.2,T+5.4)],.55,'mid');
   return s;
 });
-const button=(id,cx,cy)=>add(id,'btn','b',BO,[cx-5,cy-5,T,cx+5,cy+5,T+4.4],(P,c)=>{
+const button=(id,cx,cy)=>add(id,'btn','b',BO,[cx-6.8,cy-5,T,cx+6.8,cy+5,T+4.4],(P,c)=>{
   const plan=R(cx-5,cy-5,cx+5,cy+5,1);
-  let s=sol(K.slabOf(plan,T,2.2,P,3,.4),'mm',{tone:'mid',lit:c.lit});
+  let s='';
+  for(const sg of[-1,1])for(const yy of[-2.6,2.6]){const x0=sg<0?cx-6.8:cx+5-.2;s+=sol(K.slabOf(R(x0,cy+yy-1.1,x0+2,cy+yy+1.1,.2),T,.6,P,1,0),'mg',{tone:'lo',crease:'none'})}
+  s+=sol(K.slabOf(plan,T,2.2,P,3,.4),'mm',{tone:'mid',lit:c.lit});
   s+=sol(K.cylinder(cx,cy,2.7,T+2.2,2.2,P,20,.3),'mk',{tone:'mid',lit:c.lit});
   s+=ln(K.ring(cx,cy,1.5,T+4.4,P,14),'faint');
   s+=dt(K.corners(plan,1.2).map(([x,y])=>at(P,x,y,T+2.2)),.45,'mid');
@@ -8116,18 +8120,26 @@ function make(id,sp){
   const add=(oid,tag,b,draw)=>objs.push({id:oid,tag,grp:'b',o:BO,box:[b[0]+BO[0],b[1]+BO[1],b[2]+BO[2],b[3]+BO[0],b[4]+BO[1],b[5]+BO[2]],draw,after:[]});
   const hold=(x0,y0,x1,y1)=>occ.push([x0-.8,y0-.8,x1+.8,y1+.8]);
   const free=(x0,y0,x1,y1)=>!occ.some(o=>x0<o[2]&&x1>o[0]&&y0<o[3]&&y1>o[1]);
-  const rows=sp.rows,A={};
+  const rows=sp.rows,A={},net=[];
   const pw=(x,y)=>[m(x),m(y)];
   /* ---- the circuit board ---- */
   hold(-L/2-3,-W/2-3,-L/2,W/2+3);
   add('pcb','board',[-L,-W,0,L,W,T],(P,c)=>{
     let s=sol(K.slabOf(R(-L,-W,L,W,m(sp.r||1.5)),0,T,P,c.lite?3:8,.5),'mp',{tone:'mid'});
     s+=ln(K.planOutline(R(-L+2.2,-W+2.2,L-2.2,W-2.2,1.5),T,P,2),'faint');
+    if(sp.ant&&!c.lite){
+      const a=sp.ant,x0=m(a.x0)-2,y0=m(a.y0)-2,x1=m(a.x1)+2,y1=m(a.y1)+2,hz=[];
+      for(let q=-(y1-y0)+3;q<x1-x0-1;q+=6){
+        const A0=q>=0?[x0+q,y0]:[x0,y0-q],ex=x0+q+(y1-y0),B0=ex<=x1?[ex,y1]:[x1,y0+(x1-x0-q)];
+        if(Math.hypot(B0[0]-A0[0],B0[1]-A0[1])>2)hz.push(K.lineOnTop(A0,B0,T,P));
+      }
+      s+=ln(K.planOutline(R(x0,y0,x1,y1,1),T,P,2),'faint')+ln(hz.join(''),'faint');
+    }
     if(sp.ant&&!c.lite){const a=sp.ant;s+=ln(K.onTop(meander(m(a.x0),m(a.x1),m(a.y0),m(a.y1),7),T,P),'mid','gold')}
     const pads=[],holes=[],cast=[],cd=[];
-    for(const r of rows)for(const x of xs(r.x0,r.n)){
+    for(const r of rows)for(const [xi,x] of xs(r.x0,r.n).entries()){
       if(r.st==='cast'){const sg=r.y>0?1:-1,px=m(x),py=m(r.y);cast.push(K.planOutline(R(px-1.1,py-1.9,px+1.1,py+1.9,.3),T,P,2));cd.push(at(P,px,py+sg*1.3,T))}
-      else{pads.push(K.ring(m(x),m(r.y),1.9,T,P,10));holes.push(at(P,m(x),m(r.y),T))}
+      else{pads.push(xi===0&&r.st==='pin'?K.planOutline(R(m(x)-1.8,m(r.y)-1.8,m(x)+1.8,m(r.y)+1.8,.4),T,P,2):K.ring(m(x),m(r.y),1.9,T,P,10));holes.push(at(P,m(x),m(r.y),T))}
     }
     if(!c.lite){
       const tr=[],vi=[];
@@ -8151,8 +8163,24 @@ function make(id,sp){
         for(const [x,y,x1,y1,x2,y2] of make.tr[id]){seg.push(K.pathOf([at(P,m(x),m(y),T),at(P,m(x1),m(y1),T),at(P,m(x2),m(y2),T)]));ph.push(at(P,m(x2),m(y2),T));vr.push(at(P,m(x),m(y),T))}
         s+=ln(seg.join(''),'faint')+dt(ph,.5,'mid')+dt(vr,.8,'mid');
       }
-      if(L>=48){const mh=[];for(const sx of[-1,1])for(const sy of[-1,1]){const hx=sx*(L/2-2.6),hy=sy*(W/2-2.6);if(free(hx-1.8,hy-1.8,hx+1.8,hy+1.8))mh.push([hx,hy])}
-        for(const [hx,hy] of mh){s+=ln(K.ring(m(hx),m(hy),2.6,T,P,14),'mid','gold')+ln(K.ring(m(hx),m(hy),1.5,T,P,12),'faint')+dt([at(P,m(hx),m(hy),T)],1.1,'lo')}}
+    }
+    if(!c.lite){
+      if(!make.tn)make.tn={};
+      if(!make.tn[id]){
+        const pts=net.map(q=>[q[0],q[1]]),inT=[0],out=[];
+        while(inT.length<pts.length){let bi=-1,bj=-1,bd=1e9;
+          for(const i of inT)for(let j=0;j<pts.length;j++){if(inT.includes(j))continue;const d=Math.hypot(pts[i][0]-pts[j][0],pts[i][1]-pts[j][1]);if(d<bd){bd=d;bi=i;bj=j}}
+          if(bj<0)break;inT.push(bj);
+          if(bd>22)continue;
+          const a=pts[bi],b=pts[bj],dx=b[0]-a[0],dy=b[1]-a[1],ax=Math.abs(dx),ay=Math.abs(dy);
+          const mid=ax>=ay?[a[0]+Math.sign(dx)*(ax-ay),a[1]]:[a[0],a[1]+Math.sign(dy)*(ay-ax)];
+          out.push([a,mid,b]);
+        }
+        make.tn[id]=out;
+      }
+      const tl=[],vv=[];
+      make.tn[id].forEach((t,i)=>{tl.push(K.pathOf(t.map(q=>at(P,m(q[0]),m(q[1]),T))));if(i%3===0)vv.push(at(P,m(t[1][0]),m(t[1][1]),T))});
+      s+=ln(tl.join(''),'faint')+dt(vv,.6,'mid');
     }
     if(pads.length)s+=ln(pads.join(''),'mid',c.litPins?'gold pinlit':'gold')+dt(holes,.9,'hi');
     if(cast.length)s+=ln(cast.join(''),'mid',c.litPins?'gold pinlit':'gold')+dt(cd,.8,'hi');
@@ -8190,18 +8218,20 @@ function make(id,sp){
     hold(u.x-1.2,u.y-(C?4.4:3.75)-.5,u.x+(C?3.6:3),u.y+(C?4.4:3.75)+.5);
     add('usb'+i,'usb',[px,y-w,T,px+len,y+w,T+h],(P,c)=>{
       const cam=K.cameraOf(P);
-      let s=sol(K.slabOf(fl,T,h*.4,P,2,.2),'mm',{tone:'lo',lit:c.lit});
+      let s='';
+      for(const sg of[-1,1]){const t0=sg<0?y-w-1.5:y+w-.3;s+=sol(K.slabOf(R(px+len*.16,t0,px+len*.16+2.4,t0+1.8,.3),T,.7,P,2,0),'mg',{tone:'lo',crease:'none'})}
+      s+=sol(K.slabOf(fl,T,h*.4,P,2,.2),'mm',{tone:'lo',lit:c.lit});
       s+=sol(K.slabOf(plan,T,h,P,C?4:2,.3),'mm',{tone:'mid',lit:c.lit,inner:ln(K.sideSeam(plan,T+h/2,P,2),'faint')});
       s+=ln(K.lineOnTop([px,y-w*.58],[px+len,y-w*.58],T+h,P),'lo')+ln(K.lineOnTop([px,y+w*.58],[px+len,y+w*.58],T+h,P),'lo');
       if(cam.cosA<0&&!c.plugged){
         const a=w*.8,z1=T+h*.82,z0=T+h*.2,zc=T+h*.5;
         const pts=(C?[[-a,z1],[a,z1],[a+.8,zc],[a,z0],[-a,z0],[-a-.8,zc]]:[[-a,z1],[a,z1],[a,zc],[a-1,z0],[-a+1,z0],[-a,zc]]).map(([yy,z])=>at(P,px,y+yy,z));
-        s+=`<path class="hm-hole" d="${K.pathOf(pts,true)}"/>`+ln(K.pathOf([at(P,px,y-a*.6,zc),at(P,px,y+a*.6,zc)]),'mid');
+        s+=`<path class="hm-hole" d="${K.pathOf(pts,true)}"/>`+ln(K.pathOf([at(P,px,y-a*.6,zc),at(P,px,y+a*.6,zc)]),'mid')+dt(Array.from({length:C?8:5},(_,q)=>at(P,px,y+(q/((C?8:5)-1)-.5)*a*1.1,zc+.9)),.4,'hi');
       }
       s+=dt([at(P,px+len*.3,y-w*.7,T+h),at(P,px+len*.3,y+w*.7,T+h),at(P,px+len*.8,y-w*.7,T+h),at(P,px+len*.8,y+w*.7,T+h),at(P,px+len*.9,y-w-.5,T),at(P,px+len*.9,y+w+.5,T)],.5,'mid');
       return s;
     });
-    if(i===0)A.usb=[px+len/2,y,T+h/2];
+    if(i===0)A.usb=[px+len/2,y,T+h/2];net.push([(px+len/2)/2,u.y]);
   });
   /* ---- the radio module ---- */
   const M=sp.mod;
@@ -8214,6 +8244,11 @@ function make(id,sp){
         let s=sol(K.slabOf(plan,T,1.6,P,2,.3),'mk',{tone:'lo',lit:c.lit});
         const sx=Math.min(sa,sb),sw=Math.abs(sb-sa);
         const sh=R(Math.max(x0,sx)+.6,y0+.8,sb-.6,y1-.8,1.2),top=R(sh.x+.7,sh.y+.7,sh.x+sh.w-.7,sh.y+sh.d-.7,1);
+        if(!c.lite){
+          const d=[],ca=[];const n=Math.max(4,Math.floor(top.w/5.8));
+          for(let i=0;i<n;i++){const x=top.x+2+i*(top.w-4)/(n-1);d.push(at(P,x,y0+.4,z),at(P,x,y1-.4,z));ca.push(K.pathOf([at(P,x,y0+1.4,z),at(P,x,y0-.2,z)]),K.pathOf([at(P,x,y1-1.4,z),at(P,x,y1+.2,z)]))}
+          s+=dt(d,.4,'mid')+ln(ca.join(''),'mid','gold');
+        }
         if(ant&&!c.lite){const ax0=M.sx1>M.x0+1&&M.sx0==null?sb+2:x0+2,ax1=M.sx0!=null?sa-2:x1-2;s+=ln(K.onTop(meander(Math.min(ax0,ax1),Math.max(ax0,ax1),y0+4,y1-4,7),z,P),'mid','gold')}
         s+=sol(K.slabOf(sh,z,1.3,P,3,.6),'mm',{tone:'mid',lit:c.lit});
         s+=sol(K.slabOf(top,z+1.3,3.5,P,3,.6),'mm',{tone:'hi',lit:c.lit,inner:ln(K.sideSeam(top,z+1.3+2.2,P,3),'faint')});
@@ -8223,9 +8258,11 @@ function make(id,sp){
           s+=K.faceTextSvg(K.topMatrix([top.x+2.2,(top.y+top.y+top.d)/2-1],zt,P,'x'),M.t,{size:sz,tone:'lo'});
           s+=K.faceTextSvg(K.topMatrix([top.x+2.2,(top.y+top.y+top.d)/2+3.4],zt,P,'x'),M.t2,{size:Math.min(2,sz*.7),tone:'faint'});
           s+=ln(K.planOutline(K.insetPlan(top,2),zt,P,3),'faint');
-          const d=[],ca=[];const n=Math.max(4,Math.floor(top.w/5.8));
-          for(let i=0;i<n;i++){const x=top.x+2+i*(top.w-4)/(n-1);d.push(at(P,x,y0+.4,z),at(P,x,y1-.4,z));ca.push(K.pathOf([at(P,x,y0+1.4,z),at(P,x,y0-.2,z)]),K.pathOf([at(P,x,y1-1.4,z),at(P,x,y1+.2,z)]))}
-          s+=dt(d,.4,'mid')+ln(ca.join(''),'mid','gold');
+          s+=ln(K.pathOf([at(P,top.x,top.y+3,zt),at(P,top.x+3,top.y,zt)]),'lo');
+          if(top.w>24&&top.d>26){const qr=[],q0=[top.x+top.w-10,top.y+top.d-9.6],qq=rng(M.t.length*7+top.w|0);
+            for(let a=0;a<6;a++)for(let b=0;b<6;b++)if((a<2&&b<2)||(a>3&&b<2)||(a<2&&b>3)||qq()<.5)qr.push(K.lineOnTop([q0[0]+a*1.3-.45,q0[1]+b*1.3],[q0[0]+a*1.3+.45,q0[1]+b*1.3],zt,P));
+            s+=ln(qr.join(''),'lo')+ln(K.planOutline(R(q0[0]-1.1,q0[1]-1.1,q0[0]+7.9,q0[1]+7.9,.3),zt,P,2),'faint');}
+
         }
         return s;
       });
@@ -8242,7 +8279,7 @@ function make(id,sp){
         return s;
       });
     }
-    A.module=[(x0+x1)/2,(y0+y1)/2,T+(M.k==='wroom'?6.4:4.4)];
+    A.module=[(x0+x1)/2,(y0+y1)/2,T+(M.k==='wroom'?6.4:4.4)];net.push([M.x0+1,(M.y0+M.y1)/2],[M.x1-1,(M.y0+M.y1)/2]);
   }
   /* ---- USB to serial chip and 3.3 V regulator ---- */
   if(sp.bridge){
@@ -8258,36 +8295,45 @@ function make(id,sp){
       }
       return s;
     });
-    A.bridge=[x,y,T+1.7];
+    A.bridge=[x,y,T+1.7];net.push([b.x,b.y]);
   }
   if(sp.reg){
     const x=m(sp.reg.x),y=m(sp.reg.y);hold(sp.reg.x-2,sp.reg.y-2.2,sp.reg.x+2,sp.reg.y+2.2);
     add('reg','reg',[x-3.6,y-5,T,x+3.6,y+5,T+3],(P,c)=>{
       let s='';
+      if(L*W<700){
+        for(let i=0;i<3;i++)s+=sol(K.slabOf(R(x-3.2,y-1.9+i*1.9-.45,x-1,y-1.9+i*1.9+.45,.15),T,.5,P,1,0),'mg',{tone:'lo',crease:'none'});
+        for(let i=0;i<2;i++)s+=sol(K.slabOf(R(x+1,y-.95+i*1.9-.45,x+3.2,y-.95+i*1.9+.45,.15),T,.5,P,1,0),'mg',{tone:'lo',crease:'none'});
+        s+=sol(K.slabOf(R(x-1.5,y-2.6,x+1.5,y+2.6,.3),T,1.7,P,2,.2),'mk',{tone:'mid',lit:c.lit});
+        if(!c.lite)s+=dt([at(P,x-.7,y-2,T+1.7)],.45,'hi');
+        return s;
+      }
       for(let i=0;i<3;i++){const yy=y-4+i*4;s+=sol(K.slabOf(R(x-3.6,yy-.7,x-1.6,yy+.7,.2),T,.6,P,1,0),'mm',{tone:'lo',crease:'none'})}
       s+=sol(K.slabOf(R(x+1.4,y-1.6,x+3.6,y+1.6,.3),T,.9,P,1,0),'mm',{tone:'lo',crease:'none'});
       s+=sol(K.slabOf(R(x-1.8,y-4.8,x+1.4,y+4.8,.5),T,3,P,2,.4),'mk',{tone:'lo',lit:c.lit});
       s+=dt([at(P,x-1,y-3.8,T+3)],.5,'hi');
       return s;
     });
-    A.reg=[x,y,T+3];
+    A.reg=[x,y,T+3];net.push([sp.reg.x,sp.reg.y]);
   }
   /* ---- buttons ---- */
   (sp.btn||[]).forEach((b,i)=>{
     const cx=m(b.x),cy=m(b.y),h=b.s;hold(b.x-b.s/2-.3,b.y-b.s/2-.3,b.x+b.s/2+.3,b.y+b.s/2+.3);
-    add('btn'+i,'btn',[cx-h,cy-h,T,cx+h,cy+h,T+(h>2.5?4.4:3.4)],(P,c)=>{
+    add('btn'+i,'btn',[cx-h-1.5,cy-h,T,cx+h+1.5,cy+h,T+(h>2.5?4.4:3.4)],(P,c)=>{
       const plan=R(cx-h,cy-h,cx+h,cy+h,1),z=T+(h>2.5?2.2:1.7);
-      let s=sol(K.slabOf(plan,T,z-T,P,3,.4),'mm',{tone:'mid',lit:c.lit});
+      let s='';
+      for(const sg of[-1,1])for(const yy of[-.55,.55]){const x0=sg<0?cx-h-1.5:cx+h-.2;s+=sol(K.slabOf(R(x0,cy+yy*h-.6,x0+1.7,cy+yy*h+.6,.2),T,.6,P,1,0),'mg',{tone:'lo',crease:'none'})}
+      s+=sol(K.slabOf(plan,T,z-T,P,3,.4),'mm',{tone:'mid',lit:c.lit});
       s+=sol(K.cylinder(cx,cy,h*.54,z,h>2.5?2.2:1.7,P,20,.3),'mk',{tone:'mid',lit:c.lit});
       s+=ln(K.ring(cx,cy,h*.3,z+(h>2.5?2.2:1.7),P,14),'faint');
       if(!c.lite)s+=dt(K.corners(plan,1.1).map(([x,y])=>at(P,x,y,z)),.45,'mid');
       return s;
     });
-    if(i===0)A.btn=[cx,cy,T+3];
+    if(i===0)A.btn=[cx,cy,T+3];net.push([b.x,b.y]);
   });
   /* ---- LEDs ---- */
   (sp.leds||[]).forEach((l,i)=>{
-    const cx=m(l.x),cy=m(l.y),w=l.rgb?2.6:1.8,d=l.rgb?2.6:1;hold(l.x-w/2,l.y-d/2,l.x+w/2,l.y+d/2);
+    net.push([l.x,l.y]);const cx=m(l.x),cy=m(l.y),w=l.rgb?2.6:1.8,d=l.rgb?2.6:1;hold(l.x-w/2,l.y-d/2,l.x+w/2,l.y+d/2);
     add('led'+i,'led',[cx-w,cy-d,T,cx+w,cy+d,T+.9],(P,c)=>{
       let s=sol(K.slabOf(R(cx-w,cy-d,cx+w,cy+d,.2),T,.9,P,1,0),l.rgb?'mw':'mk',{tone:'lo',crease:'none'});
       const p=at(P,cx,cy,T+.9),k=K.cameraOf(P).k,dl=`animation-delay:-${(c.t%2.4).toFixed(2)}s`;
@@ -8312,13 +8358,14 @@ function make(id,sp){
     const cx=m(sp.flash.x),cy=m(sp.flash.y);hold(sp.flash.x-1.4,sp.flash.y-1.4,sp.flash.x+1.4,sp.flash.y+1.4);
     add('flash','led',[cx-2.4,cy-2.4,T,cx+2.4,cy+2.4,T+1.4],(P,c)=>sol(K.slabOf(R(cx-2.4,cy-2.4,cx+2.4,cy+2.4,.5),T,1.4,P,2,.2),'mw',{tone:'lo',crease:'none'})+dt([at(P,cx,cy,T+1.4)],1.2,'hi'));
   }
+  for(const k of sp.silk||[])hold(k.x,k.y-k.s*.5,k.x+k.t.length*k.s*.34,k.y+k.s*.5);
   /* ---- small parts, placed where there is room ---- */
   {
     const rand=rng(id.split('').reduce((a,ch)=>a*31+ch.charCodeAt(0),7)),want=Math.min(26,Math.floor(L*W/46));let n=0;
     for(let tries=0;tries<400&&n<want;tries++){
       const al=rand()<.5?'x':'y',w=al==='x'?2:1.25,d=al==='x'?1.25:2,x=(rand()-.5)*(L-4.4),y=(rand()-.5)*(W-4.4);
       if(!free(x-w/2,y-d/2,x+w/2,y+d/2))continue;
-      hold(x-w/2,y-d/2,x+w/2,y+d/2);
+      hold(x-w/2,y-d/2,x+w/2,y+d/2);net.push([x,y]);
       const cx=m(x),cy=m(y),mat=rand()<.7?'mk':'mg',hw=w,hd=d;
       add('s'+n,'smd',[cx-hw,cy-hd,T,cx+hw,cy+hd,T+1],(P,c)=>{
         const plan=R(cx-hw,cy-hd,cx+hw,cy+hd,.2);let s=sol(K.slabOf(plan,T,1,P,1,0),mat,{tone:'lo',crease:'none'});
@@ -8327,6 +8374,57 @@ function make(id,sp){
       });
       n++;
     }
+  }
+  /* ---- typed small parts: capacitors, transistors, an inductor, a diode, a crystal, test points ---- */
+  {
+    const rand=rng(id.split('').reduce((a,ch)=>a*31+ch.charCodeAt(0),11)),sc=Math.max(.5,Math.min(1.6,L*W/1400));
+    const twoT=(oid,x,y,w,d,al,o)=>{
+      const cx=m(x),cy=m(y),hw=al==='x'?w:d,hd=al==='x'?d:w,e=o.e,h=o.h;
+      add(oid,'smd',[cx-hw,cy-hd,T,cx+hw,cy+hd,T+h],(P,c)=>{
+        let s='';
+        const ends=al==='x'?[R(cx-hw,cy-hd,cx-hw+e,cy+hd,.2),R(cx+hw-e,cy-hd,cx+hw,cy+hd,.2)]:[R(cx-hw,cy-hd,cx+hw,cy-hd+e,.2),R(cx-hw,cy+hd-e,cx+hw,cy+hd,.2)];
+        const mid=al==='x'?R(cx-hw+e,cy-hd+.15,cx+hw-e,cy+hd-.15,.2):R(cx-hw+.15,cy-hd+e,cx+hw-.15,cy+hd-e,.2);
+        s+=sol(K.slabOf(mid,T,h,P,1,.1),o.body,{tone:'mid',crease:'faint',lit:c.lit});
+        for(const q of ends)s+=sol(K.slabOf(q,T,h*.85,P,1,0),'mg',{tone:'lo',crease:'none'});
+        if(o.stripe&&!c.lite){const q=al==='x'?R(cx-hw+e,cy-hd,cx-hw+e+1.1,cy+hd,0):R(cx-hw,cy-hd+e,cx+hw,cy-hd+e+1.1,0);s+=sol(K.slabOf(q,T+h,.12,P,1,0),'mk',{tone:'lo',crease:'none'})}
+        if(o.ring&&!c.lite)s+=ln(K.planOutline(K.insetPlan(mid,.6),T+h,P,2),'faint');
+        return s;
+      });
+    };
+    const spots=(w,d,n,fn)=>{let k=0;for(let t=0;t<80&&k<n;t++){const al=rand()<.5?'x':'y',ww=al==='x'?w:d,dd=al==='x'?d:w,x=(rand()-.5)*(L-6),y=(rand()-.5)*(W-6);
+      if(!free(x-ww/2-.6,y-dd/2-.6,x+ww/2+.6,y+dd/2+.6))continue;hold(x-ww/2,y-dd/2,x+ww/2,y+dd/2);net.push([x,y]);fn(x,y,al,k++)}};
+    spots(3.2,1.6,Math.round(2*sc),(x,y,al,k)=>twoT('tant'+k,x,y,3.2,1.6,al,{h:2.4,e:1.1,body:'mg',stripe:1}));
+    spots(2.5,2.5,Math.round(sc),(x,y,al,k)=>twoT('ind'+k,x,y,2.5,2.5,al,{h:1.8,e:1.1,body:'mk',ring:1}));
+    spots(2.7,1.6,Math.round(sc),(x,y,al,k)=>twoT('dio'+k,x,y,2.7,1.6,al,{h:1.5,e:.9,body:'mk',stripe:1}));
+    spots(2.8,2.6,Math.round(2*sc),(x,y,al,k)=>{
+      const cx=m(x),cy=m(y),sgn=rand()<.5?1:-1;
+      add('sot'+k,'smd',[cx-2.6,cy-2.9,T,cx+2.6,cy+2.9,T+1.9],(P,c)=>{
+        let s='';
+        for(const [dx,yy] of [[-1,-1.9],[-1,1.9],[1,0]])s+=sol(K.slabOf(R(cx+dx*sgn*2.8-1.2,cy+yy-.5,cx+dx*sgn*2.8+1.2,cy+yy+.5,.2),T,.5,P,1,0),'mg',{tone:'lo',crease:'none'});
+        s+=sol(K.slabOf(R(cx-1.4,cy-2.9,cx+1.4,cy+2.9,.3),T,1.8,P,2,.2),'mk',{tone:'mid',lit:c.lit});
+        if(!c.lite)s+=dt([at(P,cx-sgn*.5,cy-2.1,T+1.8)],.45,'hi');
+        return s;
+      });
+    });
+    if(sp.bridge)spots(3.2,2.5,1,(x,y,al,k)=>{
+      const cx=m(x),cy=m(y);
+      add('xtal'+k,'smd',[cx-3.6,cy-2.9,T,cx+3.6,cy+2.9,T+1.4],(P,c)=>{
+        let s='';
+        for(const sx of[-1,1])for(const sy of[-1,1])s+=sol(K.slabOf(R(cx+sx*3.6-(sx<0?0:1.7),cy+sy*2.9-(sy<0?0:1.3),cx+sx*3.6+(sx<0?1.7:0),cy+sy*2.9+(sy<0?1.3:0),.2),T,.35,P,1,0),'mg',{tone:'lo',crease:'none'});
+        const b=R(cx-3.2,cy-2.5,cx+3.2,cy+2.5,.5);
+        s+=sol(K.slabOf(b,T,1.4,P,2,.25),'mm',{tone:'hi',lit:c.lit});
+        if(!c.lite)s+=ln(K.planOutline(K.insetPlan(b,.9),T+1.4,P,2),'faint')+dt([at(P,cx-2.2,cy+1.6,T+1.4)],.5,'lo');
+        return s;
+      });
+    });
+    spots(2.2,2.2,Math.round(4*sc),(x,y,al,k)=>{
+      const cx=m(x),cy=m(y);
+      add('tp'+k,'smd',[cx-1.5,cy-1.5,T,cx+1.5,cy+1.5,T+.1],(P,c)=>c.lite?'':ln(K.ring(cx,cy,1.4,T,P,10),'mid','gold')+dt([at(P,cx,cy,T)],.55,'hi'));
+    });
+    spots(2,2,2,(x,y,al,k)=>{
+      const cx=m(x),cy=m(y);
+      add('fid'+k,'smd',[cx-1.3,cy-1.3,T,cx+1.3,cy+1.3,T+.1],(P,c)=>c.lite?'':ln(K.ring(cx,cy,1.25,T,P,12),'faint')+dt([at(P,cx,cy,T)],.9,'lo'));
+    });
   }
   if(!A.usb)A.usb=A.module;if(!A.bridge)A.bridge=A.module;if(!A.reg)A.reg=A.module;
   const r0=rows[0],rc=[m((xs(r0.x0,r0.n)[0]+xs(r0.x0,r0.n)[r0.n-1])/2),m(r0.y),T];
