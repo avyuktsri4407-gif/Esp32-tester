@@ -8754,30 +8754,35 @@ function setFont(x,size,weight){x.font=(weight||600)+' '+size+'px ui-monospace,"
 /* ---------- environment and lights ---------- */
 function envMap(renderer){
   const sc=new TH.Scene();
-  const gt=canvasTex(8,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#c9d3e6');g.addColorStop(.42,'#6c7686');g.addColorStop(.5,'#3d424c');g.addColorStop(1,'#15171b');x.fillStyle=g;x.fillRect(0,0,w,h)});
+  const gt=canvasTex(8,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#4a5266');g.addColorStop(.45,'#1d2129');g.addColorStop(.5,'#101216');g.addColorStop(1,'#060708');x.fillStyle=g;x.fillRect(0,0,w,h)});
   gt.encoding=TH.LinearEncoding;
   sc.add(new TH.Mesh(new TH.SphereGeometry(30,24,16),new TH.MeshBasicMaterial({map:gt,side:TH.BackSide})));
   const panel=(w,h,c,i,x,y,z)=>{const m=new TH.Mesh(new TH.PlaneGeometry(w,h),new TH.MeshBasicMaterial({color:new TH.Color(c).multiplyScalar(i),side:TH.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);sc.add(m)};
-  panel(14,8,0xfff1dd,2.6,-12,10,16);
-  panel(8,12,0xcfdcff,1.4,18,4,8);
-  panel(16,4,0xffffff,1.0,0,-10,14);
-  const pm=new TH.PMREMGenerator(renderer),rt=pm.fromScene(sc,0.04);pm.dispose();
+  panel(18,12,0xfff1dd,5.5,-5,9,23);
+  panel(2.5,12,0xcfdcff,6,19,3,5);
+  panel(12,1.5,0xffffff,5,2,-9,9);
+  panel(8,8,0xffe0b8,3,0,24,-4);
+  panel(2.5,9,0x9db6ff,4,-20,2,-8);
+  panel(3,10,0xffffff,4,-14,-14,10);
+  const pm=new TH.PMREMGenerator(renderer),rt=pm.fromScene(sc,0.03);pm.dispose();
   return rt.texture;
 }
 /* ---------- one renderer per hero canvas ---------- */
 function stage(canvas,opt={}){
   const renderer=new TH.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:!!opt.keep});
-  renderer.outputEncoding=TH.sRGBEncoding;renderer.toneMapping=TH.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;
+  renderer.outputEncoding=TH.sRGBEncoding;renderer.toneMapping=TH.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=TH.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
   const scene=new TH.Scene();scene.environment=envMap(renderer);
   const cam=new TH.OrthographicCamera(-1,1,1,-1,1,2000);
-  const key=new TH.DirectionalLight(0xfff3e2,2.3),fill=new TH.DirectionalLight(0xb7c8ff,.5),rim=new TH.DirectionalLight(0xffe2c0,.7);
+  const key=new TH.DirectionalLight(0xfff0dc,3.1),fill=new TH.DirectionalLight(0xaec3ff,.35),rim=new TH.DirectionalLight(0xffd9b0,1.1);
   key.castShadow=true;key.shadow.mapSize.set(opt.shadow||2048,opt.shadow||2048);key.shadow.bias=-.0004;key.shadow.normalBias=.15;key.shadow.radius=4;
-  scene.add(key,key.target,fill,fill.target,rim,rim.target,new TH.HemisphereLight(0xbcc8e0,0x14161a,.28));
-  const floor=new TH.Mesh(new TH.PlaneGeometry(1,1),new TH.ShadowMaterial({opacity:.14}));floor.receiveShadow=true;floor.position.z=0;scene.add(floor);
+  scene.add(key,key.target,fill,fill.target,rim,rim.target,new TH.HemisphereLight(0xaab8d8,0x0c0d10,.18));
+  const floor=new TH.Mesh(new TH.PlaneGeometry(1,1),new TH.ShadowMaterial({opacity:.4}));floor.receiveShadow=true;floor.position.z=0;scene.add(floor);
+  const blobT=canvasTex(128,128,(x,w,h)=>{const g=x.createRadialGradient(64,64,6,64,64,64);g.addColorStop(0,'rgba(0,0,0,.65)');g.addColorStop(.55,'rgba(0,0,0,.28)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,w,h)});
+  const blob=new TH.Mesh(new TH.PlaneGeometry(1,1),new TH.MeshBasicMaterial({map:blobT,transparent:true,depthWrite:false}));blob.position.z=.2;blob.renderOrder=-1;scene.add(blob);
   const root=new TH.Group();root.scale.set(2,-2,2);scene.add(root);
   SHARED={aniso:Math.min(8,renderer.capabilities.getMaxAnisotropy())};
-  const S={renderer,scene,cam,key,fill,rim,floor,root,board:null,W:0,H:0,dpr:1,ext:60};
+  const S={renderer,scene,cam,key,fill,rim,floor,blob,root,board:null,W:0,H:0,dpr:1,ext:60};
   return S;
 }
 function sizeOf(S,W,H,dpr){
@@ -8793,7 +8798,7 @@ function aim(S,P,W,H){
   c.left=-P.origin[0]/k;c.right=(W-P.origin[0])/k;c.top=P.origin[1]/k;c.bottom=-(H-P.origin[1])/k;c.near=1;c.far=2000;c.updateProjectionMatrix();c.updateMatrixWorld();
   /* lights ride with the camera so the board keeps its studio look as it turns */
   const at=new TH.Vector3(0,0,S.mid||20),dir=(x,y,z)=>new TH.Vector3().addScaledVector(r,x).addScaledVector(u,y).addScaledVector(t,z).normalize().multiplyScalar(300).add(at);
-  S.key.position.copy(dir(-.55,.75,.62));S.key.target.position.copy(at);
+  S.key.position.copy(dir(-.7,.78,.42));S.key.target.position.copy(at);
   S.fill.position.copy(dir(.9,.25,.35));S.fill.target.position.copy(at);
   S.rim.position.copy(dir(.1,.5,-.9));S.rim.target.position.copy(at);
   const e2=S.ext,sc=S.key.shadow.camera;sc.left=-e2;sc.right=e2;sc.top=e2;sc.bottom=-e2;sc.near=1;sc.far=700;sc.updateProjectionMatrix();
@@ -8854,8 +8859,8 @@ function buildPCB(fig,sp,B){
   const pos=geo.attributes.position,uv=new Float32Array(pos.count*2);
   for(let i=0;i<pos.count;i++){uv[2*i]=(pos.getX(i)+L/2)/L;uv[2*i+1]=1-(pos.getY(i)+W/2)/W}
   geo.setAttribute('uv',new TH.BufferAttribute(uv,2));
-  const top=new TH.MeshStandardMaterial({map:tex,roughness:.42,metalness:.05,envMapIntensity:.32});
-  const side=mat({c:0x3a3b33,r:.7});B.userData.tex={lab:tex,no:null,make:()=>pcbTexture(fig,sp,ppm,false),mat:top};
+  const top=new TH.MeshPhysicalMaterial({map:tex,roughness:.6,metalness:0,envMapIntensity:.55,clearcoat:.45,clearcoatRoughness:.3});
+  const side=mat({c:0x1b1f1d,r:.55,e:.5});B.userData.tex={lab:tex,no:null,make:()=>pcbTexture(fig,sp,ppm,false),mat:top};
   const pcb=new TH.Mesh(geo,[top,side]);pcb.castShadow=pcb.receiveShadow=true;B.add(pcb);
   /* gold pads and castellations */
   const gold=()=>mat({c:palette.gold,m:1,r:.28,e:1.2}),ringG=new TH.RingGeometry(.5,.97,28),sqG=new TH.BoxGeometry(1.8,1.8,.03),caG=new TH.BoxGeometry(1.1,1.9,.03);
@@ -8966,7 +8971,7 @@ function buildParts(fig,sp,B,tags,anim){
   (sp.usb||[]).forEach((u,i)=>{
     const ex=-sp.L/2-1.1;
     if(u.k==='c'){const g=usbC(7.2);g.position.set(ex,u.y,T+1.63);B.add(g);tags.usb.push(...g.userData.mats)}
-    else{const g=place('usbmicro',[{x:ex+5.42-3.77+0,y:u.y,z:T+.24,rz:0}]);B.add(g);tags.usb.push(...g.userData.mats);g.userData.micro=1}
+    else{const g=place('usbmicro',[{x:ex+3.77,y:u.y,z:T+.24,rz:-Math.PI/2}]);B.add(g);tags.usb.push(...g.userData.mats);g.userData.micro=1}
   });
   buildModule(fig,sp,B,tags);
   /* USB to serial */
@@ -8988,8 +8993,8 @@ function buildParts(fig,sp,B,tags,anim){
   });
   /* LEDs */
   (sp.leds||[]).forEach(l=>{
-    const k=l.rgb?1.5:1.15,col=palette.led[l.c]||0x58a0ff,tint=l.c==='r'?0xff8a80:0x9ec4ff;
-    const g=place('led0603',[{x:l.x,y:l.y,z:T,sx:k,sy:k,sz:k}],{over:{'PLASTIC-GREEN-01':()=>mat({c:col,r:.3,emi:col,ei:2.2}),'PLASTIC-WHITE-01':()=>mat({c:tint,r:.45,emi:col,ei:.35}),'PIN-02':()=>mat({c:0xb99b54,m:.9,r:.4})}});
+    const k=l.rgb?1.5:1.15,col=palette.led[l.c]||0x58a0ff,tint=l.c==='r'?0xd8483c:0x4a82e0;
+    const g=place('led0603',[{x:l.x,y:l.y,z:T,sx:k,sy:k,sz:k}],{over:{'PLASTIC-GREEN-01':()=>mat({c:col,r:.3,emi:col,ei:2.2}),'PLASTIC-WHITE-01':()=>mat({c:tint,r:.4,emi:col,ei:.5}),'PIN-02':()=>mat({c:0xb99b54,m:.9,r:.4})}});
     B.add(g);
     const sp2=new TH.Sprite(new TH.SpriteMaterial({map:glowTex(l.c),transparent:true,blending:TH.AdditiveBlending,depthWrite:false,opacity:.5}));
     sp2.scale.set(6,6,1);sp2.position.set(l.x,l.y,T+1.1);sp2.renderOrder=5;B.add(sp2);anim.push({sp:sp2,m:g.userData.mats[0]});
@@ -9048,7 +9053,7 @@ function board(S,id){
   }
   for(const k in S.boards)S.boards[k].g.visible=k===id;
   const b=S.boards[id];S.board=b;S.ext=b.ext;S.mid=b.mid;
-  S.floor.scale.set(b.ext*4,b.ext*4,1);
+  S.floor.scale.set(b.ext*4,b.ext*4,1);S.blob.scale.set(b.ext*2.1,b.ext*1.5,1);
   return b;
 }
 function draw(S,P,o){
