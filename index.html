@@ -1425,6 +1425,9 @@ header.top{position:relative;z-index:6}
 .irf540nsvg .tg,.pc817svg .tg{stroke:var(--muted);stroke-width:1.5;fill:none}
 .irf540nsvg .tl,.pc817svg .tl{fill:var(--muted);font-size:12px;font-family:inherit}
 .irf540nsvg .ring,.pc817svg .ring{stroke:var(--muted);fill:none}
+@keyframes hmglin{from{opacity:0}to{opacity:1}}
+.hm-gl:not([hidden]){animation:hmglin .7s ease-out}
+@media (prefers-reduced-motion:reduce){.hm-gl:not([hidden]){animation:none}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -8713,6 +8716,13 @@ const palette={
   alu:0xbfc3c8,steel:0xa9adb3,black:0x0d0d0f,tan:0x8c7a52,led:{b:0x58a0ff,r:0xff3a30,g:0x4cff7a}
 };
 /* ---------- three.js and the model bundle ---------- */
+let FAILED=false,WANT=null;
+/* true while a 3D board is expected: callers hold back the flat drawing so it never flashes before the real board */
+function want(){
+  if(FAILED)return false;
+  if(WANT==null){try{const c=document.createElement('canvas'),g=c.getContext('webgl2')||c.getContext('webgl');WANT=!!g&&typeof DecompressionStream!=='undefined';if(g){const x=g.getExtension('WEBGL_lose_context');x&&x.loseContext()}}catch(e){WANT=false}}
+  return WANT;
+}
 function ready(){
   if(loadP)return loadP;
   loadP=(async()=>{
@@ -8724,7 +8734,7 @@ function ready(){
     for(const name of Object.keys(GLB_DATA))MODELS[name]=await decodeModel(name);
     DONE=true;return TH;
   })();
-  loadP.catch(()=>{});
+  loadP.catch(()=>{FAILED=true});
   return loadP;
 }
 async function decodeModel(name){
@@ -9187,7 +9197,7 @@ function snap(id,az,elv,zm,lab,t){
   draw(S,P,{W,H,dpr:2,t:t||0,lit:'',nolab:!lab,floor:false});
   return S.renderer.domElement.toDataURL('image/png');
 }
-return {fig,snap,get ok(){return DONE},ready,get TH(){return TH},stage,board,draw,place,mat,lin,palette,MODELS:()=>MODELS,canvas,shared,dpr};
+return {fig,snap,get ok(){return DONE},want,fail(){FAILED=true},ready,get TH(){return TH},stage,board,draw,place,mat,lin,palette,MODELS:()=>MODELS,canvas,shared,dpr};
 })();
 /* ---- Home page: idea, how it works, get started, the flashing software, and a board (HF, parts/homefig.js) that turns as you scroll. ---- */
 const HM_VIEW=[[38,34,1,'hero'],[128,38,1.45,'usb'],[190,40,1.05,'how'],[300,42,1.5,'btn'],[232,26,1.5,'usb'],[440,40,1.5,'pins'],[500,42,1.9,'reg'],[560,42,1.6,'bridge'],[650,34,1,'hero']];
@@ -9363,7 +9373,7 @@ function homeMount(root,S,FG,HM_CH){
     const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,nar?.85:1,pS),st.f,{cx,cy,fw,fh});
     const t1=performance.now();
     if(GLS.on)GLH.draw(GLS.S,P,{W,H,dpr:GLH.dpr(),t:now/1000,lit});
-    else g.innerHTML=FG.draw(P,{ex:st.ex,lit,t:now/1000,lite:lite||st.zoom<.75,W,H});
+    else if(!(FG.id&&GLH.want()))g.innerHTML=FG.draw(P,{ex:st.ex,lit,t:now/1000,lite:lite||st.zoom<.75,W,H});
     builtAt=performance.now()-t1;
     const R=Math.hypot(W,H),kk=nar?.5:.55,mk=lerp(R,sl.w*kk,pS).toFixed(0)+'px '+lerp(R,sl.h*kk,pS).toFixed(0)+'px at '+cx.toFixed(0)+'px '+cy.toFixed(0)+'px';
     if(mk!==maskKey){maskKey=mk;const m='radial-gradient(ellipse '+mk+',#000 '+(nar?88:64)+'%,transparent 100%)';svg.style.webkitMaskImage=m;svg.style.maskImage=m;gl.style.webkitMaskImage=m;gl.style.maskImage=m}
@@ -9434,7 +9444,7 @@ function homeMount(root,S,FG,HM_CH){
   if(FG.id)GLH.ready().then(()=>{
     if(!root.isConnected)return;
     const S=GLH.shared();GLH.board(S,FG.id);FG=GLH.fig(FG.id);GLS.S=S;GLS.on=true;gl.hidden=false;g.innerHTML='';maskKey='';dirty=true;kick();
-  }).catch(e=>{GLS.on=false;gl.hidden=true;try{console.warn('3D board unavailable, using the drawing:',e&&e.message)}catch(_){}});
+  }).catch(e=>{GLH.fail();GLS.on=false;gl.hidden=true;dirty=true;kick();try{console.warn('3D board unavailable, using the drawing:',e&&e.message)}catch(_){}});
 }
 
 /* ---- Search palette: Ctrl+K or / from anywhere, and the Search parts button in the header ---- */
@@ -9543,6 +9553,7 @@ function pickerStr(id,az,t,lab,elv,zm){const f=BD.fig(id),W=400,H=300,P=f.cam(W,
 function pickerDraw(svg,id,az,t,lab,elv,zm){
   const f=BD.fig(id),W=400,H=300,P=f.cam(W,H,az,elv||34,zm||1.02,f.focus.hero);
   let g=svg.querySelector('g');if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');svg.append(g)}
+  if(!t&&!GLH.ok&&GLH.want())return;
   if(!t&&GLH.ok){try{g.innerHTML='<image href="'+GLH.snap(id,az,elv,zm,lab)+'" width="'+W+'" height="'+H+'"/>';return}catch(e){}}
   g.innerHTML=f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:!lab,W,H});
 }
@@ -9612,6 +9623,8 @@ function pickerGrid(b){
     help,
     );
   b.append(root);
+  const redrawCards=()=>root.querySelectorAll('.bp-card').forEach(c=>pickerDraw(c.querySelector('svg'),c.dataset.id,+c.dataset.az,0));
+  GLH.ready().then(redrawCards).catch(()=>{GLH.fail();redrawCards()});
 }
 
 /* ---- Dock picker: the DevKit floats in the middle as before, every other board sits beside it. The board under the pointer grows and turns. ---- */
@@ -9659,7 +9672,7 @@ function pickerDock(b){
   const drawN=i=>{const o=it[i];if(o.dN)return;o.dN=1;pickerDraw(o.sN,list[i].id,40,0,false,28)};
   const go=()=>{drawL(idx);pickerGo(list[idx].id,it[idx].fig)};
   /* once three.js is ready, redo the drawings already made as real 3D stills */
-  GLH.ready().then(()=>{let k=0;const redo=()=>{if(!b.isConnected||k>=it.length*2)return;const o=it[k>>1];if(k&1){if(o.dN){o.dN=0;drawN(o.i)}}else if(o.dL){o.dL=0;drawL(o.i)}k++;idle(redo)};redo()}).catch(()=>{});
+  GLH.ready().then(()=>{let k=0;const redo=()=>{if(!b.isConnected||k>=it.length*2)return;const o=it[k>>1];if(k&1){if(o.dN){o.dN=0;drawN(o.i)}}else if(o.dL){o.dL=0;drawL(o.i)}k++;idle(redo)};redo()}).catch(()=>{GLH.fail();it.forEach(o=>{if(o.dL){o.dL=0;drawL(o.i)}if(o.dN){o.dN=0;drawN(o.i)}})});
   function turnTo(i){const c=Math.round(pos);tgt=c+wrap(i-c);kick()}
   function step(d){tgt=Math.round(tgt)+d;kick()}
   function measure(){
