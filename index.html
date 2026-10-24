@@ -1320,7 +1320,7 @@ header.top{position:relative;z-index:6}
 .pj-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 4px}
 .pj-warn{margin:0 0 14px;padding:10px 14px;border:1px solid var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft);font:400 14px var(--f-body);color:var(--fg)}
 .btn.danger{border-color:var(--fail);color:var(--fail)}
-.pj-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 10px}
+.pj-bar{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:center;margin:22px 0 16px}
 .pj-title{flex:1 1 220px;min-width:0;font:600 22px var(--f-body);color:var(--fg);background:transparent;border:0;border-bottom:1px solid transparent;padding:4px 2px}
 .pj-title:hover,.pj-title:focus{border-bottom-color:var(--hair2)}
 .pj-tabs{display:flex;gap:2px;border-bottom:1px solid var(--hair);overflow-x:auto;scrollbar-width:none;margin:0 0 20px}
@@ -1333,7 +1333,12 @@ header.top{position:relative;z-index:6}
 .pj-empty{padding:28px 20px;border:1px dashed var(--hair2);border-radius:var(--r-md);text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
 .pj-empty h3{margin:0;font:600 17px var(--f-body)}
 .pj-empty p{margin:0;color:var(--muted);max-width:46ch;font:400 14px/1.5 var(--f-body)}
-.pj-count{margin:10px 0 8px;font:500 14px var(--f-body)}
+.pj-count{margin:20px 0 12px;font:500 14px var(--f-body)}
+.pj-chips:empty{display:none}
+.pj-chips{margin:0 0 4px}
+.pj-find{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;margin:16px 0 0}
+.pj-find .pj-in{flex:1 1 280px}
+.pj-body>.hint:first-child{margin-top:0}
 .pj-sel{margin-bottom:10px}
 .pj-x{cursor:pointer;min-height:32px;background:var(--accent-soft);white-space:normal;text-align:left;max-width:100%;line-height:1.3}
 .pj-x:hover{border-color:var(--fail);color:var(--fail)}
@@ -1359,7 +1364,7 @@ header.top{position:relative;z-index:6}
 .pj-cf li.conflict::marker{color:var(--fail)}
 .pj-tb2 td,.pj-tb2 th{vertical-align:top}
 .pj-dim{color:var(--muted)}
-.pj-tbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:14px 16px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);margin:0 0 8px;position:sticky;top:0;z-index:5}
+.pj-tbar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:14px 16px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);margin:0 0 16px;position:sticky;top:0;z-index:5}
 .pj-ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;min-width:0}
 .pj-clock{font:500 22px var(--f-mono);font-variant-numeric:tabular-nums;min-width:3.4ch}
 .pj-lb{display:flex;flex-direction:column;gap:4px;font:500 12px var(--f-body);color:var(--muted)}
@@ -1429,6 +1434,69 @@ header.top{position:relative;z-index:6}
 .hm-gl:not([hidden]){animation:hmglin .7s ease-out}
 @media (prefers-reduced-motion:reduce){.hm-gl:not([hidden]){animation:none}}
 .bpd>.bp-note{margin:56px 0 24px}.bpd>.bp-help{margin-top:6px}
+
+/* ---- Project checker cards ---- */
+.pj-h0{margin-top:22px}
+.pj-is{display:grid;gap:10px;margin:0 0 6px;padding:0;list-style:none}
+.pj-i{display:grid;grid-template-columns:78px minmax(0,1fr);gap:4px 16px;padding:14px 16px;border:1px solid var(--hair2);border-left-width:4px;border-radius:var(--r-md);background:var(--raise)}
+.pj-i.error{border-left-color:var(--fail)}.pj-i.warn{border-left-color:var(--accent)}.pj-i.info{border-left-color:var(--hair2)}
+.pj-ik{font:600 12px var(--f-mono);color:var(--muted);padding-top:3px}
+.pj-i.error .pj-ik{color:var(--fail)}.pj-i.warn .pj-ik{color:var(--accent-hi)}
+.pj-ib strong{font:600 15px var(--f-body);display:block;margin:0 0 4px}
+.pj-ib p{margin:0 0 6px;font:400 14px/1.5 var(--f-body)}
+.pj-ib p:last-child{margin-bottom:0}
+.pj-fix{color:var(--fg)}.pj-fix b{font-weight:600}
+@media (max-width:560px){.pj-i{grid-template-columns:minmax(0,1fr)}.pj-ik{padding:0}}
+/* ---- Build tab: breadboard player ---- */
+.bb{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin:0 0 26px}
+.bb-stage{min-width:0;border:1px solid var(--hair2);border-radius:var(--r-md);background:#15171b;overflow:hidden}
+.bb-fig{overflow-x:auto;padding:6px 6px 0;scrollbar-width:thin}
+.bb-fig:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.bb-svg{display:block;width:100%;height:auto}
+.bb-ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--hair)}
+.bb-count{margin-left:auto;font:500 13px var(--f-mono);color:var(--muted)}
+.bb-side{min-width:0;display:flex;flex-direction:column;gap:14px}
+.bb-pills{display:flex;gap:8px;list-style:none;margin:0;padding:2px 2px 8px;overflow-x:auto;scrollbar-width:thin}
+.bb-pills li{flex:0 0 auto}
+.bb-pill{display:inline-flex;gap:7px;align-items:center;min-height:36px;padding:6px 12px;border:1px solid var(--hair2);border-radius:999px;background:transparent;color:var(--muted);font:500 13px var(--f-body);cursor:pointer;white-space:nowrap}
+.bb-pill:hover{color:var(--fg);border-color:var(--accent-line)}
+.bb-pill.done{color:var(--fg)}
+.bb-pill.on{background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+.bb-pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bb-pn{font:500 11.5px var(--f-mono);opacity:.8}
+.bb-info{padding:16px 18px;border:1px solid var(--hair2);border-radius:var(--r-md);background:var(--raise);min-height:180px}
+.bb-step h4{margin:0 0 10px;font:600 16px var(--f-body)}
+.bb-step p{margin:0 0 10px;font:400 14px/1.55 var(--f-body)}
+.bb-step .tw{margin:0 0 12px}
+.bb-tb td,.bb-tb th{padding:7px 10px 7px 0}
+.bb-add{padding:10px 12px;border:1px dashed var(--accent-line);border-radius:var(--r-sm);background:var(--accent-soft)}
+.bb-step .pj-is{margin-top:14px}
+.bb-alt{margin:0 0 22px}.bb-alt summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font:500 14px var(--f-body)}
+.bb-alt ol{margin:6px 0 0;padding-left:22px;font:400 13.5px/1.6 var(--f-body);color:var(--muted)}
+/* drawing */
+.isoc .bb-holes circle{fill:#2b2822;opacity:.9}
+.isoc .bb-stripe{fill:none;stroke-width:1.6px;stroke-linecap:round;opacity:.9}
+.isoc .bb-pad{fill:#d8b877;stroke:none}
+.isoc .bbp{opacity:0;transform:translateY(-44px);transition:opacity .45s ease,transform .75s cubic-bezier(.2,.8,.25,1);pointer-events:none}
+.isoc .bbp.on{opacity:1;transform:none}
+.isoc .bbw{opacity:0;transition:opacity .25s ease .45s}
+.isoc .bbw.on{opacity:1}
+.isoc .bbw-o{fill:none;stroke:#050506;stroke-width:3.6px;stroke-linecap:round;stroke-linejoin:round}
+.isoc .bbw-c{fill:none;stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round}
+.isoc .bbw-o,.isoc .bbw-c{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .7s ease var(--d,.6s)}
+.isoc .bbw.on .bbw-o,.isoc .bbw.on .bbw-c{stroke-dashoffset:0}
+.isoc .bbw-w.opt .bbw-c{stroke-dasharray:.04 .03}
+.isoc .bbw-e{fill:#0b0b0c;stroke:none}
+.isoc .bbw-w circle{opacity:0;transition:opacity .2s ease 1s}
+.isoc .bbw.on .bbw-w circle{opacity:1}
+.isoc .bbh{opacity:0;transition:opacity .3s}
+.isoc .bbh.cur{opacity:1}
+.isoc .bb-ring{fill:rgba(216,184,119,.12);stroke:#d8b877;stroke-width:1.2px;stroke-dasharray:4 3}
+@media (prefers-reduced-motion:reduce){.isoc .bbp,.isoc .bbw,.isoc .bbw-o,.isoc .bbw-c,.isoc .bbw-w circle,.isoc .bbh{transition:none!important}.isoc .bbp{transform:none}}
+
+.isoc:not(.bb-all) .bbw.on:not(.cur) .bbw-w{opacity:.5;transition:opacity .4s}
+.isoc .bbw.on.cur .bbw-w{opacity:1}
+.pj-chk{margin:10px 0 0;font:400 14px var(--f-body);display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.pj-chk:empty{display:none}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -10688,7 +10756,7 @@ const PJ_PRESETS=[
   ['Distance and obstacle sensing','Three ways to measure how far away things are.',['sr04','vl53l0x','irobs']],
   ['Power and battery log','Voltage and current of a battery powered build.',['ina219','batt']]
 ];
-const PJ_TABS=[['dash','Dashboard'],['parts','Parts'],['wire','Wiring'],['runs','Runs']];
+const PJ_TABS=[['dash','Dashboard'],['parts','Parts'],['build','Build'],['wire','Wiring'],['runs','Runs']];
 const pjHead=(t,s)=>{const h=$('.ph h2'),u=$('.ph .sub');if(h)h.textContent=t;if(u)u.textContent=s||''};
 const pjPlural=(n,w)=>n+' '+w+(n===1?'':'s');
 function pjSeed(ids){try{BRD.reset();ids.forEach(id=>BRD.seed(pjPart(id)))}catch(e){}}
@@ -10794,6 +10862,7 @@ async function pjProject(b,pr,tok){
   const body=el('div',{class:'pj-body',role:'tabpanel',id:'pj-panel','aria-labelledby':'pj-t-'+PJ.view});
   b.append(el('div',{class:'pj-bar'},btn('All projects',()=>pjGo({}),'sm'),nameIn),tabs,body);
   if(PJ.view==='parts')pjParts(body,pr);
+  else if(PJ.view==='build')pjBuild(body,pr);
   else if(PJ.view==='wire')pjWire(body,pr);
   else if(PJ.view==='runs')await pjRuns(body,pr,runs,tok);
   else pjDash(body,pr,runs.length);
@@ -10803,8 +10872,13 @@ async function pjProject(b,pr,tok){
 function pjParts(body,pr){
   const chips=el('div',{class:'pj-chips'}),count=el('p',{class:'pj-count',role:'status'}),list=el('div',{class:'pj-pl'});
   const q=el('input',{type:'search',class:'pj-in',placeholder:'Search parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',oninput:()=>build()});
+  const rm=btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build();paint();pjHead('Projects',pjPlural(0,'part'))},'sm');
+  const chk=el('p',{class:'pj-chk',role:'status'});
   const boxes=new Map();
   const paint=()=>{
+    rm.hidden=!pr.parts.length;
+    chk.replaceChildren();
+    try{const r=pjCheck(pr.parts),c=r.counts,n=c.error+c.warn;if(pr.parts.length&&n)chk.append(el('span',{class:'chip '+(c.error?'fail':'dash')},c.error?pjPlural(c.error,'fix'):pjPlural(c.warn,'check')),' '+pjPlural(n,'thing')+' to look at. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'See the Build tab'))}catch(e){}
     count.textContent=pr.parts.length?pjPlural(pr.parts.length,'part')+' in this project (up to '+PJ.max+')':'No parts yet. Tick the parts below.';
     chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),onclick:()=>toggle(id,false)},pjName(id)+' ×')));
     for(const [id,c] of boxes)c.checked=pr.parts.includes(id);
@@ -10837,7 +10911,7 @@ function pjParts(body,pr){
     paint();
   }
   body.append(el('p',{class:'hint'},'Pick the parts that run together. The dashboard shows each part’s own live test, side by side.'),
-    count,chips,...(pr.parts.length?[btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build()},'sm')]:[]),q,list);
+    count,chips,chk,el('div',{class:'pj-find'},q,rm),list);
   build();
 }
 
@@ -11064,6 +11138,588 @@ function pjCompare(body,pr,runs){
     for(const k of keys)sets.forEach((s,i)=>{const o=all[i].get(k);if(o)rows.push([q(o.name),q(o.unit),q(s.n),new Date(s.started).toISOString(),o.st.n,o.st.min,o.st.max,o.st.mean,o.st.std,s.simulated?'yes':'no'].join(','))});
     stDownload('esp32-project_'+pjSlug(pr.name)+'_comparison.csv',rows.join('\n')+'\n','text/csv;charset=utf-8');toast('Saved the comparison');
   },'sm')));
+}
+/* ---- Project checker: pin clashes, voltage levels, power and missing parts. Pure functions plus one list renderer. ----
+   Every entry in PJ_NEED comes from a note on that part's own page (wiring notes) or from the module's datasheet. */
+/* [sev, kind, title, why, fix, extra parts to add (optional), [pin A, pin B] they go between (optional)] */
+const PJ_NEED={
+  ds18b20:[['error','missing','Pull-up resistor','The 1-Wire line is held high by a pull-up. A 3-pin module has one on board. A bare probe cable does not, and then the sensor never answers.','Add a 4.7 kΩ resistor between DATA and 3V3, unless your module already has one.','4.7 kΩ resistor',['DATA|DQ|OUT|SIG','3V3']]],
+  dht:[['warn','missing','Pull-up resistor','A bare 4-pin DHT needs a pull-up on DATA. The 3-pin module already has one.','If you have the bare 4-pin sensor, add a 10 kΩ resistor between DATA and 3V3.','10 kΩ resistor',['DATA|OUT|SIG','3V3']]],
+  neo:[['warn','missing','Data resistor','A resistor in the data wire stops the first LED being damaged by voltage spikes.','Add a 330 Ω resistor in series with the data wire.','330 Ω resistor',['DIN|DI|DATA|IN','GPIO']],
+       ['warn','missing','Supply capacitor','A strip switches a lot of current at once. A big capacitor smooths the 5 V supply.','Add a 1000 µF capacitor across 5V and GND at the start of the strip. The stripe on the capacitor goes to GND.','1000 µF capacitor'],
+       ['info','level','Data is a 5 V signal','3.3 V from the ESP32 works on short wires with most strips. A level shifter makes it reliable.','If the first LED flickers, run the data wire through a 74AHCT125 or the level converter.']],
+  sk6812:[['warn','missing','Data resistor','A resistor in the data wire protects the first LED.','Add a 330 Ω resistor in series with the data wire.','330 Ω resistor',['DIN|DI|DATA|IN','GPIO']],
+       ['warn','missing','Supply capacitor','Smooths the 5 V supply when many LEDs switch together.','Add a 1000 µF capacitor across the strip supply. The stripe goes to GND.','1000 µF capacitor'],
+       ['info','level','Data is a 5 V signal','3.3 V from the ESP32 works on short wires. A 74AHCT125 level shifter makes it reliable.','If the first LED flickers, use a level shifter on the data wire.']],
+  nrf24:[['error','missing','Decoupling capacitor','Without a capacitor at the module the radio resets under load, and many modules seem dead.','Add a 10 µF to 100 µF capacitor across VCC and GND, right at the module.','10 µF capacitor'],
+       ['warn','level','3.3 V only','The radio and its pins are 3.3 V. Only adapter boards with a regulator accept 5 V.','Power it from 3V3, not from 5V.']],
+  sx1278:[['warn','missing','Antenna','Transmitting into an open antenna port can damage the chip.','Connect the antenna before you power the module.','antenna'],
+       ['warn','level','3.3 V only','The module takes 3.3 V and up to 120 mA when transmitting.','Power it from 3V3 and keep a capacitor close to the module.']],
+  dfplayer:[['warn','missing','Series resistor','Without it many boards play a loud noise.','Put a 1 kΩ resistor in series with the module RX line.','1 kΩ resistor',['RX','GPIO']]],
+  mg996r:[['error','power','Needs its own supply','At stall it draws about 2.5 A. USB or the VIN pin cannot give that, and the ESP32 resets.','Power the servo from a separate 5 to 6 V supply of 2 A or more. Join its ground to the ESP32 ground. Keep only the signal wire on the ESP32.','5 to 6 V supply (2 A)'],
+       ['warn','missing','Supply capacitor','Servo current spikes dip the supply.','Add a 470 to 1000 µF capacitor across the servo supply.','470 µF capacitor']],
+  servo:[['info','power','Stall current','An SG90 draws about 0.65 A if it stalls. A full sweep with no load is fine from the board.','For anything heavier, give the servo its own 5 V supply and join the grounds.']],
+  pca9685:[['warn','power','Servo power','The V+ pin powers the servos. It must come from an external 5 to 6 V supply, never the ESP32 board.','Connect an external 5 to 6 V supply to V+ and join its ground to the ESP32 ground. VCC takes 3.3 V from the ESP32.','5 to 6 V supply']],
+  sim800l:[['error','power','Needs its own supply','It needs 3.4 to 4.4 V and bursts of 2 A. The ESP32 3V3 and 5V pins cannot give that.','Use a LiPo cell or a 4 V supply that can give 2 A. Join its ground to the ESP32 ground.','4 V supply (2 A)'],
+       ['error','missing','Supply capacitor','The current bursts crash the supply without a nearby capacitor.','Add a 1000 µF capacitor close to the module supply pins.','1000 µF capacitor'],
+       ['warn','level','Module RX level','The module logic is 2.8 V. Most boards accept 3.3 V on RX, a divider is safer.','Put a 1 kΩ resistor in series, then 2 kΩ from the RX pin to GND.','2 kΩ resistor']],
+  a7670c:[['error','power','Needs its own supply','It needs 3.4 to 4.2 V with 2 A bursts, like the SIM800L.','Use a supply or LiPo that can give 2 A. Boards with USB-C take 5 V there. Join its ground to the ESP32 ground.','4 V supply (2 A)']],
+  lcd:[],
+  sr04:[['warn','level','ECHO is a 5 V signal','The ECHO pin swings to 5 V and the ESP32 pins are only rated for 3.3 V.','Put 1 kΩ in series with ECHO and 2 kΩ from the ESP32 pin to GND, or use the 3.3 V HC-SR04P.','2 kΩ resistor',['ECHO','GPIO']]],
+  ph:[['error','level','Output up to 5 V','The module output can reach 5 V and the ESP32 ADC stops at 3.3 V.','Always put a voltage divider between the module output and the ESP32 pin.','2 resistors (divider)',['PO|AO|OUT|SIG','GPIO']]],
+  mt3608:[['warn','level','Output can exceed 3.3 V','A boost converter can output well above what an ESP32 pin takes.','Measure its output only through a divider. 10 kΩ + 10 kΩ for up to 6 V, 100 kΩ + 10 kΩ for up to 36 V.','2 resistors (divider)']],
+  tp4056:[['warn','level','Cell voltage up to 4.2 V','A full Li-ion cell is above the ESP32 pin limit.','Measure the cell through a divider so the pin stays below 3.3 V.','2 resistors (divider)']],
+  xkby25:[['warn','level','Output equals the supply','On a 5 V supply the output is 5 V.','Put 1 kΩ in series with the output and 2 kΩ from the ESP32 pin to GND.','2 kΩ resistor',['OUT|SIG','GPIO']]],
+  mq2:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V. The ESP32 ADC stops at 3.3 V.','Use a voltage divider (for example 1 kΩ and 2 kΩ) on the AO wire.','2 kΩ resistor',['AO|A0|OUT','GPIO']],
+       ['info','power','Heater and warm-up','The heater draws about 150 mA and needs about 3 minutes to settle.','Give the sensor time before reading.']],
+  mq135:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V.','Use a voltage divider (for example 1 kΩ and 2 kΩ) on the AO wire.','2 kΩ resistor',['AO|A0|OUT','GPIO']],
+       ['info','power','Heater and warm-up','The heater draws about 150 mA and needs a few minutes to settle.','Give the sensor time before reading.']],
+  yfs201:[['warn','level','Pulse output is the supply level','On a 5 V supply the signal wire pulses to 5 V.','Put 1 kΩ in series and 2 kΩ from the ESP32 pin to GND.','2 kΩ resistor',['SIG|OUT|YELLOW|PULSE','GPIO']]],
+  lm2596:[['error','power','Needs an outside supply','IN+ takes 7 to 35 V. It is not powered from the ESP32.','Connect a 7 to 35 V supply to IN+ and IN−. Join its ground to the ESP32 ground.','7 to 35 V supply']],
+  l298n:[['error','power','Motor supply','The motors run from their own 6 to 35 V supply on the +12V terminal, never from the ESP32 5V pin.','Connect the motor supply and join its minus to the ESP32 ground.','6 to 35 V supply'],
+       ['info','tip','Add a motor','The module needs a DC motor on its outputs.','Connect a DC motor to OUT1 and OUT2.']],
+  l9110s:[['info','tip','Add a motor','The module needs a DC motor on its outputs.','Connect a small DC motor (3 to 6 V) to the A or B output.']],
+  a4988:[['error','power','Motor supply','VMOT takes 8 to 35 V from its own supply.','Connect a motor supply to VMOT and GND. Join its ground to the ESP32 ground.','8 to 35 V supply'],
+       ['error','missing','Capacitor on VMOT','Without a capacitor the supply spikes can kill the driver.','Add a 100 µF capacitor across VMOT and GND, next to the board.','100 µF capacitor'],
+       ['warn','tip','Set the current limit first','A wrong limit can overheat the driver or the motor.','Turn the current-limit trimmer to the motor rating before you plug the motor in. Never connect or unplug the motor while the supply is on.']],
+  tmc2209:[['error','power','Motor supply','VM takes the motor supply from its own source. VIO takes 3.3 V from the ESP32.','Connect the motor supply to VM and GND. Join its ground to the ESP32 ground.','motor supply'],
+       ['warn','tip','Never hot-plug the motor','Connecting or unplugging the motor with VM on kills the driver.','Switch the motor supply off first.']],
+  nema17:[['error','power','Motor supply','A NEMA 17 runs from 12 to 24 V through its driver, not from the ESP32.','Power the driver from a 12 to 24 V supply and set its current limit to the motor rating (run at 70 to 80 percent).','12 to 24 V supply']],
+  step28:[['info','power','Supply','It draws about 240 mA. VIN is fine for a test.','For a real project use a separate 5 V supply and join the grounds.']],
+  max98357:[['warn','missing','Speaker','The amplifier drives a speaker directly.','Connect a 4 to 8 Ω speaker to OUT+ and OUT−.','4 to 8 Ω speaker']],
+  irf540n:[['error','level','Not a logic-level MOSFET','The gate threshold is 2 to 4 V and the rating is for 10 V on the gate. At 3.3 V it is barely on.','Use a logic-level part such as the IRLZ44N, or drive the gate from 10 to 12 V through a small NPN.','IRLZ44N MOSFET']],
+  ad8232:[['error','tip','Safety: use battery power','A mains-connected computer or charger is not an isolated medical setup.','Power the ESP32 from a laptop on battery or a USB power bank while the pads are on your body. This is for learning, not for diagnosis.']],
+  relay:[['warn','tip','Low voltage only','The test does not isolate or protect against mains.','Never connect mains to the relay contacts during a test.']],
+  ssr:[['warn','tip','Low voltage only','Only the DC input side is wired. The two screw terminals on the other side are the AC output.','Do not connect mains to them in this test.']],
+  motor:[['info','power','Bigger motors','A small 130 motor runs from USB 5 V.','A bigger motor needs its own supply with the ground shared.']],
+  ds3231:[['info','tip','Backup battery','The clock stops at power-off without its coin cell.','Fit a CR2032 or LIR2032. On a ZS-042 board do not fit a plain CR2032 with the charging resistor still in place.']],
+  pcm5102:[['info','tip','Clock pin','SCK to GND makes the chip derive its own clock.','Tie SCK to GND, or close the solder bridge on the board.']],
+  ina219:[['info','tip','Measures a load','It reads the current of something else.','Put the shunt in series with the positive side of the load. All grounds common, including the ESP32.']],
+  max7219:[['info','level','Needs 5 V on VCC','The chip wants 4 V or more. The 3.3 V logic of the ESP32 works with most modules.','Power it from 5V and keep the data pins on 3.3 V logic.']],
+  ili9341:[['info','power','Backlight current','The backlight draws about 80 mA.','USB handles it. A weak power bank may not.']],
+  tcs34725:[['info','tip','LED pin','The LED pin switches the white LED. Tie it to 3V3 if you do not need to switch it.','']],
+  pmsa003:[['info','power','Fan current','The fan and laser draw about 100 mA from the 5 V rail.','Use the 5 V rail. Leave SET and RESET open.']],
+  mhz19b:[['info','power','Heater current','It draws up to 150 mA on 5 V. Its TX and RX are 3.3 V logic and connect straight to the ESP32.','']]
+};
+/* parts that need a partner to do anything */
+const PJ_REQ=[
+  {part:'nema17',any:['a4988','tmc2209'],sev:'error',title:'Stepper driver missing',why:'A NEMA 17 motor cannot be driven straight from an ESP32 pin.',fix:'Add a stepper driver (A4988 or TMC2209) between the ESP32 and the motor.'},
+  {part:'a4988',any:['nema17'],sev:'info',title:'No stepper motor in the project',why:'The driver has nothing to drive.',fix:'Add a NEMA 17 (or another bipolar stepper) to the project, or test the driver on its own.'},
+  {part:'tmc2209',any:['nema17'],sev:'info',title:'No stepper motor in the project',why:'The driver has nothing to drive.',fix:'Add a NEMA 17 (or another bipolar stepper) to the project, or test the driver on its own.'}
+];
+/* typical running current from the board rails, in mA. Parts with their own supply are left out. */
+const PJ_MA={servo:150,sd:80,gps:45,hc12:40,relay:75,motor:250,neo:120,sk6812:120,lcd:40,mq2:150,mq135:150,step28:240,max98357:100,mhz19b:130,pmsa003:100,hc05:40,ili9341:100,st7789:50,st7735:40,gc9a01:40,oled:20,sh1106:20,scd30:75,tcs34725:20,pir:1,sr04:15,rc522:25,pn532:50,as608:60,dfplayer:30,ad8232:1,max30102:20,tm1637:20,max7219:60};
+const PJ_EXT=new Set(['mg996r','sim800l','a7670c','pca9685','l298n','a4988','tmc2209','nema17','lm2596']);
+const PJ_ADDR_FIX={mpu:'MPU-6050: tie AD0 to 3V3 to move it to 0x69.',bmp280:'BMP280: tie SDO to 3V3 to move it to 0x77.',bme280:'BME280: tie SDO to 3V3 to move it to 0x77.',bh1750:'BH1750: tie ADDR to 3V3 to move it to 0x5C.',sht31:'SHT31: tie ADDR to 3V3 to move it to 0x45.',ina219:'INA219: bridge the A0 or A1 pads to change its address.',pca9685:'PCA9685: bridge an address pad (A0 to A5) to change its address.',lsm6ds3:'LSM6DS3: tie SDO to 3V3 to change its address.',adxl345:'ADXL345: tie SDO to 3V3 to move it to 0x1D.',mpu9250:'MPU-9250: tie AD0 to 3V3 to move it to 0x69.'};
+const pjRail=e=>/3V3|3\.3/i.test(e)?'3V3':/5V|VIN|VBUS/i.test(e)?'5V':/GND/i.test(e)?'GND':/^GPIO/i.test(e)?'GPIO':'ext';
+const pjSevN={error:0,warn:1,info:2};
+const pjKindLabel={clash:'Clash',missing:'Add',level:'Voltage',power:'Power',tip:'Tip',fit:'Board'};
+
+function pjCheck(ids){
+  const out=[],extras=[],has=new Set(ids),w=pjWiring(ids);
+  const seen=new Set();
+  const add=(o)=>{const k=o.kind+'|'+o.title+'|'+o.parts.join();if(seen.has(k))return;seen.add(k);out.push(o)};
+  const addExtra=(part,item,why,between)=>{const k=part+'|'+item;if(seen.has('x|'+k))return;seen.add('x|'+k);extras.push({part,item,why:why||'',between:between||null})};
+  /* 1. pins and addresses */
+  for(const c of w.conflicts){
+    if(c.kind==='pin'){
+      const pin=pjPin('GPIO'+c.pin),names=c.parts.map(pjShort);
+      const fr=w.free.slice(0,4).map(n=>pjPin('GPIO'+n)).join(', ');
+      add({sev:c.sev==='conflict'?'error':'warn',kind:'clash',parts:c.parts,title:pin+' is used twice',
+        text:pjConflictText(c),
+        fix:c.sev==='conflict'?'The tester firmware uses fixed pins, so test these parts one after the other. In your own sketch, move one of them to a free pin'+(fr?' ('+fr+')':'')+'.':'One of them is optional. Leave that wire off, or move it to a free pin'+(fr?' ('+fr+')':'')+'.'});
+    }else{
+      const tip=c.parts.map(p=>PJ_ADDR_FIX[p]).filter(Boolean)[0];
+      add({sev:'error',kind:'clash',parts:c.parts,title:'Two parts at address '+hex(c.addr),
+        text:c.parts.map(pjShort).join(' and ')+' both answer at '+hex(c.addr)+' on the same I2C bus, so one hides the other.',
+        fix:(tip?tip+' ':'')+'Otherwise change the address pin (often ADDR, AD0 or SDO) on one of them, or put one on a second I2C bus.'});
+    }
+  }
+  /* 2. board fit */
+  try{
+    if(typeof BRD!=='undefined'&&BRD.cur)for(const id of ids){
+      const p=pjPart(id),fx=p&&BRD.fit(p);
+      if(fx&&!fx.ok)add({sev:'error',kind:'fit',parts:[id],title:pjShort(id)+' does not fit your board',text:fx.why||'This part needs pins your board does not have.',fix:'Pick another board in the header, or leave this part out of the project.'});
+    }
+  }catch(e){}
+  /* 3. partners */
+  for(const r of PJ_REQ)if(has.has(r.part)&&!r.any.some(x=>has.has(x))){
+    const names=r.any.map(pjShort).join(' or ');
+    add({sev:r.sev,kind:'missing',parts:[r.part],title:r.title,text:pjShort(r.part)+': '+r.why,fix:r.fix+' ('+names+' is in the parts list.)'});
+  }
+  /* 4. per-part notes */
+  const lvl=has.has('levelshift');
+  for(const id of ids){
+    for(const n of PJ_NEED[id]||[]){
+      const [sev,kind,title,why,fix,item,between]=n;
+      let s=sev,f=fix;
+      if(kind==='level'&&lvl){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
+      add({sev:s,kind,parts:[id],title,text:pjShort(id)+': '+why,fix:f});
+      if(item&&kind!=='power')addExtra(id,item,title,between);
+      else if(item)addExtra(id,item,title);
+    }
+  }
+  /* 5. an I2C backpack on a 5 V pull-up shares a bus with 3.3 V parts */
+  if(has.has('lcd')){
+    const i2c=w.pins.find(o=>o.n===21&&o.owners.length>1);
+    add(i2c?{sev:'warn',kind:'level',parts:['lcd',...i2c.owners.map(o=>o.part).filter(x=>x!=='lcd')],title:'LCD pulls the I2C bus up to 5 V',
+        text:'The LCD backpack pull-ups go to 5 V. Shared with 3.3 V sensors, they put 5 V on the ESP32 SDA and SCL pins.',
+        fix:'Cut or remove the two pull-up resistors (or jumpers) on the backpack, or put the LCD behind the level converter. The other parts already have pull-ups.'}
+      :{sev:'info',kind:'level',parts:['lcd'],title:'LCD needs 5 V',text:'The backpack pull-ups go to 5 V. Alone on the bus that is acceptable for a test.',fix:'If you add 3.3 V I2C parts later, remove the backpack pull-ups or use a level converter.'});
+  }
+  /* 6. extra components named in the part's own wiring box (LED + 220 Ω ...) */
+  for(const id of ids){
+    const p=pjPart(id);let wp=null;try{wp=p&&p.wiring?W(p.wiring).part:null}catch(e){}
+    if(!wp||!/ \+ /.test(wp))continue;
+    const bits=String(wp).split(/ \+ /).slice(1);
+    for(const b of bits){
+      const m=/^(?:(\d+) x )?(\d+(?:\.\d+)? ?[kM]?Ω)(?: x(\d+))?( reference)?$/i.exec(b.trim());
+      if(m){addExtra(id,(m[1]||m[3]?(m[1]||m[3])+' x ':'')+m[2]+(m[4]?' reference resistor':' resistor'),'Part of this test');continue}
+      if(/^[0-9A-Z]{3,}\w*$/.test(b.trim())&&/\d/.test(b))addExtra(id,b.trim(),'Part of this test');
+    }
+  }
+  /* 7. what the rails can supply */
+  const rail={'3V3':0,'5V':0};
+  for(const id of ids){
+    if(PJ_EXT.has(id))continue;
+    const rs=w.rows.filter(r=>r.part===id&&r.kind==='pwr').map(r=>pjRail(r.esp));
+    const ma=PJ_MA[id]??12;
+    if(rs.includes('5V'))rail['5V']+=ma;else if(rs.includes('3V3'))rail['3V3']+=ma;
+  }
+  if(rail['5V']>450)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(i)&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='5V')),title:'The 5 V rail is close to its limit',
+    text:'These parts draw roughly '+rail['5V']+' mA from the 5 V pin. A USB port gives about 500 mA, and the board itself needs some.',fix:'Power the heavy parts from a separate 5 V supply with a shared ground, or use a powered USB hub.'});
+  if(rail['3V3']>250)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(i)&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='3V3')),title:'The 3V3 rail is close to its limit',
+    text:'These parts draw roughly '+rail['3V3']+' mA from the 3V3 pin, which is the same regulator that runs the ESP32 and its radio.',fix:'Move the hungriest part to its own 3.3 V regulator, or to 5V if it accepts it.'});
+  out.sort((a,b)=>pjSevN[a.sev]-pjSevN[b.sev]);
+  const n={error:0,warn:0,info:0};out.forEach(o=>n[o.sev]++);
+  return {issues:out,extras,counts:n,rail,wiring:w};
+}
+function pjCheckSummary(res,n){
+  const c=res.counts;
+  if(!n)return {cls:'warn',head:'No parts yet',tail:''};
+  if(c.error)return {cls:'bad',head:pjPlural(c.error,'thing')+' to fix',tail:c.warn?' and '+pjPlural(c.warn,'thing')+' to check.':'.'};
+  if(c.warn)return {cls:'warn',head:pjPlural(c.warn,'thing')+' to check',tail:'. Nothing blocks the build.'};
+  return {cls:'good',head:'These parts work together',tail:c.info?'. '+pjPlural(c.info,'tip')+' below.':'.'};
+}
+/* the list: one card per issue, with what is wrong and what to do about it */
+function pjIssueList(issues,only){
+  const list=only?issues.filter(o=>only.includes(o.parts[0])||o.parts.some(p=>only.includes(p))):issues;
+  if(!list.length)return null;
+  return el('ul',{class:'plain pj-is'},...list.map(o=>el('li',{class:'pj-i '+o.sev},
+    el('span',{class:'pj-ik'},pjKindLabel[o.kind]||'Check'),
+    el('div',{class:'pj-ib'},el('strong',{},o.title),el('p',{},o.text),o.fix?el('p',{class:'pj-fix'},el('b',{},'What to do: '),o.fix):null))));
+}
+/* ---- Projects: Build tab. Every part of the project goes onto one breadboard, one step at a time.
+   Drawn with the Anatomy iso kit (ISO): solids, painter's order, calm motion. Hole positions, wire colours and pins all come
+   from each part's own wiring table, so the picture and the step text cannot disagree. ---- */
+const BB=(()=>{
+const K=ISO,PITCH=10,X0=22,ZB=8,BDY=194,AZ=60,EL=30;
+const ROW={a:42,b:52,c:62,d:72,e:82,f:112,g:122,h:132,i:142,j:152},RAIL={tp:12,tm:22,bp:172,bm:182};
+const colX=c=>X0+(c-1)*PITCH+5;
+const SKIP=new Set(['i2c','studio','breadboard','jumper']);
+const OFF={servo:'servo',mg996r:'servo',motor:'motor',step28:'step',nema17:'step',relay:'relay',ssr:'relay',lcd:'lcd',neo:'strip',sk6812:'strip',yfs201:'flow',keypad:'pad',ds18b20:'probe',ph:'probe',pmsa003:'big',mhz19b:'big',l298n:'big',sim800l:'big',a7670c:'big',lm2596:'big',mt3608:'big',tp4056:'big'};
+const DISC={led:'led',rgb:'rgbled',gpio:'sw',button:'sw',resistor:'res',ldr:'res',ntc:'res',capacitor:'cap',diode:'dio',transistor:'tr',lm35:'tr',pc817:'dip',irf540n:'to220',abuzz:'buzz',pbuzz:'buzz',pot:'pot'};
+const SIZE={servo:[46,24,44],motor:[34,34,40],step:[44,44,24],relay:[56,40,36],lcd:[84,38,5],strip:[110,12,4],flow:[34,26,34],pad:[64,64,3],probe:[10,10,56],big:[56,38,16]};
+/* DevKit V1, USB at the left. Back header runs left to right, front header too. */
+const BACK=['VIN','GND',13,12,14,27,26,25,33,32,35,34,39,36,'EN'],FRONT=['3V3','GND',15,2,4,16,17,5,18,19,21,3,1,22,23];
+const EC0=5,ESPPIN={};
+BACK.forEach((p,i)=>{if(typeof p==='number')ESPPIN[p]={row:'back',idx:i}});FRONT.forEach((p,i)=>{if(typeof p==='number')ESPPIN[p]={row:'front',idx:i}});
+const pinName=p=>typeof p==='number'?'D'+p:p;
+const PCB=['#2456a6','#b3262a','#1f7a46','#5b3a8c','#1c6f9a','#1f8a7f','#2c333f'];
+let P=null;
+/* ---------- little drawing helpers ---------- */
+const matCache={};
+function matVars(hex){
+  if(matCache[hex])return matCache[hex];
+  const n=parseInt(hex.slice(1),16),c=[n>>16&255,n>>8&255,n&255];
+  const f=k=>'#'+c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))).toString(16).padStart(2,'0')).join('');
+  return matCache[hex]=`--anatomy-paper:${f(.82)};--anatomy-shade-0:${f(.5)};--anatomy-shade-1:${f(.66)};--anatomy-shade-2:${f(.84)};--anatomy-shade-3:${f(1)};--anatomy-top:${f(1.2)}`;
+}
+const sol=(p,o={})=>K.solidSvg(p,{tone:o.tone||'lo',crease:o.crease||'faint',className:o.cls,inner:o.inner||''});
+const G=(hex,inner)=>`<g style="${matVars(hex)}">${inner}</g>`;
+const bx=(x0,y0,x1,y1,z0,z1,hex,o={})=>G(hex,sol(K.slabOf({x:x0,y:y0,w:x1-x0,d:y1-y0,r:o.r||0},z0,z1-z0,P,o.steps||3,o.bevel||0),o));
+const cyl=(cx,cy,r,z0,h,hex,o={})=>G(hex,sol(K.cylinder(cx,cy,r,z0,h,P,o.steps||22,0),o));
+const at=(x,y,z)=>K.iso([x,y,z],P);
+const ln=(pts,tone,cls)=>K.lineSvg(K.pathOf(pts.map(p=>at(p[0],p[1],p[2]))),{tone:tone||'mid',className:cls});
+const txt=(x,y,z,s,size,tone,anchor)=>K.faceTextSvg(K.topMatrix([x,y],z,P,'x'),s,{size:size||3.4,tone:tone||'mid',anchor:anchor||'middle'});
+const sidetxt=(x,y,z,s,size,tone,anchor)=>K.faceTextSvg(K.sideMatrix([x,y],z,P,'left'),s,{size:size||3.4,tone:tone||'hi',anchor:anchor||'middle'});
+const hashN=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)};
+/* ---------- what is on the board ---------- */
+function planOf(ids){
+  const items=[];
+  for(const id of ids){
+    if(SKIP.has(id))continue;
+    const p=pjPart(id);if(!p)continue;
+    let wr=null;try{wr=p.wiring?W(p.wiring):null}catch(e){}
+    const rows=((wr&&wr.rows)||[]).map(r=>({esp:String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp));
+    const n=Math.max(2,Math.min(9,rows.length||2));
+    const kind=OFF[id]?'off':DISC[id]?'disc':'plug';
+    const need5=rows.some(r=>r.kind==='pwr'&&pjRail(r.esp)==='5V');
+    items.push({id,name:p.n,short:pjShort(id),rows,n,kind,shape:OFF[id]||DISC[id]||'mod',need5,color:PCB[hashN(id)%PCB.length],extras:[]});
+  }
+  /* lane: 5 V parts at the back (top rail is 5 V), everything else in front (bottom rail is 3V3). Balance when one lane gets long. */
+  const w={back:0,front:0};
+  const width=it=>it.n+1+it.extras.length*3;
+  return {items,w,width};
+}
+function layout(ids,res){
+  const pl=planOf(ids),items=pl.items;
+  /* extra components from the checker, drawn beside their part */
+  for(const it of items)it.extras=(res.extras||[]).filter(x=>x.part===it.id&&/resistor|capacitor|Ω|µF|diode|MOSFET|transistor/i.test(x.item)&&!/supply/i.test(x.item)).slice(0,3);
+  const start=EC0+16+2,cur={back:start,front:start};
+  for(const it of items){
+    it.lane=it.need5?'back':(cur.front-start<=cur.back-start+14?'front':'back');
+    it.c0=cur[it.lane];cur[it.lane]+=it.n+1+it.extras.length*3;
+  }
+  const cols=Math.max(34,Math.max(cur.back,cur.front)+1);
+  return {items,cols};
+}
+/* ---------- the scene ---------- */
+function scene(ids,res){
+  const L=layout(ids,res),items=L.items,cols=L.cols;
+  const BL=X0*2+(cols-1)*PITCH+PITCH;
+  /* rail holes: groups of five with a gap */
+  const railX=[];for(let k=0;;k++){const x=X0+5+k*PITCH+Math.floor(k/5)*5;if(x>BL-X0-2)break;railX.push(x)}
+  const nearRail=x=>railX.reduce((b,v)=>Math.abs(v-x)<Math.abs(b-x)?v:b,railX[0]);
+  /* where each off-board part sits on the bench, tiered so two never overlap */
+  const lanePos={back:[],front:[]};let y0=-34,y1=BDY+34;
+  for(const it of items){
+    if(it.kind!=='off')continue;
+    const [w,d,h]=SIZE[it.shape]||SIZE.big,xm=(colX(it.c0)+colX(it.c0+it.n-1))/2,list=lanePos[it.lane];
+    let tier=0;const hit=t=>list.some(q=>q.t===t&&Math.abs(q.x-xm)<(q.w+w)/2+10);
+    while(hit(tier)&&tier<3)tier++;
+    list.push({x:xm,w,t:tier});
+    const gap=30+tier*(Math.max(w,d)+26),front=it.lane==='front';
+    const cy=front?BDY+gap+d/2:-gap-d/2;
+    it.bench={cx:xm,cy,w,d,h};
+    if(front)y1=Math.max(y1,cy+d/2+22);else y0=Math.min(y0,cy-d/2-22);
+  }
+  const W=Math.max(900,Math.round(cols*11.5+260));
+  /* projection from the bounding box of everything */
+  const pts=[];for(const x of [-12,BL+12])for(const y of [-12,BDY+12])for(const z of [-5,0])pts.push([x,y,z]);
+  pts.push([0,0,70],[BL,0,70],[BL,BDY,70],[0,BDY,70]);
+  for(const it of items)if(it.bench){const q=it.bench;for(const x of [q.cx-q.w/2-10,q.cx+q.w/2+10])for(const y of [q.cy-q.d/2-18,q.cy+q.d/2+18])pts.push([x,y,0]);pts.push([q.cx,q.cy,q.h+30])}
+  const unit={origin:[0,0],scale:1,azimuth:AZ,elevation:EL};
+  const fl=pts.map(p=>K.iso(p,unit)),xs=fl.map(p=>p[0]),ys=fl.map(p=>p[1]);
+  const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),pad=14;
+  const sc=(W-2*pad)/(xmax-xmin),H=Math.round((ymax-ymin)*sc+2*pad);
+  P={origin:[pad-xmin*sc,pad-ymin*sc],scale:sc,azimuth:AZ,elevation:EL};
+  const defs=[],stat=[],dyn=[],wires=[];
+  /* bench */
+  stat.push(bx(-12,-12,BL+12,BDY+12,-5,0,'#262b33',{r:6,steps:4}));
+  /* the breadboard */
+  stat.push(bx(0,0,BL,BDY,0,ZB-1.5,'#cfcabd',{r:3,steps:4}));
+  stat.push(bx(0,0,BL,92,ZB-1.5,ZB,'#ddd8cb',{r:2,steps:4}));
+  stat.push(bx(0,102,BL,BDY,ZB-1.5,ZB,'#ddd8cb',{r:2,steps:4}));
+  /* centre channel and rail seams */
+  stat.push(bx(3,92,BL-3,102,ZB-5,ZB-4.5,'#a39f93',{tone:'faint',crease:'none',steps:3}));
+  const holes=[];
+  for(let c=1;c<=cols;c++)for(const r of ['a','b','c','d','e','f','g','h','i','j'])holes.push(at(colX(c),ROW[r],ZB));
+  for(const x of railX)for(const y of [RAIL.tp,RAIL.tm,RAIL.bp,RAIL.bm])holes.push(at(x,y,ZB));
+  stat.push(`<g class="bb-holes">${K.dotsSvg(holes,{size:1.15,tone:'hi'})}</g>`);
+  /* rail stripes: red is +, blue is minus */
+  const stripe=(y,col)=>`<path class="bb-stripe" style="stroke:${col}" d="${K.pathOf([at(X0-6,y,ZB),at(BL-X0+6,y,ZB)])}"/>`;
+  stat.push(stripe(RAIL.tp-6,'#d0463f'),stripe(RAIL.tm+6,'#4a79d8'),stripe(RAIL.bp-6,'#d0463f'),stripe(RAIL.bm+6,'#4a79d8'));
+  stat.push(txt(X0-12,RAIL.tp+3,ZB,'5V',3.2,'lo'),txt(X0-12,RAIL.tm+3,ZB,'GND',3.2,'lo'),txt(X0-12,RAIL.bp+3,ZB,'3V3',3.2,'lo'),txt(X0-12,RAIL.bm+3,ZB,'GND',3.2,'lo'));
+  /* row letters and column numbers */
+  for(const r of ['a','b','c','d','e','f','g','h','i','j'])stat.push(txt(8,ROW[r]+1.4,ZB,r,3,'lo'));
+  for(let c=1;c<=cols;c++)if(c===1||c%5===0)stat.push(txt(colX(c),97+1.4,ZB,String(c),3.2,'lo'));
+  /* ---- the ESP32 (step 0) ---- */
+  const ex0=colX(EC0)-40,ex1=colX(EC0+14)+30,pz=ZB+7;
+  const esp=[];
+  esp.push(bx(colX(EC0)-2,ROW.b-4,colX(EC0+14)+2,ROW.b+4,ZB,pz,'#1b1c1f',{tone:'faint'}));
+  esp.push(bx(colX(EC0)-2,ROW.i-4,colX(EC0+14)+2,ROW.i+4,ZB,pz,'#1b1c1f',{tone:'faint'}));
+  esp.push(bx(ex0,47,ex1,147,pz,pz+3.5,'#14171d',{r:3,steps:5}));
+  esp.push(bx(ex0-3,82,ex0+24,112,pz+3.5,pz+12,'#a9a8a2',{tone:'lo'}));            /* micro USB */
+  esp.push(bx(ex0+30,62,ex0+40,72,pz+3.5,pz+6.5,'#101113'),bx(ex0+30,122,ex0+40,132,pz+3.5,pz+6.5,'#101113'));
+  esp.push(cyl(ex0+35,67,2.6,pz+6.5,1.8,'#bdb8ab'),cyl(ex0+35,127,2.6,pz+6.5,1.8,'#bdb8ab'));
+  esp.push(bx(ex0+44,88,ex0+60,106,pz+3.5,pz+5.2,'#101113'));                      /* USB bridge */
+  esp.push(bx(ex1-124,63,ex1-38,131,pz+3.5,pz+10.5,'#a8a8a2',{tone:'lo'}));       /* WROOM shield can */
+  esp.push(bx(ex1-36,66,ex1-3,128,pz+3.5,pz+4.4,'#202428',{tone:'faint'}));         /* antenna keep-out */
+  esp.push(ln([[ex1-32,72,pz+4.4],[ex1-12,72,pz+4.4],[ex1-12,80,pz+4.4],[ex1-30,80,pz+4.4],[ex1-30,88,pz+4.4],[ex1-12,88,pz+4.4],[ex1-12,96,pz+4.4],[ex1-30,96,pz+4.4],[ex1-30,104,pz+4.4],[ex1-12,104,pz+4.4],[ex1-12,112,pz+4.4],[ex1-30,112,pz+4.4]],'mid','gold'));
+  esp.push(txt((ex1-124+ex1-38)/2,99,pz+10.5,'ESP32',5.2,'lo'));
+  esp.push(bx(ex0+62,120,ex0+70,128,pz+3.5,pz+5,'#e0524b',{tone:'faint'}));        /* LED */
+  BACK.forEach((p,i)=>{esp.push(txt(colX(EC0+i),ROW.b+10,pz+3.5,pinName(p),3.3,'hi'));esp.push(`<circle class="bb-pad" cx="${at(colX(EC0+i),ROW.b,pz+3.5)[0].toFixed(1)}" cy="${at(colX(EC0+i),ROW.b,pz+3.5)[1].toFixed(1)}" r="1.5"/>`)});
+  FRONT.forEach((p,i)=>{esp.push(txt(colX(EC0+i),ROW.i-6,pz+3.5,pinName(p),3.3,'hi'));esp.push(`<circle class="bb-pad" cx="${at(colX(EC0+i),ROW.i,pz+3.5)[0].toFixed(1)}" cy="${at(colX(EC0+i),ROW.i,pz+3.5)[1].toFixed(1)}" r="1.5"/>`)});
+  dyn.push({i:0,depth:K.depthOf([(ex0+ex1)/2,97,0],P),svg:esp.join(''),hold:[ex0,47,ex1,147]});
+  /* hole of an ESP pin: row a for the back header, row j for the front one */
+  const espHole=n=>{const q=ESPPIN[n];return q?[colX(EC0+q.idx),q.row==='back'?ROW.a:ROW.j]:null};
+  const lift=(a,b,k)=>9+Math.min(34,Math.hypot(a[0]-b[0],a[1]-b[1])*.12)+((k||0)%4)*3;
+  function wire(a,b,hex,k,cls){
+    const h=lift(a,b,k),N=18,p3=[];
+    for(let t=0;t<=N;t++){const u=t/N;p3.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,ZB+.8+h*Math.pow(Math.sin(Math.PI*u),.7)])}
+    const d=K.pathOf(p3.map(p=>at(p[0],p[1],p[2]))),e1=at(a[0],a[1],ZB),e2=at(b[0],b[1],ZB);
+    return `<g class="bbw-w ${cls||''}"><path class="bbw-o" pathLength="1" d="${d}"/><path class="bbw-c" pathLength="1" style="stroke:${hex}" d="${d}"/>`+
+      [e1,e2].map(e=>`<circle class="bbw-e" cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="2.1"/><circle cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="1" style="fill:${hex}"/>`).join('')+`</g>`;
+  }
+  /* step 0 also lays the four short power jumpers */
+  const j0=[];
+  const jump=(a,b,hex,k)=>j0.push(wire(a,b,hex,k));
+  jump([colX(EC0),ROW.a],[nearRail(colX(EC0)),RAIL.tp],'#e5484d',0);
+  jump([colX(EC0+1),ROW.a],[nearRail(colX(EC0+1)+14),RAIL.tm],'#2b2b2b',1);
+  jump([colX(EC0),ROW.j],[nearRail(colX(EC0)),RAIL.bp],'#e9954a',0);
+  jump([colX(EC0+1),ROW.j],[nearRail(colX(EC0+1)+14),RAIL.bm],'#2b2b2b',1);
+  wires.push({i:0,svg:j0.join('')});
+  /* ---- one group per part ---- */
+  items.forEach((it,s)=>{
+    const i=s+1,svg=[],ww=[],x0=colX(it.c0),x1=colX(it.c0+it.n-1),xm=(x0+x1)/2;
+    const rowPlug=it.kind==='off'?(it.lane==='back'?ROW.b:ROW.g):(it.lane==='back'?ROW.a:ROW.f);
+    const rowHole=it.lane==='back'?ROW.c:ROW.h;
+    const hole=k=>[colX(it.c0+k),rowHole];
+    let ref=[xm,rowPlug];
+    if(it.kind==='plug'){
+      const h=Math.min(46,20+it.n*3.4),y=rowPlug;
+      svg.push(bx(x0-6,y-2.4,x1+6,y+2.4,ZB,ZB+4,'#1a1a1c',{tone:'faint'}));
+      svg.push(bx(x0-7,y-1.3,x1+7,y+1.3,ZB+4,ZB+4+h,it.color,{r:1}));
+      svg.push(bx(xm-9,y+1.3,xm+9,y+2.9,ZB+4+h*.35,ZB+4+h*.35+12,'#16171a',{tone:'faint'}));
+      svg.push(sidetxt(xm,y+1.3,ZB+4+h-5,it.short.slice(0,9),3.6,'hi'));
+      for(let k=0;k<it.n;k++)svg.push(cyl(colX(it.c0+k),y,.9,ZB+1,3.4,'#cdb064',{tone:'faint',crease:'none',steps:6}));
+    }else if(it.kind==='disc'){
+      svg.push(...discSvg(it,x0,x1,xm,rowPlug));
+    }else{
+      svg.push(bx(x0-6,rowPlug-3,x1+6,rowPlug+3,ZB,ZB+9,'#1d1e21',{tone:'faint'}));
+      for(let k=0;k<it.n;k++)svg.push(cyl(colX(it.c0+k),rowPlug,.9,ZB+1,3,'#cdb064',{tone:'faint',crease:'none',steps:6}));
+    }
+    /* extras beside the part */
+    it.extras.forEach((x,k)=>{
+      const cx0=colX(it.c0+it.n+1+k*3),cx1=colX(it.c0+it.n+3+k*3),cy=it.lane==='back'?ROW.c:ROW.h;
+      svg.push(...extraSvg(x.item,cx0,cx1,cy));
+    });
+    /* wires */
+    it.rows.forEach((r,k)=>{
+      const a=hole(Math.min(k,it.n-1)),rail=pjRail(r.esp),hex=(typeof wireHex==='function'&&wireHex(r.wire))||'#d8b877';
+      let b=null;
+      if(rail==='GPIO'){const m=/GPIO(\d+)/.exec(r.esp);if(m)b=espHole(+m[1])}
+      else if(rail==='5V')b=[nearRail(a[0]),RAIL.tp];
+      else if(rail==='3V3')b=[nearRail(a[0]),RAIL.bp];
+      else if(rail==='GND')b=[nearRail(a[0]+(k%2?7:-7)),it.lane==='back'?RAIL.tm:RAIL.bm];
+      if(b){
+        /* a power wire to the far side crosses the board, so lift it higher */
+        ww.push(wire(a,b,hex,k+it.c0,r.kind==='opt'?'opt':''));
+      }
+    });
+    /* off board body on the bench, joined by a cable */
+    if(it.kind==='off'){
+      const o=benchSvg(it,xm,rowPlug);
+      svg.push(o.svg);ww.push(o.cable);ref=[o.cx,o.cy];
+    }
+    /* footprint ring */
+    const ring=`<path class="bb-ring" d="${K.pathOf([at(x0-9,(it.lane==='back'?ROW.a:ROW.f)-4,ZB),at(x1+9,(it.lane==='back'?ROW.a:ROW.f)-4,ZB),at(x1+9,(it.lane==='back'?ROW.e:ROW.j)+5,ZB),at(x0-9,(it.lane==='back'?ROW.e:ROW.j)+5,ZB)],true)}"/>`;
+    it.x=at(xm,rowPlug,0)[0];it.i=i;
+    dyn.push({i,depth:K.depthOf([ref[0],ref[1]+8,0],P),svg:svg.join(''),ring});
+    wires.push({i,svg:ww.join('')});
+  });
+  /* label plate on the board end */
+  stat.push(txt(BL-18,97+1.4,ZB,'830',3.4,'faint'));
+  dyn.sort((a,b)=>a.depth-b.depth);
+  let out=`<svg xmlns="http://www.w3.org/2000/svg" class="isoc bb-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Isometric drawing of a breadboard with the ESP32 and the project parts being added one step at a time">`;
+  out+=`<g>${stat.join('')}</g>`;
+  for(const d of dyn)out+=`<g class="bbp" data-i="${d.i}">${d.svg}</g>`;
+  for(const d of dyn)if(d.ring)out+=`<g class="bbh" data-i="${d.i}">${d.ring}</g>`;
+  for(const d of wires)out+=`<g class="bbw" data-i="${d.i}">${d.svg}</g>`;
+  out+='</svg>';
+  return {svg:out,W,H,items,cols,P};
+}
+function extraSvg(name,x0,x1,y){
+  const xm=(x0+x1)/2,o=[];
+  const leg=(x)=>ln([[x,y,ZB],[x,y,ZB+4]],'mid');
+  if(/capacitor|µF/i.test(name)){
+    o.push(leg(x0),leg(x1),cyl(xm,y,5.6,ZB+2,10,'#2c5fa8'),cyl(xm,y,5.7,ZB+10.4,1.6,'#b9b6ac'));
+  }else if(/MOSFET|transistor|2N|BC5/i.test(name)){
+    o.push(leg(x0),leg(xm),leg(x1),bx(x0-1,y-2.5,x1+1,y+2.5,ZB+3,ZB+11,'#18191c',{r:2}));
+  }else if(/diode|1N/i.test(name)){
+    o.push(leg(x0),leg(x1),bx(x0+2,y-2.2,x1-2,y+2.2,ZB+3,ZB+7,'#18191c',{r:1}),bx(x1-4.5,y-2.3,x1-3,y+2.3,ZB+3.1,ZB+7.1,'#c9c6bd',{tone:'faint',crease:'none'}));
+  }else{
+    o.push(leg(x0),leg(x1),bx(x0+1.5,y-2.4,x1-1.5,y+2.4,ZB+3,ZB+7.6,'#d9c79a',{r:2,steps:6}),
+      bx(xm-4,y-2.5,xm-2.6,y+2.5,ZB+3.1,ZB+7.7,'#8b4a2b',{tone:'faint',crease:'none'}),bx(xm-1,y-2.5,xm+.4,y+2.5,ZB+3.1,ZB+7.7,'#222',{tone:'faint',crease:'none'}),bx(xm+2,y-2.5,xm+3.4,y+2.5,ZB+3.1,ZB+7.7,'#c33',{tone:'faint',crease:'none'}));
+  }
+  return o;
+}
+function discSvg(it,x0,x1,xm,y){
+  const o=[],legs=(zs)=>{for(let k=0;k<it.n;k++){const x=colX(it.c0+k);o.push(ln([[x,y,ZB],[x,y,ZB+(zs||4)]],'mid'))}};
+  switch(it.shape){
+    case 'led':case 'rgbled':{
+      legs(5);const col=it.shape==='led'?'#e0524b':'#e6e1d4';
+      o.push(cyl(xm,y,7.2,ZB+4.5,1.8,col),cyl(xm,y,5.8,ZB+6,9,col,{steps:20}),cyl(xm,y,3.6,ZB+15,1.6,col));break}
+    case 'sw':
+      o.push(bx(x0-3,y-6,x1+3,y+6,ZB+1,ZB+5.5,'#1d1e21'),cyl(xm,y,3.6,ZB+5.5,3.2,'#c9c6bd'));legs(3);break;
+    case 'cap':
+      legs(4);o.push(cyl(xm,y,6,ZB+3,11,'#2c5fa8'),cyl(xm,y,6.1,ZB+13.4,1.6,'#b9b6ac'));break;
+    case 'dio':
+      legs(4);o.push(bx(x0+1,y-2.4,x1-1,y+2.4,ZB+3,ZB+8,'#18191c',{r:1}),bx(x1-5,y-2.5,x1-3,y+2.5,ZB+3.1,ZB+8.1,'#c9c6bd',{tone:'faint',crease:'none'}));break;
+    case 'tr':
+      legs(4);o.push(bx(x0-2,y-3,x1+2,y+3,ZB+4,ZB+14,'#18191c',{r:3,steps:8}));break;
+    case 'dip':
+      legs(3);o.push(bx(x0-3,y-4,x1+3,y+4,ZB+3,ZB+11,'#18191c',{r:1}),cyl(x0,y,1.4,ZB+11,.5,'#555'));break;
+    case 'to220':
+      legs(3);o.push(bx(x0-2,y-1.5,x1+2,y+1.5,ZB+16,ZB+34,'#a9a8a2',{tone:'lo'}),bx(x0-2,y+1.5,x1+2,y+5,ZB+3,ZB+20,'#18191c',{r:1}));break;
+    case 'buzz':
+      o.push(cyl(xm,y,10,ZB+1,10,'#18191c',{steps:26}),cyl(xm,y,1.8,ZB+11,.4,'#2a2b2e'));legs(3);break;
+    case 'pot':
+      o.push(bx(x0-3,y-6,x1+3,y+6,ZB+1,ZB+9,'#2c5fa8',{r:1}),cyl(xm,y,4,ZB+9,6,'#c9c6bd'));legs(3);break;
+    default:{
+      legs(4);o.push(bx(x0+1,y-2.4,x1-1,y+2.4,ZB+3,ZB+8,'#d9c79a',{r:2,steps:6}));
+      o.push(bx(xm-4,y-2.5,xm-2.6,y+2.5,ZB+3.1,ZB+8.1,'#8b4a2b',{tone:'faint',crease:'none'}),bx(xm-1,y-2.5,xm+.4,y+2.5,ZB+3.1,ZB+8.1,'#222',{tone:'faint',crease:'none'}),bx(xm+2,y-2.5,xm+3.4,y+2.5,ZB+3.1,ZB+8.1,'#c33',{tone:'faint',crease:'none'}));
+    }
+  }
+  return o;
+}
+/* the part itself, on the bench beside the board, with a cable of the real wire colours back to its connector */
+function benchSvg(it,xm,plugY){
+  const {cx,cy,w,d,h}=it.bench,front=it.lane==='front';
+  const o=[bx(cx-w/2-10,cy-d/2-10,cx+w/2+10,cy+d/2+10,-5,0,'#262b33',{r:6,steps:4})],hx=cx-w/2,hy=cy-d/2;
+  const z0=0;
+  switch(it.shape){
+    case 'servo':
+      o.push(bx(hx,hy+d*.15,hx+w,hy+d*.85,z0,z0+h,'#2f6ec0',{r:2}),bx(hx-8,hy+d*.3,hx+w+8,hy+d*.7,z0+h-14,z0+h-10,'#2f6ec0',{r:1}),cyl(hx+w*.72,cy,6,z0+h,5,'#e6e1d4'),bx(hx+w*.72-3,cy-1.6,hx+w*.72+30,cy+1.6,z0+h+5,z0+h+7,'#e6e1d4',{r:1}));break;
+    case 'motor':
+      o.push(cyl(cx,cy,w/2,z0,h,'#a9a8a2'),cyl(cx,cy,w/2-2,z0+h,3,'#7d7d78'),cyl(cx,cy,2.6,z0+h+3,14,'#cfcbbf'));break;
+    case 'step':
+      o.push(cyl(cx-w*.16,cy,w*.34,z0,h,'#b8b5ab'),cyl(cx-w*.16,cy,w*.1,z0+h,6,'#cfcbbf'),bx(cx+w*.1,cy-d*.34,cx+w*.5,cy+d*.34,z0,z0+3,'#1f7a46'),bx(cx+w*.2,cy-6,cx+w*.4,cy+6,z0+3,z0+8,'#18191c'));break;
+    case 'relay':
+      o.push(bx(hx,hy,hx+w,hy+d,z0,z0+3,'#1f7a46'),bx(hx+4,hy+5,hx+w*.62,hy+d-5,z0+3,z0+h,'#2a64b8',{r:1}),bx(hx+w*.7,hy+8,hx+w-6,hy+d-8,z0+3,z0+12,'#18191c'));break;
+    case 'lcd':
+      o.push(bx(hx,hy,hx+w,hy+d,z0,z0+h,'#1f7a46',{r:1}),bx(hx+8,hy+6,hx+w-8,hy+d-6,z0+h,z0+h+1.6,'#3f7fd0'),bx(hx+10,hy+8,hx+w-10,hy+d-8,z0+h+1.6,z0+h+2,'#7fb2ee',{tone:'faint',crease:'none'}));break;
+    case 'strip':
+      o.push(bx(hx,hy,hx+w,hy+d,z0,z0+h,'#2a2c30',{r:1}));
+      for(let k=0;k<8;k++)o.push(bx(hx+5+k*13,cy-3.4,hx+10+k*13,cy+3.4,z0+h,z0+h+3,['#ff6b6b','#ffd166','#6be0a0','#6b9bff'][k%4],{tone:'faint',crease:'none'}));break;
+    case 'pad':
+      o.push(bx(hx,hy,hx+w,hy+d,z0,z0+h,'#2a2c30',{r:2}));
+      for(let a=0;a<4;a++)for(let b=0;b<4;b++)o.push(bx(hx+6+a*14,hy+6+b*14,hx+16+a*14,hy+16+b*14,z0+h,z0+h+1.8,'#b9b6ac',{tone:'faint',crease:'none',r:1}));break;
+    case 'probe':
+      o.push(cyl(cx,cy,w/2,z0,h,'#b8b5ab',{steps:14}),cyl(cx,cy,w/2+.6,z0+h-8,3,'#3a3b3f'));break;
+    default:
+      o.push(bx(hx,hy,hx+w,hy+d,z0,z0+h,it.color,{r:2}),bx(cx-9,cy-7,cx+9,cy+7,z0+h,z0+h+2.6,'#16171a',{tone:'faint'}));
+  }
+  o.push(txt(cx,front?cy+d/2+10:cy-d/2-4,z0,it.short.slice(0,14),4,'hi'));
+  /* cable: one wire per pin, true colours, from the connector to a port on the part */
+  const cab=[],px=cx,py=front?cy-d/2:cy+d/2,pz=Math.min(h,10)+1;
+  it.rows.slice(0,it.n).forEach((r,k)=>{
+    const hex=(typeof wireHex==='function'&&wireHex(r.wire))||'#d8b877',sx=colX(it.c0+k),sp=(k-(it.n-1)/2)*3.4;
+    const p3=[];const N=14;
+    for(let t=0;t<=N;t++){const u=t/N,e=u*u*(3-2*u);p3.push([sx+(px+sp-sx)*e,plugY+(py-plugY)*u,ZB+9+((pz-ZB-9)*u)+Math.sin(Math.PI*u)*(10+k*1.2)])}
+    const d=K.pathOf(p3.map(p=>at(p[0],p[1],p[2])));
+    cab.push(`<path class="bbw-o" pathLength="1" d="${d}"/><path class="bbw-c" pathLength="1" style="stroke:${hex}" d="${d}"/>`);
+  });
+  return {svg:o.join(''),cable:`<g class="bbw-w cab">${cab.join('')}</g>`,cx,cy};
+}
+return {scene,layout,planOf,colX,ROW};
+})();
+
+/* ---------- the tab ---------- */
+function bbWhere(it){
+  const a=it.c0,b=it.c0+it.n-1,rows=it.lane==='back'?'a to e (back half)':'f to j (front half)';
+  return 'columns '+(a===b?a:a+' to '+b)+', rows '+rows;
+}
+function bbDest(r){
+  const t=pjRail(r.esp);
+  if(t==='3V3')return '3V3 rail (bottom red)';
+  if(t==='5V')return '5V rail (top red)';
+  if(t==='GND')return 'GND rail (blue)';
+  if(t==='GPIO')return 'ESP32 '+pjPin(r.esp);
+  return r.esp+' (outside the ESP32)';
+}
+function bbStepText(it,n,total,res){
+  const where=bbWhere(it),box=el('div',{class:'bb-step'});
+  box.append(el('h4',{},'Step '+n+' of '+total+': '+it.short));
+  if(it.kind==='off')box.append(el('p',{},'Put the '+it.short+' on the bench next to the board. Plug its cable into '+where+'. The cable only carries the wires listed below.'));
+  else if(it.kind==='disc')box.append(el('p',{},'Press the '+it.short+' into '+where+'. Its legs go in the first row of that block.'));
+  else box.append(el('p',{},'Push the '+it.short+' into '+where+', pins down, label facing you.'));
+  if(it.rows.length){
+    const tb=el('tbody',{});
+    for(const r of it.rows)tb.append(el('tr',{},el('td',{class:'m'},r.pp),el('td',{},bbDest(r)),el('td',{},swatch(r.wire),r.wire||'')));
+    box.append(el('div',{class:'tw'},el('table',{class:'t pj-tb2 bb-tb'},el('thead',{},el('tr',{},...['Part pin','Wire to','Colour'].map(h=>el('th',{},h)))),tb)));
+  }
+  const ex=(res.extras||[]).filter(x=>x.part===it.id&&!/supply|antenna|speaker/i.test(x.item));
+  if(ex.length)box.append(el('p',{class:'bb-add'},el('b',{},'Also add: '),ex.map(x=>x.item+(x.why&&x.why!=='Part of this test'?' ('+x.why.toLowerCase()+')':'')).join(', ')+'.'));
+  const other=(res.extras||[]).filter(x=>x.part===it.id&&/supply|antenna|speaker/i.test(x.item));
+  if(other.length)box.append(el('p',{class:'bb-add'},el('b',{},'Not on the breadboard: '),other.map(x=>x.item).join(', ')+'.'));
+  const list=pjIssueList(res.issues,[it.id]);
+  if(list)box.append(list);
+  return box;
+}
+function pjBuild(body,pr){
+  if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
+  pjSeed(pr.parts);
+  const res=pjCheck(pr.parts),sm=pjCheckSummary(res,pr.parts.length);
+  body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('strong',{},sm.head),el('span',{},sm.tail)));
+  /* parts that exist in the project but not on the breadboard (test-only pages) */
+  const sc=BB.scene(pr.parts,res),items=sc.items;
+  const skipped=pr.parts.filter(id=>!items.some(i=>i.id===id));
+  const total=items.length+2;
+  const fig=el('div',{class:'bb-fig',tabindex:'0','aria-label':'Breadboard drawing. It scrolls sideways on a small screen.'});
+  fig.innerHTML=sc.svg;
+  const svg=fig.firstChild;svg.style.minWidth=Math.round(sc.W*(sc.cols>46?.95:.72))+'px';
+  const info=el('div',{class:'bb-info','aria-live':'polite'});
+  const pills=el('ol',{class:'bb-pills'});
+  const names=['Board and ESP32',...items.map(i=>i.short.length>16?i.short.slice(0,15)+'…':i.short),'All together'];
+  const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let cur=0,timer=0;
+  const play=btn('Play',()=>{timer?stop():start()},'sm primary'),prev=btn('Back',()=>go(cur-1),'sm'),next=btn('Next',()=>go(cur+1),'sm'),restart=btn('Start over',()=>{stop();go(0)},'sm');
+  const count=el('span',{class:'bb-count'},'');
+  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>{stop();go(i)}},el('span',{class:'bb-pn'},String(i)),nm))));
+  function text(i){
+    info.replaceChildren();
+    if(i===0){
+      info.append(el('div',{class:'bb-step'},el('h4',{},'Step 1 of '+total+': Board and ESP32'),
+        el('p',{},'Lay the breadboard flat with the red and blue rails along the top and bottom. Press the ESP32 DevKit in at the left, USB end to the left, so its two rows of pins sit on either side of the centre channel.'),
+        el('p',{},'Then add four short jumpers: VIN to the top red rail (5V), 3V3 to the bottom red rail (3.3 V), and each GND pin to the blue rail beside it.'),
+        el('p',{class:'hint'},'Rows a to e share one strip per column, and so do rows f to j. The centre channel keeps the two halves apart.')));
+      return;
+    }
+    if(i===total-1){
+      const nw=items.reduce((a,b)=>a+b.rows.filter(r=>pjRail(r.esp)!=='ext').length,0);
+      const c=res.counts;
+      info.append(el('div',{class:'bb-step'},el('h4',{},'Step '+total+' of '+total+': All together'),
+        el('p',{},pjPlural(items.length,'part')+' and '+pjPlural(nw,'wire')+' on one breadboard.'+(c.error?' Fix the '+pjPlural(c.error,'item')+' marked red above before you power it.':c.warn?' Check the '+pjPlural(c.warn,'item')+' marked amber above.':' Nothing in the checks blocks it. Connect USB and open the Dashboard.')),
+        skipped.length?el('p',{class:'hint'},skipped.map(pjShort).join(', ')+(skipped.length>1?' have':' has')+' no pins to wire, so '+(skipped.length>1?'they are':'it is')+' not drawn.'):null,
+        el('div',{class:'pj-acts'},btn('Open the dashboard',()=>pjGo({pid:pr.id,view:'dash'}),'primary'),btn('See every wire',()=>pjGo({pid:pr.id,view:'wire'}),'sm'))));
+      return;
+    }
+    info.append(bbStepText(items[i-1],i+1,total,res));
+  }
+  function go(i){
+    cur=Math.max(0,Math.min(total-1,i));
+    svg.querySelectorAll('.bbp,.bbw').forEach(g=>{const k=+g.dataset.i;g.classList.toggle('on',k<=Math.min(cur,items.length));g.classList.toggle('cur',k===cur)});
+    svg.querySelectorAll('.bbh').forEach(g=>g.classList.toggle('cur',+g.dataset.i===cur));
+    svg.querySelectorAll('.bbw-w').forEach((w,k)=>w.style.setProperty('--d',(0.5+(k%12)*.07)+'s'));
+    svg.classList.toggle('bb-all',cur===total-1);
+    prev.disabled=cur===0;next.disabled=cur===total-1;
+    count.textContent='Step '+(cur+1)+' of '+total;
+    pills.querySelectorAll('.bb-pill').forEach((b,k)=>{b.classList.toggle('on',k===cur);b.classList.toggle('done',k<cur);if(k===cur)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+    const pb=$('#bb-p'+cur);if(pb&&pb.scrollIntoView&&pills.scrollWidth>pills.clientWidth){const l=pb.offsetLeft-pills.clientWidth/2+pb.offsetWidth/2;pills.scrollTo({left:l,behavior:still?'auto':'smooth'})}
+    text(cur);
+    const it=items[cur-1];
+    if(it&&fig.scrollWidth>fig.clientWidth){const px=it.x*(svg.getBoundingClientRect().width/sc.W);fig.scrollTo({left:Math.max(0,px-fig.clientWidth/2),behavior:still?'auto':'smooth'})}
+    else if(cur===0||cur===total-1)fig.scrollTo({left:0,behavior:still?'auto':'smooth'});
+    if(cur===total-1)stop();
+  }
+  function stop(){if(timer){clearInterval(timer);timer=0}play.textContent=cur===total-1?'Replay':'Play'}
+  function start(){
+    if(cur>=total-1)go(0);
+    play.textContent='Pause';
+    timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);timer=0;return}go(cur+1)},4200);
+  }
+  body.append(el('h3',{class:'pj-h'},'Build it on a breadboard'),
+    el('div',{class:'bb'},
+      el('div',{class:'bb-stage'},fig,el('div',{class:'bb-ctl'},prev,play,next,restart,count)),
+      el('div',{class:'bb-side'},pills,info)));
+  /* the first step is on show, and the rest wait for Play or Next */
+  go(0);
+  /* the whole project at a glance when the picture cannot animate */
+  if(still)play.disabled=true;
+  /* a plain list for anyone who cannot see the drawing */
+  const alt=el('details',{class:'bb-alt'},el('summary',{},'Every step as a list'),el('ol',{},...items.map(it=>el('li',{},it.short+': '+bbWhere(it)+'. Wires: '+it.rows.map(r=>it.short&&r.pp+' to '+bbDest(r)).join('; ')+'.'))));
+  body.append(alt);
+  if(res.issues.length){
+    const blockers=res.issues.filter(o=>o.sev!=='info');
+    body.append(el('h3',{class:'pj-h'},blockers.length?'Before you build':'Tips'),pjIssueList(res.issues));
+  }
+  /* shopping list of the small parts */
+  if(res.extras.length){
+    const trs=res.extras.map(x=>el('tr',{},el('td',{},x.item),el('td',{},pjName(x.part)),el('td',{class:'pj-dim'},x.why||'')));
+    body.append(el('h3',{class:'pj-h'},'Extra parts to have on the bench'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},...['Part','For','Why'].map(h=>el('th',{},h)))),el('tbody',{},...trs))));
+  }
 }
 /* HC-12 link test: ESP32 sends over its radio, a second HC-12 on a USB-serial adapter receives on this laptop (second Web Serial port). */
 const HCRX={
