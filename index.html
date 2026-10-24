@@ -1718,15 +1718,16 @@ header.top{position:relative;z-index:6}
       <h1>ESP32 Live Tester</h1>
     </a>
       <button id="bBoard" class="btn brd" type="button" aria-label="Pick a board"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="3" y="5.5" width="14" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 5.5V3.6M10 5.5V3.6M13.5 5.5V3.6M6.5 14.5v1.9M10 14.5v1.9M13.5 14.5v1.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="bn">Pick a board</span></button>
+      <button id="bProj" class="btn proj" type="button" aria-label="Start a project">Start a project</button>
     </div>
     <div class="conn">
       <button id="bSearch" class="btn srch" type="button" aria-haspopup="dialog" aria-keyshortcuts="Control+K /"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Search</span><kbd></kbd></button>
       <span id="status" class="stat" role="status">Not connected</span>
       <button id="bConnect" class="btn primary" type="button">Connect ESP32</button>
-      <button id="bDemo" class="btn" type="button" aria-pressed="false">Demo mode</button>
+      <button id="bDemo" class="btn" type="button" aria-pressed="false">Simulated mode</button>
     </div>
   </header>
-  <div id="frameNote" class="notice" hidden>This page is running inside a frame. Browsers usually block Web Serial here, so Connect may fail. Demo mode and the wiring diagrams work. To test real hardware or run your own scripts, open the downloaded tester.html in Chrome or Edge.</div>
+  <div id="frameNote" class="notice" hidden>This page is running inside a frame. Browsers usually block Web Serial here, so Connect may fail. Simulated mode and the wiring diagrams work. To test real hardware or run your own scripts, open the downloaded tester.html in Chrome or Edge.</div>
   <div class="layout">
     <nav aria-label="Components">
       <div class="navq"><input id="navQ" type="search" placeholder="Search components" aria-label="Search components" autocomplete="off" spellcheck="false"><span id="navCount" class="vh" aria-live="polite"></span></div>
@@ -1908,7 +1909,7 @@ const Link={
     BRD.sentOk(need.key);
   },
   send(line,timeout=3000){
-    if(this.mode==='none')return Promise.reject(new Error('Not connected. Connect an ESP32 or turn on Demo mode.'));
+    if(this.mode==='none')return Promise.reject(new Error('Not connected. Connect an ESP32 or turn on Simulated mode.'));
     const name=line.trim().split(/\s+/)[0].toUpperCase();
     const run=()=>(name==='PING'||name==='PINMAP'?Promise.resolve():this.pinplan(line)).then(()=>this.exchange(line,timeout));
     const p=this.queue.then(run,run);
@@ -1967,8 +1968,8 @@ function demoReply(line){
   const [c0,...rest]=line.trim().split(/\s+/);const c=c0.toUpperCase();const a=rest.map(Number);
   const n=()=>Math.random()-.5,r2=v=>+v.toFixed(2),r3=v=>+v.toFixed(3);
   switch(c){
-    case 'PING':return {c,ok:1,fw:'tester-1.3 (demo)'};
-    case 'INFO':return {c,ok:1,fw:'tester-1.3 (demo)',chip:'ESP32-D0WD-V3',rev:301,cpu:240,heap:212000,up:Date.now()-Demo.t0};
+    case 'PING':return {c,ok:1,fw:'tester-1.3 (simulated)'};
+    case 'INFO':return {c,ok:1,fw:'tester-1.3 (simulated)',chip:'ESP32-D0WD-V3',rev:301,cpu:240,heap:212000,up:Date.now()-Demo.t0};
     case 'OUT':if(!FW_OUT.includes(a[0]))return {c,ok:0,err:'pin not allowed. Use 2, 4, 5, 13 to 19, 21 to 23, 25 to 27, 32, 33'};Demo.out[a[0]]=a[1]?1:0;return {c,ok:1,pin:a[0],v:a[1]?1:0};
     case 'IN':if(![...FW_OUT,...IN_ONLY].includes(a[0]))return {c,ok:0,err:'pin not allowed'};return {c,ok:1,pin:a[0],v:a[0] in Demo.din?Demo.din[a[0]]:(Math.random()>.5?1:0)};
     case 'SERVO':if(!svPins().includes(a[0]))return {c,ok:0,err:'pin must be 13, 14, 27, 32 or 33'};return {c,ok:1,pin:a[0],deg:a[1]};
@@ -2025,7 +2026,7 @@ function setResult(id,v,note){
 function resultChip(id){
   const r=R()[id];
   if(!r)return el('span',{class:'chip dash'},'untested');
-  const demo=Link.mode==='demo'?' demo':'';
+  const demo=Link.mode==='demo'?' simulated':'';
   return r.v==='pass'?el('span',{class:'chip pass'},'pass'+demo):el('span',{class:'chip fail'},'fail'+demo);
 }
 
@@ -2166,7 +2167,7 @@ function svgEl(vb,cls,label){
   if(label){s.setAttribute('role','img');s.setAttribute('aria-label',label)}else s.setAttribute('aria-hidden','true');
   return s;
 }
-function linkText(){return Link.mode==='serial'?'Live from the ESP32':Link.mode==='demo'?'Demo board, simulated':'Not connected, visual only'}
+function linkText(){return Link.mode==='serial'?'Live from the ESP32':Link.mode==='demo'?'Simulated board':'Not connected, visual only'}
 /* a readout: big value with a label and a note. set(value, note) */
 function readout(label,opts={}){
   const v=el('div',{class:'v'+(opts.accent?' accent':'')},opts.init??'n/a'),s=el('div',{class:'s'},opts.note||'');
@@ -2180,7 +2181,7 @@ function stage({reads=[],visual,caption,controls=[],title='Controls'}){
   const pill=el('span',{class:'linkp '+Link.mode},linkText());
   const plate=el('div',{class:'stage'},
     el('div',{class:'reads',style:'--n:'+Math.max(1,Math.min(4,reads.length))},...reads.map(r=>r.el)),
-    (caption&&visual&&visual.dataset&&!visual.dataset.tip&&(visual.dataset.tip=caption,visual.dataset.tipDelay='1500'),visual),pill,Link.mode==='none'?el('button',{type:'button',class:'btn linkdemo',onclick:()=>$('#bDemo').click()},'No board? Turn on Demo mode'):null);
+    (caption&&visual&&visual.dataset&&!visual.dataset.tip&&(visual.dataset.tip=caption,visual.dataset.tipDelay='1500'),visual),pill,Link.mode==='none'?el('button',{type:'button',class:'btn linkdemo',onclick:()=>$('#bDemo').click()},'No board? Turn on Simulated mode'):null);
   const ctl=controls.length?el('div',{class:'ctl'},el('h4',{},title),...controls):null;
   const gl=typeof glossaryFor==='function'?glossaryFor(reads):null;
   return el('div',{class:'stagewrap'},plate,gl,ctl);
@@ -2292,7 +2293,7 @@ function pServo(b,kind){
   const pulse=el('span',{class:'mono'},'');
   const rng=el('input',{type:'range',min:0,max:180,value:ang,id:'ang','aria-label':'Servo angle'});
   function draw(a){V.sel(a);selR.set(a+'°',`GPIO${pin}`);rng.value=a;pulse.textContent=`pulse ${Math.round(500+a*1900/180)} µs`}
-  function showApplied(){if(applied==null){appR.set('n/a',Link.mode==='none'?'connect or start Demo mode':'no reply yet');V.applied(ang)}else{appR.set(applied+'°','reported by the ESP32');V.applied(applied)}}
+  function showApplied(){if(applied==null){appR.set('n/a',Link.mode==='none'?'connect or start Simulated mode':'no reply yet');V.applied(ang)}else{appR.set(applied+'°','reported by the ESP32');V.applied(applied)}}
   async function push(a){
     a=Math.max(0,Math.min(180,Math.round(a)));ang=a;draw(a);
     if(Link.mode==='none'){showApplied();return}
@@ -3110,7 +3111,7 @@ function codePanel(p){
   }
   async function run(){
     if(running||mode==='ino')return;
-    if(Link.mode==='none'){con.textContent='Not connected. Press Connect ESP32, or Demo mode to try it with a simulated board.\n';return}
+    if(Link.mode==='none'){con.textContent='Not connected. Press Connect ESP32, or Simulated mode to try it with a simulated board.\n';return}
     let job;
     if(mode==='cmd'){let tree;try{tree=parseSeq(getCode())}catch(e){con.textContent='Error: '+e.message+'\n';return}job=()=>execSeq(tree)}
     else{
@@ -3205,7 +3206,7 @@ function monitorPanel(p){
   const live=el('span',{class:'mon-live'}),sTx=el('b',{},'0'),sRx=el('b',{},'0'),sAs=el('b',{},'0'),sMs=el('b',{},'n/a');
   function paintStats(){
     live.className='mon-live'+(paused?' paused':Link.mode!=='none'?' on':'');
-    live.textContent=paused?'Paused, '+held.length+' waiting':Link.mode==='serial'?'Live from the ESP32':Link.mode==='demo'?'Demo board':'Not connected';
+    live.textContent=paused?'Paused, '+held.length+' waiting':Link.mode==='serial'?'Live from the ESP32':Link.mode==='demo'?'Simulated board':'Not connected';
     sTx.textContent=nTx;sRx.textContent=nRx;sAs.textContent=nAsync;sMs.textContent=lastMs==null?'n/a':Math.round(lastMs)+' ms';
   }
   function row(ev){
@@ -3381,9 +3382,9 @@ function overview(b){
     el('ul',{class:'plain'},
       el('li',{},'Plug the ESP32 in with a USB cable and press Install firmware below. It flashes from this page in about 40 seconds. No Arduino IDE needed. Do this once.'),
       el('li',{},'Open tester.html in Chrome or Edge, press Connect ESP32 and pick the port. Close the Arduino Serial Monitor first if it is open.'),
-      el('li',{},'Pick a part. Circuit shows the wiring, Live test runs it. Demo mode simulates everything with no board.')),
+      el('li',{},'Pick a part. Circuit shows the wiring, Live test runs it. Simulated mode simulates everything with no board.')),
     firmwareBlock(),
-    el('p',{class:'hint'},'Demo results are never saved. Real results are kept in this browser and can be copied with the Copy results button.')));
+    el('p',{class:'hint'},'Simulated results are never saved. Real results are kept in this browser and can be copied with the Copy results button.')));
   const stRows=PARTS.filter(p=>!noRes(p)).map(p=>el('tr',{},el('td',{},p.n),el('td',{},subOf(p)),el('td',{},(p.criteria||[])[0]||'')));
   b.append(mapBlock());
   b.append(blk('Parts this tester covers',el('div',{class:'tw'},el('table',{class:'t t3'},el('thead',{},el('tr',{},...['Part','Module and pins','Passes when'].map(h=>el('th',{},h)))),el('tbody',{},stRows))),
@@ -3404,16 +3405,16 @@ Object.assign(Demo,{adcFn:{},din:{},out:{},sim:{nf:100,cm:42,t:24.6,h:48,i2c:[]}
 function simRow(label,min,max,step,val,unit,on){
   if(Link.mode!=='demo')return null;
   const out=el('span',{class:'mono'},val+' '+unit);
-  const r=el('input',{type:'range',min,max,step,value:val,'aria-label':'Demo: '+label});
+  const r=el('input',{type:'range',min,max,step,value:val,'aria-label':'Simulated: '+label});
   r.addEventListener('input',()=>{out.textContent=r.value+' '+unit;on(+r.value)});on(+val);
-  return el('div',{class:'sim'},el('span',{class:'simtag'},'Demo only'),el('span',{class:'lbl'},label),r,out);
+  return el('div',{class:'sim'},el('span',{class:'simtag'},'Simulated only'),el('span',{class:'lbl'},label),r,out);
 }
 function simToggle(label,on){
   if(Link.mode!=='demo')return null;
   let v=false;
   const b=el('button',{type:'button',class:'btn','aria-pressed':'false',onclick:()=>{v=!v;b.setAttribute('aria-pressed',String(v));on(v)}},label);
   on(false);
-  return el('div',{class:'sim'},el('span',{class:'simtag'},'Demo only'),b);
+  return el('div',{class:'sim'},el('span',{class:'simtag'},'Simulated only'),b);
 }
 /* run a timed, guided check: the user does something while samples are taken */
 async function guided(id,chk,sample,status,alive){
@@ -4242,7 +4243,7 @@ function busPart(b,p){
     if(!(sw>=st.rise)){const n=`${st.name||st.key} moved only ${sw.toFixed(st.d??1)}, needs ${st.rise}`;setResult(p.id,'fail',n);status.textContent='Fail: '+n+'.';return}
     const n=`${prev?prev+'; ':''}${st.name||st.key} moved ${sw.toFixed(st.d??1)}`;setResult(p.id,'pass',n);status.textContent='Pass: '+n+'.';
   }
-  async function runCheck(){try{await runCheck_()}catch(e){if(e===ABORT||!alive)return;if(/^Not connected/i.test(e.message)){status.textContent='Cannot test yet: connect an ESP32, or turn on Demo mode.';return}setResult(p.id,'fail',e.message);status.textContent='Fail: '+e.message+'.'}}
+  async function runCheck(){try{await runCheck_()}catch(e){if(e===ABORT||!alive)return;if(/^Not connected/i.test(e.message)){status.textContent='Cannot test yet: connect an ESP32, or turn on Simulated mode.';return}setResult(p.id,'fail',e.message);status.textContent='Fail: '+e.message+'.'}}
   async function runCheck_(){
     live.stop();status.textContent='Looking for the part ...';
     const fnd=await find();
@@ -4268,7 +4269,7 @@ function busPart(b,p){
   ctls.push(status,el('p',{class:'hint'},S.hint));
   b.append(stage({reads:[...R_,aR],visual:G.el,caption:S.cap,controls:ctls.filter(Boolean)}));
 }
-/* Bus parts, part 2: I2C sensors. Each part is a spec for busPart(): how to find it, read its ID, read its values, and a virtual chip for Demo mode. */
+/* Bus parts, part 2: I2C sensors. Each part is a spec for busPart(): how to find it, read its ID, read its values, and a virtual chip for Simulated mode. */
 Object.assign(KNOWN,{0x23:'BH1750 light (ADDR low)',0x5C:'BH1750 light (ADDR high)',0x38:'AHT20 temperature and humidity',0x44:'SHT31 (ADDR low)',0x45:'SHT31 (ADDR high)',0x58:'SGP30 air quality',0x61:'SCD30 CO2',
   0x39:'TSL2561 light',0x29:'TCS34725 colour, or VL53L0X / VL53L1X / TSL2561 distance and light',0x49:'AS7262 spectrometer, or TSL2561',0x57:'MAX30102 pulse oximeter',0x53:'ADXL345 (ALT low)',0x1D:'ADXL345 (ALT high)',
   0x6A:'LSM6DS3 (SDO low)',0x6B:'LSM6DS3 (SDO high)',0x5A:'MPR121 touch',0x40:'INA219, or PCA9685 PWM driver',0x24:'PN532 NFC',0x0C:'AK8963 compass inside an MPU-9250',0x70:'PCA9685 all-call'});
@@ -5335,7 +5336,7 @@ defPart({id:'sx1278',grp:'Radio, network and location',n:'SX1278 LoRa transceive
 const mvDial=label=>{const s=svgEl('0 0 160 140','dialsvg',label||'Shaft position');
   s.innerHTML='<circle cx="80" cy="70" r="56" fill="none" stroke="currentColor" opacity=".3" stroke-width="3"/><g class="rotg"><circle cx="80" cy="70" r="42" fill="var(--panel2,#0001)" stroke="currentColor" stroke-width="2"/><line x1="80" y1="70" x2="80" y2="24" stroke="var(--accent,#2f6fed)" stroke-width="5" stroke-linecap="round"/><circle cx="80" cy="70" r="5" fill="currentColor"/></g>';
   const g=s.querySelector('.rotg');return {el:s,set(deg){g.setAttribute('transform','rotate('+deg+' 80 70)')}}};
-const mvDemoRow=(...kids)=>Link.mode==='demo'?el('div',{class:'sim'},el('span',{class:'simtag'},'Demo only'),...kids):null;
+const mvDemoRow=(...kids)=>Link.mode==='demo'?el('div',{class:'sim'},el('span',{class:'simtag'},'Simulated only'),...kids):null;
 
 /* ---- 4x4 membrane keypad ---- */
 const KP_LABELS=['1','2','3','A','4','5','6','B','7','8','9','C','*','0','#','D'];
@@ -6090,7 +6091,7 @@ function studioMount(host,typeKey,o={}){
   if(lcd){lcdHost.append(el('div',{class:'stlrow'},el('span',{class:'lbl'},'Line 1'),l1In),el('div',{class:'stlrow'},el('span',{class:'lbl'},'Line 2'),l2In),el('p',{class:'hint'},'Type {0} to {7} to place a custom character. Draw the 8 custom characters below, 5 x 8 pixels each.'),glyphHost)}
   const side=el('div',{class:'stside'},el('div',{class:'stlab'},'As the display shows it'),prev);
   let boardT=null;
-  if(Link.mode==='demo'){side.append(el('div',{class:'stlab'},'Simulated board (Demo mode)'),boardCv);
+  if(Link.mode==='demo'){side.append(el('div',{class:'stlab'},'Simulated board'),boardCv);
     boardT=setInterval(()=>{
       if(!alive)return;const Dm=Demo.disp,d=D();if(!Dm.type){return}
       let by=null;
@@ -6208,7 +6209,7 @@ const flStr=u8=>{let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCo
 async function flFlash(which,ui,opts={}){
   const set=FWBIN[which];if(!set)throw new Error('This copy of the page has no '+which+' firmware inside.');
   if(!('serial' in navigator))throw new Error('This browser has no Web Serial. Use Chrome or Edge on a laptop.');
-  if(Link.mode==='demo')throw new Error('Demo mode has no board. Turn Demo mode off, then try again.');
+  if(Link.mode==='demo')throw new Error('Simulated mode has no board. Turn Simulated mode off, then try again.');
   if(flBusy)throw new Error('Already installing.');
   flBusy=true;
   try{
@@ -6239,7 +6240,7 @@ async function flFlash(which,ui,opts={}){
 /* wipe the whole flash, then reset. Nothing runs on the board afterwards until firmware is installed again. */
 async function flEraseAll(ui){
   if(!('serial' in navigator))throw new Error('This browser has no Web Serial. Use Chrome or Edge on a laptop.');
-  if(Link.mode==='demo')throw new Error('Demo mode has no board. Turn Demo mode off, then try again.');
+  if(Link.mode==='demo')throw new Error('Simulated mode has no board. Turn Simulated mode off, then try again.');
   if(flBusy)throw new Error('Already working on the board.');
   flBusy=true;
   try{
@@ -6382,7 +6383,7 @@ function pEsp32Cam(b,mb){
   const sensR=readout('Sensor',{accent:true,init:'n/a'}),sizeR=readout('Picture',{right:true,init:'n/a'}),timeR=readout('Capture',{init:'n/a'}),fpsR=readout('Rate',{right:true,init:'n/a'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
   const conR=el('span',{class:'linkp none'},'Camera not connected');
-  const setCon=()=>{conR.className='linkp '+(CamLink.mode==='demo'?'demo':CamLink.mode==='serial'?'serial':'none');conR.textContent=CamLink.mode==='demo'?'Demo camera, simulated':CamLink.mode==='serial'?'Camera connected':'Camera not connected'};
+  const setCon=()=>{conR.className='linkp '+(CamLink.mode==='demo'?'demo':CamLink.mode==='serial'?'serial':'none');conR.textContent=CamLink.mode==='demo'?'Simulated camera':CamLink.mode==='serial'?'Camera connected':'Camera not connected'};
   const sizeSel=sel('cam-size',CAM_SIZES.map(([v,l])=>[v,l]),'5',()=>{}),q=el('input',{type:'range',min:4,max:40,value:12,'aria-label':'JPEG quality, lower is better'});
   const set=async(n,v)=>{if(CamLink.mode!=='none')await CamLink.send(`SET ${n} ${v}`)};
   const slider=(label,n,min,max,val)=>{const i=el('input',{type:'range',min,max,value:val,'aria-label':label});i.addEventListener('change',()=>set(n,+i.value).catch(e=>toast(e.message)));return el('label',{class:'stf'},el('span',{},label),i)};
@@ -9251,7 +9252,7 @@ function homePage(b){
       el('p',{class:'hm-board'},el('span',{},'Testing with'),el('b',{},bd.n),btn('Change board',()=>pickBoard(),'sm')),
       el('div',{class:'hm-cta'},
         btn('Get started',()=>homeGo('hm-s1'),'primary'),
-        btn('Try demo mode',async()=>{try{if(Link.mode!=='demo')await toggleDemo();show('led');window.scrollTo(0,0)}catch(e){toast(e.message)}}),
+        btn('Try simulated mode',async()=>{try{if(Link.mode!=='demo')await toggleDemo();show('led');window.scrollTo(0,0)}catch(e){toast(e.message)}}),
         btn('Search '+nAll+' parts',()=>palOpen(),'')),
       palRecent().length?el('div',{class:'hm-recent'},el('span',{},'Pick up where you left off'),...palRecent().slice(0,4).map(id=>{const p=PARTS.find(x=>x.id===id);return el('a',{href:'#'+id,class:'hm-chip',onclick:e=>{e.preventDefault();show(id);window.scrollTo(0,0)}},p.n.length>34?p.n.slice(0,32)+'…':p.n)})):null,
       el('div',{class:'hm-facts'},fact(String(nParts),nParts===nAll?'parts with a test page':'of '+nAll+' parts fit this board'),fact('1','firmware, flashed once'),fact('0','lines of test code to write'))),
@@ -9264,7 +9265,7 @@ function homePage(b){
         el('li',{},el('b',{},'One firmware for every part.'),' The page does the work, so there is no sketch to edit per part.'),
         el('li',{},el('b',{},'Real pin order.'),' Wiring pages list each pin in the order printed on common modules. Check them against your own board before you power it.'),
         el('li',{},el('b',{},'Your results stay here.'),' They are kept in this browser. Copy them as text when you need a record.'),
-        el('li',{},el('b',{},'Demo mode.'),' Every page works with no board attached, so you can look around first.'))),
+        el('li',{},el('b',{},'Simulated mode.'),' Every page works with no board attached, so you can look around first.'))),
     sec(2,'hm-how','',
       kick('How it works'),
       el('h3',{class:'hm-h'},'Three things happen on every test.'),
@@ -9284,7 +9285,7 @@ function homePage(b){
       step('03','Wire a part.','Pick the part from the list. The Circuit tab shows each wire and pin. ESP32 pins are 3.3 V only, so power modules from 3V3 unless the page says otherwise.',
         btn('Open the pin map',()=>{show('overview');window.scrollTo(0,0)},'sm'))),
     sec(6,'hm-s4','',
-      step('04','Run the test.','Press Live test. The page runs the checks, draws the readings and shows the pass criteria. Mark the result by hand or let the automatic check do it. Demo mode runs every page without a board.')),
+      step('04','Run the test.','Press Live test. The page runs the checks, draws the readings and shows the pass criteria. Mark the result by hand or let the automatic check do it. Simulated mode runs every page without a board.')),
     sec(7,'hm-flash','hm-wide',
       kick('The flashing software'),
       el('h3',{class:'hm-h'},'Install the tester from this page.'),
@@ -9961,7 +9962,7 @@ const Rec={
   fname(ext){const ps=this.parts();return 'esp32-live-tester_'+(ps.length===1?ps[0].id:'session')+'_'+this.stamp()+'.'+ext},
   meta(){return {
     app:'ESP32 Live Tester',tester:this.who||'',started:this.at.toISOString(),ended:(this.end||new Date()).toISOString(),seconds:+this.secs().toFixed(1),
-    mode:this.mode==='demo'?'demo (simulated, no board)':this.mode==='serial'?'live board':this.mode,simulated:this.mode==='demo',firmware:this.fw,
+    mode:this.mode==='demo'?'simulated (no board)':this.mode==='serial'?'live board':this.mode,simulated:this.mode==='demo',firmware:this.fw,
     timezone:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return ''}})(),browser:navigator.userAgent,capped:this.capped
   }},
   json(){return JSON.stringify({schema:'esp32-live-tester/recording@1',...this.meta(),parts:this.info(),readings:this.reads,raw:this.raw,marks:this.marks},null,1)},
@@ -10025,7 +10026,7 @@ const Rec={
       '.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-weight:600;font-size:13px;border:1px solid var(--line)}.badge.pass{color:#1d7a46;border-color:#1d7a46}.badge.fail{color:#b3261e;border-color:#b3261e}.warn{border:1px solid var(--acc);border-radius:10px;padding:10px 14px;color:var(--acc)}'+
       'pre{overflow:auto;max-height:420px;font:12.5px/1.45 ui-monospace,Menlo,Consolas,monospace;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}summary{cursor:pointer;font-weight:600}footer{color:var(--mut);font-size:13px;margin-top:30px}@media print{pre{max-height:none}details{display:none}}'+
       '</style></head><body><main><h1>ESP32 Live Tester recording</h1><p class="meta">'+H(dt)+' &middot; '+H(mmss(m.seconds))+' long &middot; '+H(m.mode)+(m.firmware&&m.firmware!=='demo'?' &middot; firmware '+H(m.firmware):'')+' &middot; '+this.reads.length+' data points, '+this.raw.length+' raw lines'+(m.tester?' &middot; tester '+H(m.tester):'')+'</p>'+
-      (m.simulated?'<p class="warn">This is simulated data from Demo mode. No board was connected, so it says nothing about a real part.</p>':'')+body+mk+
+      (m.simulated?'<p class="warn">This is simulated data from Simulated mode. No board was connected, so it says nothing about a real part.</p>':'')+body+mk+
       '<section><details><summary>Raw serial log ('+this.raw.length+' lines'+(this.raw.length>lim?', first '+lim+' shown; the .txt and .json files have all of them':'')+')</summary><pre>'+H(raw||'No serial traffic was recorded.')+'</pre></details></section>'+
       '<footer>Made with ESP32 Live Tester. Recorded in '+H(m.timezone||'local time')+'.'+(m.capped?' The recording hit its size limit, so the end is missing.':'')+'</footer></main></body></html>';
   },
@@ -10095,8 +10096,8 @@ const TIPS={
   'Clear results':'Forgets every saved result.',
   'Connect ESP32':'Opens the port list so you can pick the ESP32 and connect over USB.',
   'Disconnect':'Closes the connection.',
-  'Demo mode':'Uses a simulated board with made-up readings. No hardware needed.',
-  'No board? Turn on Demo mode':'Uses a simulated board with made-up readings. No hardware needed.',
+  'Simulated mode':'Uses a simulated board with made-up readings. No hardware needed.',
+  'No board? Turn on Simulated mode':'Uses a simulated board with made-up readings. No hardware needed.',
   'Record test':'Records the readings and serial traffic, then lets you download a report to send, a CSV or a raw log.',
   'Circuit':'Jump to the wiring diagram.',
   'Live test':'Jump to the live readings and controls.',
@@ -10470,7 +10471,7 @@ PJ.mark=function(text){
 };
 PJ.start=function(name,rec){
   if(PJ.run)return;
-  if(Link.mode==='none'){toast('Turn on Demo mode or connect a board first.');return}
+  if(Link.mode==='none'){toast('Turn on Simulated mode or connect a board first.');return}
   PJ.buf={};
   PJ.run={name:name||'Run',rec:rec!==false,t0:performance.now(),ms0:Date.now(),reads:[],marks:[],mode:Link.mode,fw:Link.fw||'',capped:false,pid:PJ.pid};
   for(const t of PJ.tiles)for(const l of t.lives)l.start();
@@ -10596,7 +10597,7 @@ function pjCSV(s,pr){
 }
 function pjJSON(s,pr){
   return JSON.stringify({schema:'esp32-live-tester/project-run@1',app:'ESP32 Live Tester',project:pr?{id:pr.id,name:pr.name,parts:pr.parts}:null,
-    run:{id:s.id,name:s.n,started:new Date(s.started).toISOString(),ended:new Date(s.ended).toISOString(),seconds:s.seconds,mode:s.mode==='demo'?'demo (simulated, no board)':s.mode==='serial'?'live board':s.mode,simulated:!!s.simulated,firmware:s.fw,board:s.board,tester:s.tester},
+    run:{id:s.id,name:s.n,started:new Date(s.started).toISOString(),ended:new Date(s.ended).toISOString(),seconds:s.seconds,mode:s.mode==='demo'?'simulated (no board)':s.mode==='serial'?'live board':s.mode,simulated:!!s.simulated,firmware:s.fw,board:s.board,tester:s.tester},
     stats:pjSeries(s).map(o=>({part:o.part,reading:o.label,unit:o.unit,...o.st})),readings:s.reads,markers:s.marks||[]},null,1);
 }
 function pjReport(s,pr){
@@ -10606,7 +10607,7 @@ function pjReport(s,pr){
   const stats=ser.map(o=>`<tr><td>${e(o.name)}</td><td>${o.st.n}</td><td>${f(o.st.min)}</td><td>${f(o.st.max)}</td><td>${f(o.st.mean)}</td><td>${f(o.st.std)}</td><td>${e(o.unit)}</td></tr>`).join('');
   const wires=wr.rows.map(r=>`<tr><td>${e(pjName(r.part))}</td><td>${e(r.esp)}</td><td>${e(r.pp)}</td><td>${e(r.wire)}</td></tr>`).join('');
   const marks=(s.marks||[]).map(m=>`<tr><td>${pjAx(m.t)}</td><td>${e(m.text)}</td></tr>`).join('');
-  const sim=s.simulated?'<p class="sim">Simulated data from Demo mode. No board was connected.</p>':'';
+  const sim=s.simulated?'<p class="sim">Simulated data from Simulated mode. No board was connected.</p>':'';
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e((pr?pr.name+' ':'')+s.n)}</title>
 <style>:root{color-scheme:light dark;--bg:#fff;--fg:#14181f;--mu:#5b6573;--hl:#d9dee6}@media (prefers-color-scheme:dark){:root{--bg:#10141a;--fg:#e8ecf2;--mu:#98a2b3;--hl:#2b333f}}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}main{max-width:860px;margin:0 auto;padding:28px 18px 60px}h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:34px 0 8px}h3{font-size:14px;margin:18px 0 4px}h3 small{color:var(--mu);font-weight:400}
@@ -10890,7 +10891,7 @@ function pjDash(body,pr,nRuns){
     el('div',{class:'pj-ctl'},go,clock,pill),
     el('div',{class:'pj-ctl'},el('label',{class:'pj-lb'},'Run name',nameIn),el('label',{class:'pj-ck'},recCk,'Record data')),
     el('div',{class:'pj-ctl'},mk,mkb));
-  if(Link.mode==='none')tbar.append(el('div',{class:'pj-ctl'},el('p',{class:'hint'},'Not connected. Turn on Demo mode or connect your ESP32 to run the dashboard.'),btn('Turn on Demo mode',()=>$('#bDemo').click(),'sm')));
+  if(Link.mode==='none')tbar.append(el('div',{class:'pj-ctl'},el('p',{class:'hint'},'Not connected. Turn on Simulated mode or connect your ESP32 to run the dashboard.'),btn('Turn on Simulated mode',()=>$('#bDemo').click(),'sm')));
   if(wr.hard)body.append(el('p',{class:'pj-warn',role:'status'},pjPlural(wr.hard,'pin clash')+' in the wiring. Parts on one pin cannot run together. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'wire'})},'See the wiring')));
   body.append(tbar,el('p',{class:'hint'},'Start all turns on the Live mode of every part. A tile marked Manual has no live mode, so use its own buttons while recording. Everything it reads is added to the run.'));
   /* the combined readings table */
@@ -10991,7 +10992,7 @@ async function pjRuns(body,pr,runs,tok){
     list.append(el('div',{class:'pj-run'},c,
       el('div',{class:'pj-ri'},el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'runs',run:s.id})},s.n),
         el('span',{class:'pj-meta'},pjWhen(s.started)+', '+pjSpan(s.seconds)+', '+s.reads.length+' readings')),
-      el('span',{class:'chip '+(s.simulated?'dash':'fill')},s.simulated?'Demo':'Live board'),
+      el('span',{class:'chip '+(s.simulated?'dash':'fill')},s.simulated?'Simulated':'Live board'),
       el('div',{class:'pj-acts'},btn('Open',()=>pjGo({pid:pr.id,view:'runs',run:s.id}),'sm'),btn('CSV',()=>pjDownload(s,pr,'csv'),'sm'))));
   }
   body.append(list);
@@ -11001,7 +11002,7 @@ async function pjRunView(body,pr,s,tok){
   const nameIn=el('input',{type:'text',class:'pj-in',value:s.n,maxlength:'40','aria-label':'Run name',onchange:async()=>{const v=nameIn.value.trim();if(!v){nameIn.value=s.n;return}s.n=v;await pjDb.put('sessions',s);toast('Renamed')}});
   body.append(el('div',{class:'pj-acts'},btn('All runs',()=>pjGo({pid:pr.id,view:'runs'}),'sm'),nameIn),
     el('p',{class:'pj-meta'},pjWhen(s.started)+', '+pjSpan(s.seconds)+', '+s.reads.length+' readings'+(s.board?', '+s.board:'')+(s.fw?', firmware '+s.fw:'')+(s.tester?', tester '+s.tester:'')+'.'));
-  if(s.simulated)body.append(el('p',{class:'pj-warn',role:'status'},'Simulated data from Demo mode. No board was connected, so these numbers show the workflow, not real parts.'));
+  if(s.simulated)body.append(el('p',{class:'pj-warn',role:'status'},'Simulated data from Simulated mode. No board was connected, so these numbers show the workflow, not real parts.'));
   const folder=btn('Save to folder',async()=>{
     let h=await pjDir(pr.id,true);
     if(!h){try{h=await pjPickDir(pr.id)}catch(e){if(e&&e.name!=='AbortError')toast(e.message||'Could not use that folder.');return}}
@@ -11029,8 +11030,8 @@ function pjCompare(body,pr,runs){
   const all=sets.map(s=>new Map(pjSeries(s).map(o=>[o.key,o])));
   const keys=[...new Set(all.flatMap(m=>[...m.keys()]))].filter(k=>all.filter(m=>m.has(k)).length>=2);
   body.append(el('h3',{class:'pj-h'},'Comparing '+sets.map(s=>s.n).join(', ')));
-  if(new Set(sets.map(s=>!!s.simulated)).size>1)body.append(el('p',{class:'pj-warn',role:'status'},'These runs mix Demo data and a live board. Compare like with like for real conclusions.'));
-  else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs are simulated Demo data.'));
+  if(new Set(sets.map(s=>!!s.simulated)).size>1)body.append(el('p',{class:'pj-warn',role:'status'},'These runs mix simulated data and a live board. Compare like with like for real conclusions.'));
+  else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs are simulated simulated data.'));
   if(!keys.length){body.append(pjEmpty('Nothing in common','These runs have no numeric reading that appears in more than one of them. Record both with the same parts to compare.'));return}
   const f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
   const label=k=>{const o=all.find(m=>m.has(k)).get(k);return o.name+(o.unit?' ('+o.unit+')':'')};
@@ -11123,7 +11124,7 @@ function hcLinkBlock(){
   openB.setAttribute('aria-pressed','false');
   const refresh=why=>{
     openB.textContent=HCRX.on?'Close receiver port':'Open receiver port';openB.setAttribute('aria-pressed',String(HCRX.on));
-    status.textContent=HCRX.on?(HCRX.sim?'Demo receiver is open (simulated, no real radio).':'Receiver open at '+HCRX.baud+' baud. Anything the HC-12 hears shows below.'):(why==='lost'?'The receiver port went away. Unplug and replug the adapter, then open it again.':'Closed.');
+    status.textContent=HCRX.on?(HCRX.sim?'Simulated receiver is open (no real radio).':'Receiver open at '+HCRX.baud+' baud. Anything the HC-12 hears shows below.'):(why==='lost'?'The receiver port went away. Unplug and replug the adapter, then open it again.':'Closed.');
     if(!HCRX.on&&!lines.length)log.textContent='Receiver closed.';
   };
   HCRX.onState=refresh;
@@ -11151,7 +11152,7 @@ function hcLinkBlock(){
   const runB=btn('Run packet test',async()=>{
     if(R.running){R.stop=true;return}
     if(!HCRX.on)throw new Error('Open the receiver port first.');
-    if(Link.mode==='none')throw new Error('Connect the ESP32 (or turn on Demo mode) so it can send.');
+    if(Link.mode==='none')throw new Error('Connect the ESP32 (or turn on Simulated mode) so it can send.');
     const N=Math.max(1,Math.min(200,+cnt.value||20)),G=Math.max(150,+gap.value||500);
     R.running=true;R.stop=false;R.sent=0;R.got=0;R.t0={};R.seen=new Set();R.lat=[];upd();sum.textContent='Sending...';runB.textContent='Stop test';
     try{
@@ -11372,12 +11373,12 @@ function verdictBar(p){
     btn('Mark pass',()=>setResult(p.id,'pass',r&&r.note||'manual')),
     btn('Mark fail',()=>setResult(p.id,'fail',r&&r.note||'manual')),
     btn('Clear',()=>setResult(p.id,null)),
-    el('span',{class:'note'},r?`${r.v}, ${r.note||'manual'}, ${r.ts}${Link.mode==='demo'?', demo, not saved':''}`:'Not tested. Auto checks set this, or mark it by hand.'));
+    el('span',{class:'note'},r?`${r.v}, ${r.note||'manual'}, ${r.ts}${Link.mode==='demo'?', simulated, not saved':''}`:'Not tested. Auto checks set this, or mark it by hand.'));
 }
 function setStatus(){
   const s=$('#status'),c=$('#bConnect'),d=$('#bDemo');
   if(Link.mode==='serial'){s.textContent='Connected, '+(Link.fw||'');s.className='stat on';c.textContent='Disconnect'}
-  else if(Link.mode==='demo'){s.textContent='Demo mode, simulated';s.className='stat demo';c.textContent='Connect ESP32'}
+  else if(Link.mode==='demo'){s.textContent='Simulated, no board';s.className='stat demo';c.textContent='Connect ESP32'}
   else{s.textContent='Not connected';s.className='stat';c.textContent='Connect ESP32'}
   d.setAttribute('aria-pressed',String(Link.mode==='demo'));
   renderNav();
@@ -11395,8 +11396,9 @@ $('#bConnect').addEventListener('click',async()=>{
 async function toggleDemo(){
   if(Link.mode==='demo'){await runCleanups();Link.mode='none';clearInterval(Demo.gpsT);Demo.gps=false;demoResults={};setStatus();return}
   if(Link.mode==='serial')await Link.disconnect();
-  Link.mode='demo';Link.fw='demo';demoResults={};setStatus();toast('Demo mode: simulated readings, nothing saved');
+  Link.mode='demo';Link.fw='demo';demoResults={};setStatus();toast('Simulated mode: simulated readings, nothing saved');
 }
+$('#bProj').addEventListener('click',()=>{Promise.resolve(show('projects')).then(()=>window.scrollTo(0,0))});
 $('#bDemo').addEventListener('click',()=>toggleDemo().catch(e=>toast(e.message)));
 $('#navSel').addEventListener('change',e=>show(e.target.value));
 $('#brandHome').addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();pickBoard()});
@@ -11425,7 +11427,7 @@ if(matchMedia('(pointer:coarse)').matches){
   const rep=m=>{m=String(m||'').slice(0,140);if(!m||/ResizeObserver|Script error\.?$/i.test(m)||shown.has(m)||shown.size>2)return;shown.add(m);try{toast('Something failed: '+m)}catch(_){}};
   addEventListener('error',e=>rep(e.message));addEventListener('unhandledrejection',e=>rep(e.reason&&e.reason.message||e.reason));
 }
-if(!('serial' in navigator)){const n=$('#frameNote');n.textContent=(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'This phone browser cannot talk to the ESP32 (no Web Serial). ':'This browser cannot talk to the ESP32 (no Web Serial). ')+'Use Demo mode to explore every page here, or open this page in Chrome or Edge on a computer (Chrome on Android also works over a USB-OTG cable).';n.hidden=false}
+if(!('serial' in navigator)){const n=$('#frameNote');n.textContent=(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'This phone browser cannot talk to the ESP32 (no Web Serial). ':'This browser cannot talk to the ESP32 (no Web Serial). ')+'Use Simulated mode to explore every page here, or open this page in Chrome or Edge on a computer (Chrome on Android also works over a USB-OTG cable).';n.hidden=false}
 try{if(window.visualViewport){const vv=()=>document.documentElement.style.setProperty('--vvh',Math.round(visualViewport.height)+'px');visualViewport.addEventListener('resize',vv);vv()}}catch(e){}
 renderNav();
 try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
