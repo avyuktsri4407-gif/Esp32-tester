@@ -1428,6 +1428,7 @@ header.top{position:relative;z-index:6}
 @keyframes hmglin{from{opacity:0}to{opacity:1}}
 .hm-gl:not([hidden]){animation:hmglin .7s ease-out}
 @media (prefers-reduced-motion:reduce){.hm-gl:not([hidden]){animation:none}}
+.bpd>.bp-note{margin:56px 0 24px}.bpd>.bp-help{margin-top:6px}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -6372,7 +6373,7 @@ const CamLink={
 const camBlob=b64=>{const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:'image/jpeg'})};
 
 function pEsp32Cam(b,mb){
-  const RID=mb?'esp32cammb':'esp32cam';
+  const RID='esp32cam';
   let alive=true,url=null,live=false,lastFrame=null;
   cleanups.push(async()=>{alive=false;live=false;if(url)URL.revokeObjectURL(url);await CamLink.close()});
   if(typeof flasherCard==='function'){const fc=flasherCard('cam',{title:'Install the camera firmware from this page',button:'Install camera firmware',lead:'The ESP32-CAM needs its own firmware (cam-1.0), not the tester firmware. About 30 seconds.',
@@ -6461,11 +6462,16 @@ function pEsp32Cam(b,mb){
 const stField2=(l,c)=>el('label',{class:'stf'},el('span',{},l),c);
 const CAM_DEF={criteria:['A valid JPEG comes back on 5 of 6 pictures.','The picture is neither black nor all white and the sensor ID is 0x26 (OV2640).','Flash LED turns on and off.'],
   notes:['Untested on real hardware: the camera firmware compiles but has not been run on a board yet.','Reseat the ribbon cable (blue side to the PCB) if the sensor is not found. Many boards need a 5 V supply of 500 mA or more.'],ex:{cmd:{},js:{}}};
-defPart({id:'esp32cam',grp:'Board and bench',n:'ESP32-CAM bare board (AI Thinker, OV2640 2 MP camera, FTDI adapter)',s:'Own firmware, serial 921600 baud, 5 V 500 mA, IO0 to GND to flash',alias:'camera cam ov2640 ai thinker esp32-cam esp32cam picture photo video ftdi',
-  ...CAM_DEF,page:b=>pEsp32Cam(b,false)});
-defPart({id:'esp32cammb',grp:'Board and bench',n:'ESP32-CAM-MB (ESP32-CAM on the USB programmer base, OV2640)',s:'Plug in and install, no wires, serial 921600 baud',alias:'camera cam ov2640 ai thinker esp32-cam-mb mb base programmer ch340 cp2102 usb picture photo video',
-  ...CAM_DEF,notes:CAM_DEF.notes.concat(['MB base button names and USB chips vary by seller: go by what is printed on yours.']),page:b=>pEsp32Cam(b,true)});
-delete NEWCMDS.esp32cam;delete NEWEX.esp32cam;delete NEWCMDS.esp32cammb;delete NEWEX.esp32cammb;
+const camMode=()=>{try{return localStorage.getItem('cts.cammode')==='mb'}catch(e){return false}};
+defPart({id:'esp32cam',grp:'Board and bench',n:'ESP32-CAM (AI Thinker, OV2640 2 MP camera): bare board with FTDI adapter, or on the MB base',s:'Own firmware, serial 921600 baud, 5 V 500 mA, IO0 to GND to flash (bare board) or plug in (MB base)',alias:'camera cam ov2640 ai thinker esp32-cam esp32cam esp32-cam-mb mb base programmer ch340 cp2102 usb picture photo video ftdi',
+  ...CAM_DEF,notes:CAM_DEF.notes.concat(['MB base button names and USB chips vary by seller: go by what is printed on yours.']),
+  page:b=>{
+    const mb=camMode();
+    const pick=(v,label)=>{const x=el('button',{type:'button',class:'segb','aria-pressed':String(mb===v),onclick:()=>{try{localStorage.setItem('cts.cammode',v?'mb':'bare')}catch(e){}show('esp32cam')}},label);return x};
+    b.append(el('div',{class:'row'},el('span',{class:'lbl'},'How is your ESP32-CAM connected?'),el('div',{class:'seg',role:'group','aria-label':'ESP32-CAM connection'},pick(false,'Bare board + FTDI'),pick(true,'On the MB base'))));
+    return pEsp32Cam(b,mb);
+  }});
+delete NEWCMDS.esp32cam;delete NEWEX.esp32cam;
 /* "What do these values mean?" under every live test. Keyed by the label of a readout. 'label@part' overrides for one part. */
 const GLOSS={
 'Chip':'The tester asks the chip for its ID number. "ID ok" means the number matches what the datasheet says, so the chip is present, wired right and talking.',
@@ -6543,7 +6549,6 @@ const GLOSS={
 'Capture':'How long the camera took to capture and compress one picture.',
 'Rate':'How many pictures per second come through the cable. It is limited by the cable speed and picture size, not by the camera.',
 'Sensor@esp32cam':'The camera sensor chip found on the board and its ID. The usual one is the OV2640, ID 0x26.',
-'Sensor@esp32cammb':'The camera sensor chip found on the board and its ID. The usual one is the OV2640, ID 0x26.',
 'Round trip':'Time between sending a PING and getting the reply, in milliseconds (ms). It shows how fast the USB link is.',
 'Free heap':'Free working memory (RAM) on the ESP32. Low and falling means a memory leak.',
 'Uptime':'Time since the ESP32 last reset.',
@@ -8125,7 +8130,7 @@ function need(p){
 function fit(p,id){
   const b=by(id||cur);if(!b||!p||p.home||p.overview||p.projects)return {ok:true,why:''};
   const n=need(p);
-  if(p.id==='esp32cam'||p.id==='esp32cammb')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.'};
+  if(p.id==='esp32cam')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.',hide:true};
   if(n.gpio>b.pins.length)return {ok:false,why:'Needs '+n.gpio+' GPIO pins. '+b.n+' has '+b.pins.length+' free.'};
   if(n.adc>b.adc.length)return {ok:false,why:'Needs '+n.adc+' analog input'+(n.adc>1?'s':'')+'. '+b.n+' has '+(b.adc.length?b.adc.length+' analog input'+(b.adc.length>1?'s':''):'no analog input')+' usable here.'};
   return {ok:true,why:''};
@@ -8215,7 +8220,7 @@ function label(l){
   return 'GPIO'+q+(pad?' ('+pad+')':'');
 }
 function chipFam(s){s=String(s||'');return /S3/i.test(s)?'s3':/S2/i.test(s)?'s2':/C3/i.test(s)?'c3':/C6/i.test(s)?'c6':/ESP32/i.test(s)?'esp32':null}
-return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,onChange:f=>subs.push(f),famName:b=>CHIPS[b.fam].n,
+return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,hidden:p=>!!(cur&&p&&fit(p).hide),onChange:f=>subs.push(f),famName:b=>CHIPS[b.fam].n,
   ident,reset,alloc,seed,preview,plan,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
 })();
 /* ---- Board figures: every board in the picker, drawn with the Anatomy iso kit (ISO) like the DevKit in homefig.js.
@@ -9313,7 +9318,7 @@ function homeStage(big,bd){
   return {node,plate,svg,ov,call,hit,intro,ihit,gl,extra:[intro,ihit]};
 }
 function homeIndex(){
-  const groups=GROUPS.filter(g=>g.n!=='Start').map(g=>({n:g.n,ids:g.ids.filter(i=>PARTS.some(p=>p.id===i))})).filter(g=>g.ids.length);
+  const groups=GROUPS.filter(g=>g.n!=='Start').map(g=>({n:g.n,ids:g.ids.filter(i=>PARTS.some(p=>p.id===i&&!BRD.hidden(p)))})).filter(g=>g.ids.length);
   const q=el('input',{type:'search',class:'hm-q',placeholder:'Search '+PARTS.filter(p=>!noRes(p)).length+' parts, such as BME280 or servo','aria-label':'Search parts',autocomplete:'off',spellcheck:'false'});
   const none=el('p',{class:'hint',hidden:true},'No part matches. Try a part number or a type, such as sensor.');
   const cards=groups.map(g=>{
@@ -9463,7 +9468,7 @@ function palOpen(){
   if(palEl)return;
   if(BRD.locked()){toast('Pick your board first. Search opens once you have chosen one.');return}palPrev=document.activeElement;
   const gOf={};for(const g of GROUPS)for(const id of g.ids)gOf[id]=g.n;
-  const items=PARTS.filter(p=>!p.home).map(p=>({id:p.id,n:p.n,g:gOf[p.id]||'',hay:(p.n+' '+(()=>{try{return subOf(p)}catch(e){return ''}})()+' '+p.id+' '+(ALIAS[p.id]||'')+' '+(gOf[p.id]||'')).toLowerCase()}));
+  const items=PARTS.filter(p=>!p.home&&!BRD.hidden(p)).map(p=>({id:p.id,n:p.n,g:gOf[p.id]||'',hay:(p.n+' '+(()=>{try{return subOf(p)}catch(e){return ''}})()+' '+p.id+' '+(ALIAS[p.id]||'')+' '+(gOf[p.id]||'')).toLowerCase()}));
   const count=items.filter(i=>{const q=PARTS.find(p=>p.id===i.id);return !q.overview&&!q.projects}).length;
   const q=el('input',{type:'text',class:'pal-q',placeholder:'Search '+count+' parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',spellcheck:'false',role:'combobox','aria-expanded':'true','aria-controls':'pal-list'});
   const list=el('div',{class:'pal-list',id:'pal-list',role:'listbox'});
@@ -10816,7 +10821,7 @@ function pjParts(body,pr){
     const t=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);let any=false;
     for(const g of GROUPS){
       if(g.n==='Start')continue;
-      const ps=g.ids.map(pjPart).filter(p=>p&&!p.home&&!p.overview&&!p.projects&&(!t.length||t.every(w=>navHay(p).includes(w))));
+      const ps=g.ids.map(pjPart).filter(p=>p&&!BRD.hidden(p)&&!p.home&&!p.overview&&!p.projects&&(!t.length||t.every(w=>navHay(p).includes(w))));
       if(!ps.length)continue;any=true;
       const d=el('details',{class:'pj-gp'},el('summary',{},el('span',{},g.n),el('span',{class:'pj-gn'})));
       if(t.length||ps.some(p=>pr.parts.includes(p.id)))d.open=true;
@@ -11232,7 +11237,7 @@ Object.assign(ALIAS,{servo:'sg90 motor mg996r',mpu:'mpu6050 imu gyro acceleromet
 /* ---- sidebar groups, in the order of the parts list ---- */
 const GROUP_PLAN=[
   ['Start',['home','overview','projects']],
-  ['Board and bench',['esp','gpio','preflight','i2c','esp32cam','esp32cammb','breadboard','jumper']],
+  ['Board and bench',['esp','gpio','preflight','i2c','esp32cam','breadboard','jumper']],
   ['Passive and discrete',['resistor','capacitor','diode','transistor','irf540n','pc817','levelshift','led','rgb']],
   ['Buttons, knobs and touch',['button','ttp223','joystick','pot','keypad','ec11','mpr121','ps2kb']],
   ['ID and access',['rc522','pn532','as608']],
@@ -11269,7 +11274,7 @@ function renderNav(){
     const hid='ngh'+gi,inner=el('ul',{class:'ng','aria-labelledby':hid});let n=0;
     for(const id of g.ids){
       const p=PARTS.find(x=>x.id===id);
-      if(!navMatch(p))continue;
+      if(!navMatch(p)||BRD.hidden(p))continue;
       const r=noRes(p)?null:R()[p.id];
       const fx=BRD.cur?BRD.fit(p):{ok:true};
       const b=el('button',{type:'button',class:'ni'+(fx.ok?'':' nok'),'aria-current':String(p.id===cur),onclick:()=>show(p.id)},
