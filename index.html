@@ -1456,8 +1456,14 @@ header.top{position:relative;z-index:6}
   main.w2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(32px,3vw,60px);align-items:start}
   main.w2>.ph,main.w2>.jump{grid-column:1/-1}
   main.w2>.sec-circuit{grid-column:1;grid-row:3}
-  main.w2>.sec-test{grid-column:2;grid-row:3 / span 3}
-  main.w2>.sec-code{grid-column:1;grid-row:4}
+  main.w2>.sec-test{grid-column:2;grid-row:3 / span 4}
+  main.w2{grid-template-rows:auto auto auto minmax(auto,860px) auto minmax(0,1fr)}
+  main.w2>.sec-code{grid-column:1;grid-row:4;align-self:stretch;display:flex;flex-direction:column}
+  main.w2>.sec-code .ide{flex:1;display:flex;flex-direction:column;min-height:0}
+  main.w2>.sec-code .ide-body{flex:1;min-height:0}
+  main.w2>.sec-code .ed{display:flex;flex-direction:column}
+  main.w2>.sec-code .ed .CodeMirror,main.w2>.sec-code .ed .edit{flex:1;height:auto;min-height:340px}
+  main.w2>.sec-code .con{max-height:none}
   main.w2>.sec-notes{grid-column:1;grid-row:5}
   main.w2:has(>.sec-test:nth-last-child(2)) >.sec-notes{grid-row:4}
   main.w2 .board-svg{min-width:600px}main.w2 .conn-svg{min-width:640px}
