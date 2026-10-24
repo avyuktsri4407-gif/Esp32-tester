@@ -1475,19 +1475,24 @@ header.top{position:relative;z-index:6}
 .bb-alt ol{margin:6px 0 0;padding-left:22px;font:400 13.5px/1.6 var(--f-body);color:var(--muted)}
 /* drawing */
 .isoc .bb-holes circle{fill:#2b2822;opacity:.9}
+.isoc .bb-sq0{fill:#bfb9aa}
+.isoc .bb-sq{fill:#26221c}
+.isoc.bb-noanim *{transition:none!important}
+.bb-fig{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.bb-fig.drag{cursor:grabbing}
 .isoc .bb-stripe{fill:none;stroke-width:1.6px;stroke-linecap:round;opacity:.9}
 .isoc .bb-pad{fill:#d8b877;stroke:none}
-.isoc .bbp{opacity:0;transform:translateY(-44px);transition:opacity .45s ease,transform .75s cubic-bezier(.2,.8,.25,1);pointer-events:none}
+.isoc .bbp{opacity:0;transform:translateY(-36px);transition:opacity .2s ease,transform .35s cubic-bezier(.2,.8,.25,1);pointer-events:none}
 .isoc .bbp.on{opacity:1;transform:none}
-.isoc .bbw{opacity:0;transition:opacity .25s ease .45s}
+.isoc .bbw{opacity:0;transition:opacity .15s ease .15s}
 .isoc .bbw.on{opacity:1}
 .isoc .bbw-o{fill:none;stroke:#050506;stroke-width:3.6px;stroke-linecap:round;stroke-linejoin:round}
 .isoc .bbw-c{fill:none;stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round}
-.isoc .bbw-o,.isoc .bbw-c{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .7s ease var(--d,.6s)}
+.isoc .bbw-o,.isoc .bbw-c{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s ease var(--d,.2s)}
 .isoc .bbw.on .bbw-o,.isoc .bbw.on .bbw-c{stroke-dashoffset:0}
 .isoc .bbw-w.opt .bbw-c{stroke-dasharray:.04 .03}
 .isoc .bbw-e{fill:#0b0b0c;stroke:none}
-.isoc .bbw-w circle{opacity:0;transition:opacity .2s ease 1s}
+.isoc .bbw-w circle{opacity:0;transition:opacity .15s ease .4s}
 .isoc .bbw.on .bbw-w circle{opacity:1}
 .isoc .bbh{opacity:0;transition:opacity .3s}
 .isoc .bbh.cur{opacity:1}
@@ -11313,16 +11318,17 @@ function pjIssueList(issues,only){
    Drawn with the Anatomy iso kit (ISO): solids, painter's order, calm motion. Hole positions, wire colours and pins all come
    from each part's own wiring table, so the picture and the step text cannot disagree. ---- */
 const BB=(()=>{
-const K=ISO,PITCH=10,X0=22,ZB=8,BDY=194,AZ=60,EL=30;
-const ROW={a:42,b:52,c:62,d:72,e:82,f:112,g:122,h:132,i:142,j:152},RAIL={tp:12,tm:22,bp:172,bm:182};
+const K=ISO,PITCH=10,X0=22,ZB=8,BDY=218,AZ=60,EL=30,TC=109,OY=12,TR0=101,TR1=117;
+const ROW={a:54,b:64,c:74,d:84,e:94,f:124,g:134,h:144,i:154,j:164},RAIL={tp:14,tm:24,bp:194,bm:204};
+const Y=v=>v+OY;
 const colX=c=>X0+(c-1)*PITCH+5;
-const SKIP=new Set(['i2c','studio','breadboard','jumper']);
+const SKIP=new Set(['i2c','studio','breadboard','jumper','esp']);
 const OFF={servo:'servo',mg996r:'servo',motor:'motor',step28:'step',nema17:'step',relay:'relay',ssr:'relay',lcd:'lcd',neo:'strip',sk6812:'strip',yfs201:'flow',keypad:'pad',ds18b20:'probe',ph:'probe',pmsa003:'big',mhz19b:'big',l298n:'big',sim800l:'big',a7670c:'big',lm2596:'big',mt3608:'big',tp4056:'big'};
 const DISC={led:'led',rgb:'rgbled',gpio:'sw',button:'sw',resistor:'res',ldr:'res',ntc:'res',capacitor:'cap',diode:'dio',transistor:'tr',lm35:'tr',pc817:'dip',irf540n:'to220',abuzz:'buzz',pbuzz:'buzz',pot:'pot'};
 const SIZE={servo:[46,24,44],motor:[34,34,40],step:[44,44,24],relay:[56,40,36],lcd:[84,38,5],strip:[110,12,4],flow:[34,26,34],pad:[64,64,3],probe:[10,10,56],big:[56,38,16]};
 /* DevKit V1, USB at the left. Back header runs left to right, front header too. */
 const BACK=['VIN','GND',13,12,14,27,26,25,33,32,35,34,39,36,'EN'],FRONT=['3V3','GND',15,2,4,16,17,5,18,19,21,3,1,22,23];
-const EC0=5,ESPPIN={};
+const EC0=4,ESPPIN={};
 BACK.forEach((p,i)=>{if(typeof p==='number')ESPPIN[p]={row:'back',idx:i}});FRONT.forEach((p,i)=>{if(typeof p==='number')ESPPIN[p]={row:'front',idx:i}});
 const pinName=p=>typeof p==='number'?'D'+p:p;
 const PCB=['#2456a6','#b3262a','#1f7a46','#5b3a8c','#1c6f9a','#1f8a7f','#2c333f'];
@@ -11359,7 +11365,7 @@ function planOf(ids){
   }
   /* lane: 5 V parts at the back (top rail is 5 V), everything else in front (bottom rail is 3V3). Balance when one lane gets long. */
   const w={back:0,front:0};
-  const width=it=>it.n+1+it.extras.length*3;
+  const width=it=>it.n+2+it.extras.length*3;
   return {items,w,width};
 }
 function layout(ids,res){
@@ -11369,17 +11375,27 @@ function layout(ids,res){
   const start=EC0+16+2,cur={back:start,front:start};
   for(const it of items){
     it.lane=it.need5?'back':(cur.front-start<=cur.back-start+14?'front':'back');
-    it.c0=cur[it.lane];cur[it.lane]+=it.n+1+it.extras.length*3;
+    it.c0=cur[it.lane];cur[it.lane]+=it.n+2+it.extras.length*3;
   }
-  const cols=Math.max(34,Math.max(cur.back,cur.front)+1);
+  const cols=Math.max(Math.max(cur.back,cur.front)+1,EC0+17);
   return {items,cols};
 }
 /* ---------- the scene ---------- */
-function scene(ids,res){
-  const L=layout(ids,res),items=L.items,cols=L.cols;
+function scene(ids,res,view){
+  const L=layout(ids,res),items=L.items,need=L.cols;
+  const AZv=view&&view.az!=null?view.az:AZ,ELv=view&&view.el!=null?view.el:EL;
+  /* real sizes: 400 points (30 columns), 830 points (63 columns), or 830 boards clipped side by side */
+  const nb=need<=30?1:Math.ceil(need/63),cols=need<=30?30:nb*63;
   const BL=X0*2+(cols-1)*PITCH+PITCH;
-  /* rail holes: groups of five with a gap */
-  const railX=[];for(let k=0;;k++){const x=X0+5+k*PITCH+Math.floor(k/5)*5;if(x>BL-X0-2)break;railX.push(x)}
+  const bounds=[0];for(let k=1;k<nb;k++)bounds.push(colX(63*k)+5);bounds.push(BL);
+  const label=need<=30?'400':nb===1?'830':'830 x '+nb;
+  /* rail holes: groups of five, one empty hole between groups, centred on each board */
+  const railX=[],railSeg=[];
+  for(let b=0;b<nb;b++){
+    const a=bounds[b],e=bounds[b+1],g=Math.max(1,Math.floor((e-a-60+20)/60)),w=g*60-20,s0=a+(e-a-w)/2,xs=[];
+    for(let k=0;k<g*5;k++)xs.push(s0+Math.floor(k/5)*60+(k%5)*10);
+    railX.push(...xs);railSeg.push([xs[0],xs[xs.length-1]]);
+  }
   const nearRail=x=>railX.reduce((b,v)=>Math.abs(v-x)<Math.abs(b-x)?v:b,railX[0]);
   /* where each off-board part sits on the bench, tiered so two never overlap */
   const lanePos={back:[],front:[]};let y0=-34,y1=BDY+34;
@@ -11394,54 +11410,67 @@ function scene(ids,res){
     it.bench={cx:xm,cy,w,d,h};
     if(front)y1=Math.max(y1,cy+d/2+22);else y0=Math.min(y0,cy-d/2-22);
   }
-  const W=Math.max(900,Math.round(cols*11.5+260));
+  const W=Math.max(960,Math.round(cols*11.5+300));
   /* projection from the bounding box of everything */
   const pts=[];for(const x of [-12,BL+12])for(const y of [-12,BDY+12])for(const z of [-5,0])pts.push([x,y,z]);
   pts.push([0,0,70],[BL,0,70],[BL,BDY,70],[0,BDY,70]);
   for(const it of items)if(it.bench){const q=it.bench;for(const x of [q.cx-q.w/2-10,q.cx+q.w/2+10])for(const y of [q.cy-q.d/2-18,q.cy+q.d/2+18])pts.push([x,y,0]);pts.push([q.cx,q.cy,q.h+30])}
-  const unit={origin:[0,0],scale:1,azimuth:AZ,elevation:EL};
+  const unit={origin:[0,0],scale:1,azimuth:AZv,elevation:ELv};
   const fl=pts.map(p=>K.iso(p,unit)),xs=fl.map(p=>p[0]),ys=fl.map(p=>p[1]);
   const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),pad=14;
-  const sc=(W-2*pad)/(xmax-xmin),H=Math.round((ymax-ymin)*sc+2*pad);
-  P={origin:[pad-xmin*sc,pad-ymin*sc],scale:sc,azimuth:AZ,elevation:EL};
+  let sc=(W-2*pad)/(xmax-xmin),H=Math.round((ymax-ymin)*sc+2*pad);
+  if(view&&view.H0){sc=Math.min(sc,(view.H0-2*pad)/(ymax-ymin));H=view.H0}
+  P={origin:[(W-(xmax-xmin)*sc)/2-xmin*sc,(H-(ymax-ymin)*sc)/2-ymin*sc],scale:sc,azimuth:AZv,elevation:ELv};
   const defs=[],stat=[],dyn=[],wires=[];
   /* bench */
   stat.push(bx(-12,-12,BL+12,BDY+12,-5,0,'#262b33',{r:6,steps:4}));
-  /* the breadboard */
-  stat.push(bx(0,0,BL,BDY,0,ZB-1.5,'#cfcabd',{r:3,steps:4}));
-  stat.push(bx(0,0,BL,92,ZB-1.5,ZB,'#ddd8cb',{r:2,steps:4}));
-  stat.push(bx(0,102,BL,BDY,ZB-1.5,ZB,'#ddd8cb',{r:2,steps:4}));
-  /* centre channel and rail seams */
-  stat.push(bx(3,92,BL-3,102,ZB-5,ZB-4.5,'#a39f93',{tone:'faint',crease:'none',steps:3}));
+  /* the breadboard: a base, two raised terminal blocks, a centre channel with ribs, grooves, joining tabs */
+  stat.push(bx(0,0,BL,BDY,0,ZB-4.5,'#cfcabd',{r:3,steps:4}));
+  stat.push(bx(0,0,BL,TR0,ZB-4.5,ZB,'#ddd8cb',{r:2,steps:4}));
+  stat.push(bx(0,TR1,BL,BDY,ZB-4.5,ZB,'#ddd8cb',{r:2,steps:4}));
+  stat.push(bx(3,TR0+.5,BL-3,TR1-.5,ZB-4.5,ZB-4.3,'#a39f93',{tone:'faint',crease:'none',steps:3}));
+  for(let c=5;c<cols;c+=5)stat.push(bx(colX(c)+4,TR0+.5,colX(c)+7,TR1-.5,ZB-4.3,ZB-2.8,'#c3beb1',{tone:'faint',crease:'none'}));
+  for(let k=0;k<nb;k++){
+    const x0=bounds[k],x1=bounds[k+1];
+    /* joining tab on the right, matching slot on the left */
+    if(k===nb-1){stat.push(bx(BL,ROW.b-3,BL+4,ROW.c+5,0,ZB-4.5,'#cfcabd',{tone:'faint'}),bx(BL,ROW.h-3,BL+4,ROW.i+5,0,ZB-4.5,'#cfcabd',{tone:'faint'}))}
+    if(k===0){stat.push(bx(0,ROW.b-3,3.6,ROW.c+5,ZB-.06,ZB,'#8c887c',{tone:'faint',crease:'none'}),bx(0,ROW.h-3,3.6,ROW.i+5,ZB-.06,ZB,'#8c887c',{tone:'faint',crease:'none'}))}
+    if(k>0)stat.push(ln([[x0,0,ZB],[x0,TR0,ZB]],'lo'),ln([[x0,TR1,ZB],[x0,BDY,ZB]],'lo'));
+  }
+  const gy1=(RAIL.tm+ROW.a)/2,gy2=(ROW.j+RAIL.bp)/2;
+  for(const g of [gy1,gy2])stat.push(ln([[0,g,ZB],[BL,g,ZB]],'lo'),ln([[0,g+1.6,ZB],[BL,g+1.6,ZB]],'hi'));
+  /* sockets: a light chamfer with a dark square inside */
   const holes=[];
-  for(let c=1;c<=cols;c++)for(const r of ['a','b','c','d','e','f','g','h','i','j'])holes.push(at(colX(c),ROW[r],ZB));
-  for(const x of railX)for(const y of [RAIL.tp,RAIL.tm,RAIL.bp,RAIL.bm])holes.push(at(x,y,ZB));
-  stat.push(`<g class="bb-holes">${K.dotsSvg(holes,{size:1.15,tone:'hi'})}</g>`);
-  /* rail stripes: red is +, blue is minus */
-  const stripe=(y,col)=>`<path class="bb-stripe" style="stroke:${col}" d="${K.pathOf([at(X0-6,y,ZB),at(BL-X0+6,y,ZB)])}"/>`;
-  stat.push(stripe(RAIL.tp-6,'#d0463f'),stripe(RAIL.tm+6,'#4a79d8'),stripe(RAIL.bp-6,'#d0463f'),stripe(RAIL.bm+6,'#4a79d8'));
+  for(let c=1;c<=cols;c++)for(const r of ['a','b','c','d','e','f','g','h','i','j'])holes.push([colX(c),ROW[r]]);
+  for(const x of railX)for(const y of [RAIL.tp,RAIL.tm,RAIL.bp,RAIL.bm])holes.push([x,y]);
+  const sqd=(pts,s)=>{let d='';const h=s/2;for(const p of pts){const q=[[p[0]-h,p[1]-h],[p[0]+h,p[1]-h],[p[0]+h,p[1]+h],[p[0]-h,p[1]+h]].map(v=>at(v[0],v[1],ZB));d+='M'+q.map(v=>v[0].toFixed(1)+' '+v[1].toFixed(1)).join('L')+'Z'}return d};
+  stat.push(`<path class="bb-sq0" d="${sqd(holes,5.6)}"/><path class="bb-sq" d="${sqd(holes,3.4)}"/>`);
+  /* rail stripes: red is +, blue is minus, one pair of lines per board */
+  const stripe=(y,col,x0,x1)=>`<path class="bb-stripe" style="stroke:${col}" d="${K.pathOf([at(x0-6,y,ZB),at(x1+6,y,ZB)])}"/>`;
+  for(const [x0,x1] of railSeg)stat.push(stripe(RAIL.tp-6,'#d0463f',x0,x1),stripe(RAIL.tm+6,'#4a79d8',x0,x1),stripe(RAIL.bp-6,'#d0463f',x0,x1),stripe(RAIL.bm+6,'#4a79d8',x0,x1));
   stat.push(txt(X0-12,RAIL.tp+3,ZB,'5V',3.2,'lo'),txt(X0-12,RAIL.tm+3,ZB,'GND',3.2,'lo'),txt(X0-12,RAIL.bp+3,ZB,'3V3',3.2,'lo'),txt(X0-12,RAIL.bm+3,ZB,'GND',3.2,'lo'));
-  /* row letters and column numbers */
-  for(const r of ['a','b','c','d','e','f','g','h','i','j'])stat.push(txt(8,ROW[r]+1.4,ZB,r,3,'lo'));
-  for(let c=1;c<=cols;c++)if(c===1||c%5===0)stat.push(txt(colX(c),97+1.4,ZB,String(c),3.2,'lo'));
+  for(const [x0,x1] of railSeg)for(const [y,t] of [[RAIL.tp,'+'],[RAIL.tm,'-'],[RAIL.bp,'+'],[RAIL.bm,'-']])stat.push(txt(x1+14,y+2.4,ZB,t,4.2,'lo'));
+  /* row letters at both ends, column numbers above and below, every fifth column */
+  for(const r of ['a','b','c','d','e','f','g','h','i','j'])stat.push(txt(10,ROW[r]+1.4,ZB,r,3,'lo'),txt(BL-10,ROW[r]+1.4,ZB,r,3,'lo'));
+  for(let c=1;c<=cols;c++){const n=nb>1?(c-1)%63+1:c;if(n===1||n%5===0)stat.push(txt(colX(c),ROW.a-9,ZB,String(n),3.2,'lo'),txt(colX(c),ROW.j+11,ZB,String(n),3.2,'lo'))}
   /* ---- the ESP32 (step 0) ---- */
   const ex0=colX(EC0)-40,ex1=colX(EC0+14)+30,pz=ZB+7;
   const esp=[];
   esp.push(bx(colX(EC0)-2,ROW.b-4,colX(EC0+14)+2,ROW.b+4,ZB,pz,'#1b1c1f',{tone:'faint'}));
   esp.push(bx(colX(EC0)-2,ROW.i-4,colX(EC0+14)+2,ROW.i+4,ZB,pz,'#1b1c1f',{tone:'faint'}));
-  esp.push(bx(ex0,47,ex1,147,pz,pz+3.5,'#14171d',{r:3,steps:5}));
-  esp.push(bx(ex0-3,82,ex0+24,112,pz+3.5,pz+12,'#a9a8a2',{tone:'lo'}));            /* micro USB */
-  esp.push(bx(ex0+30,62,ex0+40,72,pz+3.5,pz+6.5,'#101113'),bx(ex0+30,122,ex0+40,132,pz+3.5,pz+6.5,'#101113'));
-  esp.push(cyl(ex0+35,67,2.6,pz+6.5,1.8,'#bdb8ab'),cyl(ex0+35,127,2.6,pz+6.5,1.8,'#bdb8ab'));
-  esp.push(bx(ex0+44,88,ex0+60,106,pz+3.5,pz+5.2,'#101113'));                      /* USB bridge */
-  esp.push(bx(ex1-124,63,ex1-38,131,pz+3.5,pz+10.5,'#a8a8a2',{tone:'lo'}));       /* WROOM shield can */
-  esp.push(bx(ex1-36,66,ex1-3,128,pz+3.5,pz+4.4,'#202428',{tone:'faint'}));         /* antenna keep-out */
-  esp.push(ln([[ex1-32,72,pz+4.4],[ex1-12,72,pz+4.4],[ex1-12,80,pz+4.4],[ex1-30,80,pz+4.4],[ex1-30,88,pz+4.4],[ex1-12,88,pz+4.4],[ex1-12,96,pz+4.4],[ex1-30,96,pz+4.4],[ex1-30,104,pz+4.4],[ex1-12,104,pz+4.4],[ex1-12,112,pz+4.4],[ex1-30,112,pz+4.4]],'mid','gold'));
-  esp.push(txt((ex1-124+ex1-38)/2,99,pz+10.5,'ESP32',5.2,'lo'));
-  esp.push(bx(ex0+62,120,ex0+70,128,pz+3.5,pz+5,'#e0524b',{tone:'faint'}));        /* LED */
+  esp.push(bx(ex0,Y(47),ex1,Y(147),pz,pz+3.5,'#14171d',{r:3,steps:5}));
+  esp.push(bx(ex0-3,Y(82),ex0+24,Y(112),pz+3.5,pz+12,'#a9a8a2',{tone:'lo'}));            /* micro USB */
+  esp.push(bx(ex0+30,Y(62),ex0+40,Y(72),pz+3.5,pz+6.5,'#101113'),bx(ex0+30,Y(122),ex0+40,Y(132),pz+3.5,pz+6.5,'#101113'));
+  esp.push(cyl(ex0+35,Y(67),2.6,pz+6.5,1.8,'#bdb8ab'),cyl(ex0+35,Y(127),2.6,pz+6.5,1.8,'#bdb8ab'));
+  esp.push(bx(ex0+44,Y(88),ex0+60,Y(106),pz+3.5,pz+5.2,'#101113'));                      /* USB bridge */
+  esp.push(bx(ex1-124,Y(63),ex1-38,Y(131),pz+3.5,pz+10.5,'#a8a8a2',{tone:'lo'}));       /* WROOM shield can */
+  esp.push(bx(ex1-36,Y(66),ex1-3,Y(128),pz+3.5,pz+4.4,'#202428',{tone:'faint'}));         /* antenna keep-out */
+  esp.push(ln([[ex1-32,Y(72),pz+4.4],[ex1-12,Y(72),pz+4.4],[ex1-12,Y(80),pz+4.4],[ex1-30,Y(80),pz+4.4],[ex1-30,Y(88),pz+4.4],[ex1-12,Y(88),pz+4.4],[ex1-12,Y(96),pz+4.4],[ex1-30,Y(96),pz+4.4],[ex1-30,Y(104),pz+4.4],[ex1-12,Y(104),pz+4.4],[ex1-12,Y(112),pz+4.4],[ex1-30,Y(112),pz+4.4]],'mid','gold'));
+  esp.push(txt((ex1-124+ex1-38)/2,Y(99),pz+10.5,'ESP32',5.2,'lo'));
+  esp.push(bx(ex0+62,Y(120),ex0+70,Y(128),pz+3.5,pz+5,'#e0524b',{tone:'faint'}));        /* LED */
   BACK.forEach((p,i)=>{esp.push(txt(colX(EC0+i),ROW.b+10,pz+3.5,pinName(p),3.3,'hi'));esp.push(`<circle class="bb-pad" cx="${at(colX(EC0+i),ROW.b,pz+3.5)[0].toFixed(1)}" cy="${at(colX(EC0+i),ROW.b,pz+3.5)[1].toFixed(1)}" r="1.5"/>`)});
   FRONT.forEach((p,i)=>{esp.push(txt(colX(EC0+i),ROW.i-6,pz+3.5,pinName(p),3.3,'hi'));esp.push(`<circle class="bb-pad" cx="${at(colX(EC0+i),ROW.i,pz+3.5)[0].toFixed(1)}" cy="${at(colX(EC0+i),ROW.i,pz+3.5)[1].toFixed(1)}" r="1.5"/>`)});
-  dyn.push({i:0,depth:K.depthOf([(ex0+ex1)/2,97,0],P),svg:esp.join(''),hold:[ex0,47,ex1,147]});
+  dyn.push({i:0,depth:K.depthOf([(ex0+ex1)/2,TC,0],P),svg:esp.join('')});
   /* hole of an ESP pin: row a for the back header, row j for the front one */
   const espHole=n=>{const q=ESPPIN[n];return q?[colX(EC0+q.idx),q.row==='back'?ROW.a:ROW.j]:null};
   const lift=(a,b,k)=>9+Math.min(34,Math.hypot(a[0]-b[0],a[1]-b[1])*.12)+((k||0)%4)*3;
@@ -11510,7 +11539,7 @@ function scene(ids,res){
     wires.push({i,svg:ww.join('')});
   });
   /* label plate on the board end */
-  stat.push(txt(BL-18,97+1.4,ZB,'830',3.4,'faint'));
+  stat.push(txt(BL-30,TC+1.4,ZB,label,3.4,'faint'));
   dyn.sort((a,b)=>a.depth-b.depth);
   let out=`<svg xmlns="http://www.w3.org/2000/svg" class="isoc bb-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Isometric drawing of a breadboard with the ESP32 and the project parts being added one step at a time">`;
   out+=`<g>${stat.join('')}</g>`;
@@ -11603,7 +11632,7 @@ function benchSvg(it,xm,plugY){
   });
   return {svg:o.join(''),cable:`<g class="bbw-w cab">${cab.join('')}</g>`,cx,cy};
 }
-return {scene,layout,planOf,colX,ROW};
+return {scene,layout,planOf,colX,ROW,AZ,EL};
 })();
 
 /* ---------- the tab ---------- */
@@ -11644,12 +11673,14 @@ function pjBuild(body,pr){
   const res=pjCheck(pr.parts),sm=pjCheckSummary(res,pr.parts.length);
   body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('strong',{},sm.head),el('span',{},sm.tail)));
   /* parts that exist in the project but not on the breadboard (test-only pages) */
-  const sc=BB.scene(pr.parts,res),items=sc.items;
-  const skipped=pr.parts.filter(id=>!items.some(i=>i.id===id));
+  let view={az:BB.AZ,el:BB.EL},sc=BB.scene(pr.parts,res,view),items=sc.items;view.H0=sc.H;
+  const skipped=pr.parts.filter(id=>id!=='esp'&&!items.some(i=>i.id===id));
   const total=items.length+2;
-  const fig=el('div',{class:'bb-fig',tabindex:'0','aria-label':'Breadboard drawing. It scrolls sideways on a small screen.'});
+  const fig=el('div',{class:'bb-fig',tabindex:'0','aria-label':'Breadboard drawing. Drag or use the arrow keys to spin it. It scrolls sideways on a small screen.'});
   fig.innerHTML=sc.svg;
-  const svg=fig.firstChild;svg.style.minWidth=Math.round(sc.W*(sc.cols>46?.95:.72))+'px';
+  let svg=fig.firstChild;
+  const fit=()=>{svg.style.minWidth=Math.round(sc.W*(sc.cols>46?1.3:.8))+'px';};
+  fit();
   const info=el('div',{class:'bb-info','aria-live':'polite'});
   const pills=el('ol',{class:'bb-pills'});
   const names=['Board and ESP32',...items.map(i=>i.short.length>16?i.short.slice(0,15)+'…':i.short),'All together'];
@@ -11657,6 +11688,27 @@ function pjBuild(body,pr){
   let cur=0,timer=0;
   const play=btn('Play',()=>{timer?stop():start()},'sm primary'),prev=btn('Back',()=>go(cur-1),'sm'),next=btn('Next',()=>go(cur+1),'sm'),restart=btn('Start over',()=>{stop();go(0)},'sm');
   const count=el('span',{class:'bb-count'},'');
+  /* spin and tilt: redraw the same scene from another angle, without replaying the animation */
+  let raf=0;
+  function redraw(){
+    raf=0;
+    sc=BB.scene(pr.parts,res,view);items=sc.items;
+    svg.classList.add('bb-noanim');
+    fig.innerHTML=sc.svg;svg=fig.firstChild;svg.classList.add('bb-noanim');
+    fit();go(cur,true);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>svg.classList.remove('bb-noanim')));
+  }
+  function turn(daz,del){
+    view={az:((view.az+daz)%360+360)%360,el:Math.max(12,Math.min(75,view.el+del)),H0:view.H0};
+    if(!raf)raf=requestAnimationFrame(redraw);
+  }
+  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,H0:view.H0};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
+  let drag=null;
+  fig.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag={x:e.clientX,y:e.clientY};try{fig.setPointerCapture(e.pointerId)}catch(_){}fig.classList.add('drag')});
+  fig.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)<2)return;drag={x:e.clientX,y:e.clientY};turn(-dx*.45,dy*.3)});
+  const endDrag=()=>{drag=null;fig.classList.remove('drag')};
+  fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
+  fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
   names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>{stop();go(i)}},el('span',{class:'bb-pn'},String(i)),nm))));
   function text(i){
     info.replaceChildren();
@@ -11664,7 +11716,7 @@ function pjBuild(body,pr){
       info.append(el('div',{class:'bb-step'},el('h4',{},'Step 1 of '+total+': Board and ESP32'),
         el('p',{},'Lay the breadboard flat with the red and blue rails along the top and bottom. Press the ESP32 DevKit in at the left, USB end to the left, so its two rows of pins sit on either side of the centre channel.'),
         el('p',{},'Then add four short jumpers: VIN to the top red rail (5V), 3V3 to the bottom red rail (3.3 V), and each GND pin to the blue rail beside it.'),
-        el('p',{class:'hint'},'Rows a to e share one strip per column, and so do rows f to j. The centre channel keeps the two halves apart.')));
+        el('p',{class:'hint'},'Drag the drawing to spin and tilt it, or use the arrow keys when it is focused. Rows a to e share one strip per column, and so do rows f to j. The centre channel keeps the two halves apart.')));
       return;
     }
     if(i===total-1){
@@ -11678,11 +11730,11 @@ function pjBuild(body,pr){
     }
     info.append(bbStepText(items[i-1],i+1,total,res));
   }
-  function go(i){
+  function go(i,quiet){
     cur=Math.max(0,Math.min(total-1,i));
     svg.querySelectorAll('.bbp,.bbw').forEach(g=>{const k=+g.dataset.i;g.classList.toggle('on',k<=Math.min(cur,items.length));g.classList.toggle('cur',k===cur)});
     svg.querySelectorAll('.bbh').forEach(g=>g.classList.toggle('cur',+g.dataset.i===cur));
-    svg.querySelectorAll('.bbw-w').forEach((w,k)=>w.style.setProperty('--d',(0.5+(k%12)*.07)+'s'));
+    svg.querySelectorAll('.bbw-w').forEach((w,k)=>w.style.setProperty('--d',(0.12+(k%12)*.035)+'s'));
     svg.classList.toggle('bb-all',cur===total-1);
     prev.disabled=cur===0;next.disabled=cur===total-1;
     count.textContent='Step '+(cur+1)+' of '+total;
@@ -11690,7 +11742,8 @@ function pjBuild(body,pr){
     const pb=$('#bb-p'+cur);if(pb&&pb.scrollIntoView&&pills.scrollWidth>pills.clientWidth){const l=pb.offsetLeft-pills.clientWidth/2+pb.offsetWidth/2;pills.scrollTo({left:l,behavior:still?'auto':'smooth'})}
     text(cur);
     const it=items[cur-1];
-    if(it&&fig.scrollWidth>fig.clientWidth){const px=it.x*(svg.getBoundingClientRect().width/sc.W);fig.scrollTo({left:Math.max(0,px-fig.clientWidth/2),behavior:still?'auto':'smooth'})}
+    if(quiet){}
+    else if(it&&fig.scrollWidth>fig.clientWidth){const px=it.x*(svg.getBoundingClientRect().width/sc.W);fig.scrollTo({left:Math.max(0,px-fig.clientWidth/2),behavior:still?'auto':'smooth'})}
     else if(cur===0||cur===total-1)fig.scrollTo({left:0,behavior:still?'auto':'smooth'});
     if(cur===total-1)stop();
   }
@@ -11698,11 +11751,11 @@ function pjBuild(body,pr){
   function start(){
     if(cur>=total-1)go(0);
     play.textContent='Pause';
-    timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);timer=0;return}go(cur+1)},4200);
+    timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);timer=0;return}go(cur+1)},2000);
   }
   body.append(el('h3',{class:'pj-h'},'Build it on a breadboard'),
     el('div',{class:'bb'},
-      el('div',{class:'bb-stage'},fig,el('div',{class:'bb-ctl'},prev,play,next,restart,count)),
+      el('div',{class:'bb-stage'},fig,el('div',{class:'bb-ctl'},prev,play,next,restart,spinL,spinR,reset,count)),
       el('div',{class:'bb-side'},pills,info)));
   /* the first step is on show, and the rest wait for Play or Next */
   go(0);
