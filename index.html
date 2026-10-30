@@ -841,7 +841,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
 .hm-big{position:absolute;left:0;right:0;top:31%;margin:0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.hm-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 42%,rgba(216,184,119,.14) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .01em;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
+.hm-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 42%,rgba(216,184,119,.14) 100%);-webkit-background-clip:text;background-clip:text;padding:.08em .1em .08em .05em;margin:-.08em -.1em -.08em -.05em;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
 .hm-sub{display:none;position:absolute;left:0;right:0;bottom:4.5vh;margin:0 auto;max-width:20em;font:700 clamp(22px,3.6vw,50px)/1.05 var(--f-disp);letter-spacing:-.025em;color:var(--fg);text-wrap:balance;animation:hmfade .8s .95s both}
 .hm-scrollcue{position:absolute;left:0;right:0;bottom:-20vh;display:none;margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;font:500 12px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);animation:hmfade .8s 1.4s both}
 .hm-scrollcue span{width:1px;height:30px;background:linear-gradient(var(--accent),transparent);transform-origin:top;animation:hmcue 1.8s 2s ease-in-out infinite}
@@ -1505,6 +1505,20 @@ header.top{position:relative;z-index:6}
 .bb-fig.gl{overflow:hidden;padding:0;touch-action:pan-y}
 .bb-gl{display:block;max-width:100%;border-radius:8px;outline:none}
 .bb-gl-wait{display:grid;place-items:center;min-height:320px;color:var(--muted,#8b93a1);font-size:13px}
+
+/* Build tab: the live test of the clicked part opens beside the 3D board */
+.bb-view{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch}
+.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr) minmax(320px,440px)}
+.bb-test{min-width:0;border-left:1px solid var(--hair);background:var(--raise);max-height:min(720px,80vh);overflow:auto;padding:14px 16px 18px}
+.bb-test[hidden]{display:none}
+.bb-th{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;margin:0 0 12px}
+.bb-th h4{margin:0;font:600 16px var(--f-body)}
+.bb-tc{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+.bb-tb2{min-width:0}
+.bb-click{margin:0 0 8px}
+.bbp.sel{filter:drop-shadow(0 0 3px var(--accent))}
+@media (max-width:999px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr)}.bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}}
+.isoc .bbp.on,.isoc.bb-all .bbp{pointer-events:auto;cursor:pointer}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -11442,9 +11456,13 @@ const SPEC={
     m.text(22.5,18,'HC-SR04',2,'middle','lo');m.text(11.2,1.2,'T',1.4);m.text(33.8,1.2,'R',1.4);
     m.hole(2,18,1.2);m.hole(43,18,1.2);
   }},
-  bme280:{w:15,h:12,col:PURPLE,draw(m){
-    lidSensor(m,6.2,6.6);m.smd(10.6,9,'r');m.smd(10.6,7,'r');m.smd(3.4,9.2,'c');qfn(m,3.2,5.4,1.6);m.led(11.2,3.6,'#3fa86a');
-    m.text(7.5,10.4,'BME280',1.6,'middle','hi');m.hole(1.6,10.8,.7);
+  bme280:{w:15.5,h:13,col:PURPLE,draw(m){
+    /* GY-BME280: two big gold-ringed holes at the top corners, the metal-lid sensor in the middle, the regulator and 0402s below */
+    m.hole(2.1,10.6,1.25);m.hole(13.4,10.6,1.25);
+    lidSensor(m,7.7,7.2);
+    m.smd(3.4,6.6,'r');m.smd(3.4,5.2,'r');m.smd(12,6.8,'c');m.smd(12,5.4,'r');m.smd(10.4,3.6,'c');
+    qfn(m,5,3.7,1.5);m.led(7.6,3.4,'#3fa86a');
+    m.text(7.7,11.2,'BME280',1.5,'middle','hi');
   }},
   bmp280:{w:21,h:15.5,col:PURPLE,draw(m){
     lidSensor(m,9,9);m.smd(14.8,11.4,'r');m.smd(14.8,9.4,'r');m.smd(5.4,12.6,'c');reg(m,16.5,5.8);m.smd(4,5,'c');m.led(18.5,13,'#d6453d');
@@ -11496,7 +11514,7 @@ const SPEC={
     m.chip(9.1,23.4,2.8,2,.8,'');
     /* inductors and the field of 0402 parts */
     m.box(.9,11.9,3.6,14.3,1.5,'#8a6a3e',{tone:'lo'});m.box(.9,15,3.4,16.8,1.2,'#8a6a3e',{tone:'lo'});m.box(.8,5.6,3.4,7.4,1.3,'#8a6a3e',{tone:'lo'});
-    [[1.4,19.6,'c'],[3.2,20.2,'r'],[5.6,21.2,'r'],[7,21.8,'c'],[5.4,19,'r'],[7.8,19.6,'r'],[1.6,9,'c'],[3.4,9.6,'r'],[2.2,3.6,'r'],[4.2,3.6,'c'],[9.4,3.6,'r'],[11.4,3.6,'r'],[11.8,8,'r'],[11.8,12,'r'],[1.6,21.4,'c'],[11.6,6.2,'c'],[5.6,13.2,'r'],[7,12.2,'c'],[11.5,18.4,'r'],[11.4,20.6,'c'],[10,20.2,'r'],[3.8,17.6,'r'],[9.2,18.8,'c'],[2.6,22,'r'],[4.2,7,'r'],[11.8,10.2,'c'],[6,5.2,'r']].forEach(a=>m.smd(a[0],a[1],a[2]));
+    [[10.8,4.6,'c'],[6.8,20.2,'r'],[10.8,17.4,'r'],[7.2,13.0,'c'],[1.6,10.6,'r'],[2.8,9.0,'r'],[6.4,24.2,'c'],[8.4,3.4,'r'],[2.0,3.8,'r'],[10.0,21.0,'c'],[3.2,21.8,'r'],[11.2,19.0,'r'],[4.8,3.0,'c'],[3.6,19.8,'r'],[5.2,4.6,'r'],[6.4,22.2,'c'],[10.8,3.0,'r'],[8.8,25.4,'r']].forEach(a=>m.smd(a[0],a[1],a[2]));
     m.led(2,17.8,'#e6e1d4');
     /* the spring antenna, soldered upright in the pad: a wire coil with a straight tail */
     m.vcyl(11.2,-.8,.28,22.6,28.4,'#c9ccd1',{n:8,spec:.6});
@@ -12490,9 +12508,51 @@ function pjBuild(body,pr){
     play.textContent='Pause';
     timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);timer=0;return}go(cur+1)},2000);
   }
+  /* click a part on the board and its live test opens to the right, the same page the Test tab shows */
+  const tpanel=el('aside',{class:'bb-test',hidden:true,'aria-label':'Live test of the selected part'});
+  let tsel=null,townLives=[];
+  function closeTest(){
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;tpanel.hidden=true;tpanel.replaceChildren();
+    stage.classList.remove('has-test');if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
+  }
+  function openTest(id,k){
+    const p=(typeof PARTS!=='undefined'&&PARTS.find(x=>x.id===id))||null;
+    if(!p||typeof TESTS==='undefined'||!TESTS[id]){toast((p?p.n:'That part')+' has no live test.');return}
+    if(tsel===id&&!tpanel.hidden)return;
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=id;
+    const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
+    try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
+    finally{PJO=prevO;HL=prevHL}
+    townLives=own.lives;
+    tpanel.replaceChildren(
+      el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
+      tb,typeof verdictBar==='function'?verdictBar(p):null);
+    tpanel.hidden=false;stage.classList.add('has-test');
+    if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
+    if(innerWidth<1000)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
+  }
+  const partAt=k=>k===0?'esp':(items[k-1]&&items[k-1].id);
+  /* a click is a press and a release that barely moved: anything else was a spin */
+  let down=null;
+  fig.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}},true);
+  fig.addEventListener('pointermove',e=>{
+    if(drag||!R3||!R3.pick)return;
+    fig.style.cursor=R3.pick(e.clientX,e.clientY)>=0?'pointer':'';
+  });
+  fig.addEventListener('pointerup',e=>{
+    if(!down||e.button!==0)return;const moved=Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y);down=null;if(moved>5)return;
+    let k=-1;
+    if(R3&&R3.pick)k=R3.pick(e.clientX,e.clientY);
+    else{const t=document.elementFromPoint(e.clientX,e.clientY),g=t&&t.closest&&t.closest('.bbp');if(g)k=+g.dataset.i}
+    if(k<0){return}
+    const id=partAt(k);if(id)openTest(id,k);
+  });
+  fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const id=partAt(cur);if(id){e.preventDefault();openTest(id,cur)}}});
+  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,tpanel),el('div',{class:'bb-ctl'},prev,play,next,restart,spinL,spinR,zin,zout,reset,count));
   body.append(el('h3',{class:'pj-h'},'Build it on a breadboard'),
+    el('p',{class:'hint bb-click'},'Click any part on the board to test it here, right beside the drawing.'),
     el('div',{class:'bb'},
-      el('div',{class:'bb-stage'},fig,el('div',{class:'bb-ctl'},prev,play,next,restart,spinL,spinR,zin,zout,reset,count)),
+      stage,
       el('div',{class:'bb-side'},pills,info)));
   /* the first step is on show, and the rest wait for Play or Next */
   go(0);
@@ -12517,6 +12577,90 @@ function pjBuild(body,pr){
     body.append(el('h3',{class:'pj-h'},'Extra parts to have on the bench'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},...['Part','For','Why'].map(h=>el('th',{},h)))),el('tbody',{},...trs))));
   }
 }
+/* ---- Comic look for the 3D Build tab: flat banded shading on every material, ink outlines found from the depth of
+   the picture (silhouettes and creases), and a painted backdrop. Works on any three.js scene; the Build scene hands
+   it the renderer and asks it to draw instead of calling render itself. ---- */
+const TOON=(()=>{
+let TH=null,GRAD=null;
+function grad(){
+  if(GRAD)return GRAD;
+  const d=new Uint8Array([88,148,206,244]);GRAD=new TH.DataTexture(d,d.length,1,TH.LuminanceFormat);
+  GRAD.minFilter=GRAD.magFilter=TH.NearestFilter;GRAD.generateMipmaps=false;GRAD.needsUpdate=true;return GRAD;
+}
+const cache=new Map();
+function toon(m){
+  if(!m||m.isMeshToonMaterial||m.isShaderMaterial||m.isLineBasicMaterial||m.isMeshBasicMaterial)return m;
+  let t=cache.get(m);if(t)return t;
+  const c=m.color.clone();
+  const hsl={};c.getHSL(hsl);c.setHSL(hsl.h,Math.min(1,hsl.s*1.14),Math.min(.94,hsl.l*1.04+(m.metalness>.5?.1:0)));
+  t=new TH.MeshToonMaterial({color:c,gradientMap:grad(),side:m.side,transparent:m.transparent,opacity:m.opacity,map:m.map||null,
+    emissive:m.emissive?m.emissive.clone():new TH.Color(0),emissiveIntensity:m.emissiveIntensity||1});
+  t.userData=m.userData;cache.set(m,t);return t;
+}
+function apply(root){
+  root.traverse(o=>{if(o.isMesh&&o.material)o.material=Array.isArray(o.material)?o.material.map(toon):toon(o.material)});
+}
+const VERT=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
+const FRAG=`
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D tColor,tDepth;
+uniform vec2 res;uniform float thick,range,thr,ratio;uniform vec3 ink,skyA,skyB;
+float dep(vec2 uv){vec4 t=texture2D(tDepth,uv);return (t.r*255.*256.+t.g*255.)/65535.;}
+void main(){
+  vec2 px=thick/res;
+  float d0=dep(vUv),dl=dep(vUv-vec2(px.x,0.)),dr=dep(vUv+vec2(px.x,0.)),du=dep(vUv+vec2(0.,px.y)),dd=dep(vUv-vec2(0.,px.y));
+  float lap=abs(dl+dr+du+dd-4.*d0)*range;
+  float e=smoothstep(thr,thr*1.7,lap);
+  vec3 col=texture2D(tColor,vUv).rgb;
+  if(d0>.9995){
+    vec3 s=mix(skyB,skyA,smoothstep(0.,1.,vUv.y));
+    vec2 g=gl_FragCoord.xy/ratio;vec2 c=fract(g/14.)-.5;float dot_=smoothstep(.34,.3,length(c))*smoothstep(.1,.9,vUv.y)*.05;
+    col=s+dot_;
+  }
+  gl_FragColor=vec4(mix(col,ink,e*.94),1.);
+}`;
+function pipeline(R,opt={}){
+  const o=Object.assign({thick:1.25,thr:1.5,ink:[.08,.09,.14],skyA:[.2,.27,.5],skyB:[.07,.09,.17]},opt);
+  const ok={v:true};
+  let rtC=null,rtD=null,W=0,H=0;
+  const mk=(w,h)=>{
+    rtC&&rtC.dispose();rtD&&rtD.dispose();
+    rtC=new TH.WebGLMultisampleRenderTarget(w,h,{format:TH.RGBAFormat,minFilter:TH.LinearFilter,magFilter:TH.LinearFilter});rtC.samples=4;rtC.texture.encoding=TH.sRGBEncoding;
+    rtD=new TH.WebGLRenderTarget(w,h,{format:TH.RGBAFormat,minFilter:TH.NearestFilter,magFilter:TH.NearestFilter,depthBuffer:true,generateMipmaps:false});
+  };
+  const dmat=new TH.ShaderMaterial({side:TH.DoubleSide,uniforms:{near:{value:1},far:{value:100}},
+    vertexShader:`varying float vD;void main(){vec3 transformed=position;
+#ifdef USE_INSTANCING
+ vec4 mv=instanceMatrix*vec4(transformed,1.);
+#else
+ vec4 mv=vec4(transformed,1.);
+#endif
+ mv=modelViewMatrix*mv;vD=-mv.z;gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`varying float vD;uniform float near,far;void main(){float d=clamp((vD-near)/(far-near),0.,.9990);float v=floor(d*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0.,1.);}`});
+  const fq=new TH.Mesh(new TH.PlaneGeometry(2,2),new TH.ShaderMaterial({depthTest:false,depthWrite:false,vertexShader:VERT,fragmentShader:FRAG,
+    uniforms:{tColor:{value:null},tDepth:{value:null},res:{value:new TH.Vector2(1,1)},thick:{value:o.thick},range:{value:100},thr:{value:o.thr},ratio:{value:1},
+      ink:{value:new TH.Vector3(...o.ink)},skyA:{value:new TH.Vector3(...o.skyA)},skyB:{value:new TH.Vector3(...o.skyB)}}}));
+  const qs=new TH.Scene();qs.add(fq);const qc=new TH.OrthographicCamera(-1,1,1,-1,0,1);
+  const hide=[];
+  return {
+    resize(w,h,dpr){w=Math.max(2,Math.round(w*dpr));h=Math.max(2,Math.round(h*dpr));if(w===W&&h===H)return;W=w;H=h;mk(w,h);fq.material.uniforms.res.value.set(w,h);fq.material.uniforms.ratio.value=dpr;fq.material.uniforms.thick.value=o.thick*dpr/1.2},
+    render(scene,cam){
+      if(!rtC)return;
+      const prev=R.getRenderTarget(),ca=new TH.Color();R.getClearColor(ca);const aa=R.getClearAlpha();
+      R.setRenderTarget(rtC);R.setClearColor(0x0f1220,1);R.clear();R.render(scene,cam);
+      hide.length=0;scene.traverse(x=>{if(x.userData&&x.userData.noInk&&x.visible){x.visible=false;hide.push(x)}});
+      dmat.uniforms.near.value=cam.near;dmat.uniforms.far.value=cam.far;
+      scene.overrideMaterial=dmat;R.setRenderTarget(rtD);R.setClearColor(0xffff00,1);R.clear();R.render(scene,cam);scene.overrideMaterial=null;
+      hide.forEach(x=>x.visible=true);
+      fq.material.uniforms.tColor.value=rtC.texture;fq.material.uniforms.tDepth.value=rtD.texture;fq.material.uniforms.range.value=cam.far-cam.near;
+      R.setRenderTarget(null);R.setClearColor(ca,aa);R.render(qs,qc);R.setRenderTarget(prev);
+    },
+    dispose(){rtC&&rtC.dispose();rtD&&rtD.dispose();dmat.dispose();fq.material.dispose();fq.geometry.dispose()}
+  };
+}
+return {init(three){TH=three},apply,pipeline,toon};
+})();
 /* ---- Projects: the Build tab in real 3D (three.js, shared with the board heroes).
    The breadboard, the ESP32 and every part are meshes in one lit scene, so depth is exact at every angle and spinning
    never warps. The parts are drawn by the same model code as the flat drawing (pj_models.js): this file gives it a second
@@ -12544,7 +12688,7 @@ function backend(ZB,colX){
     }
     return m;
   }
-  const H={three:true,ZB,cur:null,colX,K:{cameraOf:()=>({sinA:1,cosA:0,sinE:.5,cosE:.866}),depthOf:()=>0,pathOf:()=>''},P:()=>({}),at:()=>[0,0]};
+  const H={three:true,mat,ZB,cur:null,colX,K:{cameraOf:()=>({sinA:1,cosA:0,sinE:.5,cosE:.866}),depthOf:()=>0,pathOf:()=>''},P:()=>({}),at:()=>[0,0]};
   const add=m=>{m.castShadow=true;m.receiveShadow=true;H.cur.add(m);return ''};
   /* a KiCad model placed at (x,y) on the board face: native mm, z up; the y flip puts its back toward the board's back edge */
   const realMats=[];
@@ -12606,19 +12750,19 @@ function backend(ZB,colX){
     const w=t.w*size/64,h=t.h*size/64,pad=8*size/64,ax=anchor==='start'?w/2-pad:anchor==='end'?-w/2+pad:0,cx=x+ax;
     const P=face?[cx-w/2,y,z-h/2, cx+w/2,y,z-h/2, cx-w/2,y,z+h/2, cx+w/2,y,z+h/2]:[cx-w/2,y+h/2,z, cx+w/2,y+h/2,z, cx-w/2,y-h/2,z, cx+w/2,y-h/2,z];
     const g=new TH.BufferGeometry();g.setAttribute('position',new TH.Float32BufferAttribute(P,3));g.setAttribute('uv',new TH.Float32BufferAttribute([0,0,1,0,0,1,1,1],2));g.setIndex([0,1,2,2,1,3]);
-    const m=new TH.Mesh(g,t.m);m.renderOrder=4;H.cur.add(m);return '';
+    const m=new TH.Mesh(g,t.m);m.renderOrder=4;m.userData.noInk=true;H.cur.add(m);return '';
   }
   H.txt=(x,y,z,s,size,tone,anchor)=>{s=String(s);if(!s.trim())return '';size=size||3.4;return quad(labelTex(s,tone||'mid'),size,x,y-.25*size,z+.04,anchor||'middle',false)};
   H.faceText=(x,y,z,s,size,tone,anchor)=>{s=String(s);if(!s.trim())return '';size=size||3.4;return quad(labelTex(s,tone||'hi'),size,x,y+.03,z+.25*size,anchor||'middle',true)};
   H.ln=(pts,tone)=>{
     const key=tone||'mid';let m=lines.get(key);if(!m){m=new TH.LineBasicMaterial({color:new TH.Color(LINE[key]||LINE.mid).convertSRGBToLinear()});lines.set(key,m)}
     const g=new TH.BufferGeometry().setFromPoints(pts.map(p=>new TH.Vector3(p[0],p[1],p[2])));
-    const l=new TH.Line(g,m);l.renderOrder=3;H.cur.add(l);return '';
+    const l=new TH.Line(g,m);l.renderOrder=3;l.userData.noInk=true;H.cur.add(l);return '';
   };
   /* a round marking on a front face: a dark disc with a gold rim */
   H.disc=(x,y,z,r,fill,rim)=>{
     const g=new TH.CircleGeometry(r,20);g.rotateX(-Math.PI/2);
-    const m=new TH.Mesh(g,new TH.MeshBasicMaterial({color:new TH.Color(fill).convertSRGBToLinear(),polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));m.position.set(x,y,z);H.cur.add(m);
+    const m=new TH.Mesh(g,new TH.MeshBasicMaterial({color:new TH.Color(fill).convertSRGBToLinear(),polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}));m.position.set(x,y,z);m.userData.noInk=true;H.cur.add(m);
     if(rim){const pts=[];for(let i=0;i<=20;i++){const t=i/20*Math.PI*2;pts.push([x+Math.cos(t)*r,y+.02,z+Math.sin(t)*r])}H.ln(pts,'gold')}
     return '';
   };
@@ -12631,22 +12775,9 @@ function boardTexture(g){
   const {BL,BDY,cols,railX,railSeg,nb,label}=g,K=BB,ROW=K.ROW,RAIL=K.RAIL,colX=K.colX;
   const s=Math.min(5,4096/BL),c=document.createElement('canvas');c.width=Math.ceil(BL*s);c.height=Math.ceil(BDY*s);
   const x=c.getContext('2d');x.scale(s,s);
-  x.fillStyle='#ddd8cb';x.fillRect(0,0,BL,BDY);
-  const gy1=(RAIL.tm+ROW.a)/2,gy2=(ROW.j+RAIL.bp)/2;
-  for(const gy of [gy1,gy2]){x.fillStyle='#a8a396';x.fillRect(0,gy-.5,BL,1);x.fillStyle='#f3efe4';x.fillRect(0,gy+.6,BL,.9)}
-  const holes=[];
-  for(let k=1;k<=cols;k++)for(const r of 'abcdefghij')holes.push([colX(k),ROW[r]]);
-  for(const hx of railX)for(const hy of [RAIL.tp,RAIL.tm,RAIL.bp,RAIL.bm])holes.push([hx,hy]);
-  for(const [hx,hy] of holes){
-    x.fillStyle='#bdb7a8';x.fillRect(hx-2.9,hy-2.9,5.8,5.8);
-    x.fillStyle='#8f897b';x.fillRect(hx-2.2,hy-2.2,4.4,4.4);
-    x.fillStyle='#1d1a15';x.fillRect(hx-1.7,hy-1.7,3.4,3.4);
-    x.fillStyle='rgba(205,176,100,.55)';x.fillRect(hx-1.7,hy+.9,3.4,.8);
-  }
-  const stripe=(y,col,x0,x1)=>{x.fillStyle=col;x.fillRect(x0-6,y-.55,x1-x0+12,1.1)};
-  for(const [x0,x1] of railSeg){stripe(RAIL.tp-6,'#d0463f',x0,x1);stripe(RAIL.tm+6,'#4a79d8',x0,x1);stripe(RAIL.bp-6,'#d0463f',x0,x1);stripe(RAIL.bm+6,'#4a79d8',x0,x1)}
+  /* only the printed marks live in this transparent decal: the sockets, grooves and rail stripes are real geometry */
   const font=px=>{x.font='700 '+px+'px ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace'};
-  x.fillStyle='#6f6a5e';x.textAlign='center';x.textBaseline='alphabetic';
+  x.fillStyle='#5d584c';x.textAlign='center';x.textBaseline='alphabetic';
   font(3.2);
   for(const [t,y] of [['5V',RAIL.tp],['GND',RAIL.tm],['3V3',RAIL.bp],['GND',RAIL.bm]])x.fillText(t,K.X0-12,y+3+1);
   font(4.4);
@@ -12663,7 +12794,7 @@ function boardTexture(g){
 function topPlane(g,x0,y0,x1,y1,z,tex){
   const {BL,BDY}=g,P=[x0,y0,z, x1,y0,z, x0,y1,z, x1,y1,z],U=[x0/BL,1-y0/BDY, x1/BL,1-y0/BDY, x0/BL,1-y1/BDY, x1/BL,1-y1/BDY];
   const G=new TH.BufferGeometry();G.setAttribute('position',new TH.Float32BufferAttribute(P,3));G.setAttribute('uv',new TH.Float32BufferAttribute(U,2));G.setAttribute('normal',new TH.Float32BufferAttribute([0,0,1,0,0,1,0,0,1,0,0,1],3));G.setIndex([0,1,2,2,1,3]);
-  const m=new TH.Mesh(G,new TH.MeshStandardMaterial({map:tex,roughness:.55,metalness:0,envMapIntensity:.5}));m.receiveShadow=true;return m;
+  const m=new TH.Mesh(G,new TH.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));m.renderOrder=2;m.userData.noInk=true;return m;
 }
 
 /* ---------- build the whole scene ---------- */
@@ -12676,6 +12807,7 @@ async function mount(host,ids,res,opt={}){
   const S=GLH.stage(canvas,{shadow:2048});
   S.floor.visible=false;S.blob.visible=false;S.root.visible=false;
   const R=S.renderer;R.shadowMap.type=TH.PCFSoftShadowMap;
+  const COMIC=typeof TOON!=='undefined';if(COMIC){TOON.init(TH);R.toneMapping=TH.NoToneMapping;S.scene.environment=null}
   const H=backend(ZB,colX);
   const root=new TH.Group();root.scale.y=-1;S.scene.add(root);
   /* ----- the bench and the board ----- */
@@ -12684,8 +12816,26 @@ async function mount(host,ids,res,opt={}){
   H.bx(-12,-12,BL+12,BDY+12,-5,0,'#262b33',{r:6});
   const btex=boardTexture(geo);
   H.bx(0,0,BL,BDY,0,ZB-4.5,'#cfcabd',{r:3});
-  H.bx(0,0,BL,TR0,ZB-4.5,ZB-.02,'#ddd8cb',{r:2});H.bx(0,TR1,BL,BDY,ZB-4.5,ZB-.02,'#ddd8cb',{r:2});
-  stat.add(topPlane(geo,0,0,BL,TR0,ZB,btex),topPlane(geo,0,TR1,BL,BDY,ZB,btex));
+  H.bx(2,2,BL-2,BDY-2,ZB-4.54,ZB-4.5,'#2b261d');
+  /* the two socket plates: a real moulded slab with a square hole for every socket, a gold clip under each */
+  {
+    const hs=[];for(let k=1;k<=geo.cols;k++)for(const r of 'abcdefghij')hs.push([colX(k),ROW[r]]);
+    for(const hx of geo.railX)for(const hy of [RAIL.tp,RAIL.tm,RAIL.bp,RAIL.bm])hs.push([hx,hy]);
+    const rrs=(x0,y0,x1,y1,r)=>{const sh=new TH.Shape();sh.moveTo(x0+r,y0);sh.lineTo(x1-r,y0);sh.quadraticCurveTo(x1,y0,x1,y0+r);sh.lineTo(x1,y1-r);sh.quadraticCurveTo(x1,y1,x1-r,y1);sh.lineTo(x0+r,y1);sh.quadraticCurveTo(x0,y1,x0,y1-r);sh.lineTo(x0,y0+r);sh.quadraticCurveTo(x0,y0,x0+r,y0);return sh};
+    const plate=(y0,y1,sel)=>{
+      const sh=rrs(0,y0,BL,y1,2);
+      for(const [x,y] of hs.filter(sel)){const hp=new TH.Path();hp.moveTo(x-1.8,y-1.8);hp.lineTo(x+1.8,y-1.8);hp.lineTo(x+1.8,y+1.8);hp.lineTo(x-1.8,y+1.8);hp.closePath();sh.holes.push(hp)}
+      const m=new TH.Mesh(new TH.ExtrudeGeometry(sh,{depth:4.48,bevelEnabled:false,curveSegments:3}),H.mat('#ddd8cb'));m.position.z=ZB-4.5;m.castShadow=m.receiveShadow=true;stat.add(m);
+    };
+    plate(0,TR0,p=>p[1]<TR0);plate(TR1,BDY,p=>p[1]>TR1);
+    const clip=new TH.InstancedMesh(new TH.BoxGeometry(2.8,.5,2.6),H.mat('#cdb064',{spec:.6}),hs.length),mt=new TH.Matrix4();
+    hs.forEach(([x,y],i)=>{mt.makeTranslation(x,y+1.45,ZB-4.5+1.4);clip.setMatrixAt(i,mt)});clip.frustumCulled=false;stat.add(clip);
+    /* rail stripes and the grooves between rails and rows, as thin raised strips */
+    const strip=(x0,x1,y,hex,w)=>H.bx(x0,y-w/2,x1,y+w/2,ZB-.02,ZB+.18,hex);
+    for(const [x0,x1] of geo.railSeg){strip(x0-6,x1+6,RAIL.tp-6,'#d0463f',1.4);strip(x0-6,x1+6,RAIL.tm+6,'#4a79d8',1.4);strip(x0-6,x1+6,RAIL.bp-6,'#d0463f',1.4);strip(x0-6,x1+6,RAIL.bm+6,'#4a79d8',1.4)}
+    for(const gy of [(RAIL.tm+ROW.a)/2,(ROW.j+RAIL.bp)/2])strip(0,BL,gy,'#b5b09f',1);
+  }
+  stat.add(topPlane(geo,0,0,BL,TR0,ZB+.2,btex),topPlane(geo,0,TR1,BL,BDY,ZB+.2,btex));
   H.bx(3,TR0+.5,BL-3,TR1-.5,ZB-4.5,ZB-4.3,'#a39f93');
   for(let k=5;k<geo.cols;k+=5)H.bx(colX(k)+4,TR0+.5,colX(k)+7,TR1-.5,ZB-4.3,ZB-2.8,'#c3beb1');
   for(let k=0;k<geo.nb;k++){
@@ -12698,17 +12848,29 @@ async function mount(host,ids,res,opt={}){
   {
     const {ex0,ex1}=geo,pz=ZB+7,Y=K.Y;
     H.bx(colX(K.EC0)-2,ROW.b-4,colX(K.EC0+14)+2,ROW.b+4,ZB,pz,'#1b1c1f');H.bx(colX(K.EC0)-2,ROW.i-4,colX(K.EC0+14)+2,ROW.i+4,ZB,pz,'#1b1c1f');
-    H.bx(ex0,Y(47),ex1,Y(147),pz,pz+3.5,'#14171d',{r:3});
-    H.bx(ex0-3,Y(82),ex0+24,Y(112),pz+3.5,pz+12,'#a9a8a2');
-    H.bx(ex0+30,Y(62),ex0+40,Y(72),pz+3.5,pz+6.5,'#101113');H.bx(ex0+30,Y(122),ex0+40,Y(132),pz+3.5,pz+6.5,'#101113');
-    H.cyl(ex0+35,Y(67),2.6,pz+6.5,1.8,'#bdb8ab');H.cyl(ex0+35,Y(127),2.6,pz+6.5,1.8,'#bdb8ab');
-    H.bx(ex0+44,Y(88),ex0+60,Y(106),pz+3.5,pz+5.2,'#101113');
-    H.bx(ex1-124,Y(63),ex1-38,Y(131),pz+3.5,pz+10.5,'#a8a8a2');
-    H.bx(ex1-36,Y(66),ex1-3,Y(128),pz+3.5,pz+4.4,'#202428');
-    const mea=[[ex1-32,Y(72)],[ex1-12,Y(72)],[ex1-12,Y(80)],[ex1-30,Y(80)],[ex1-30,Y(88)],[ex1-12,Y(88)],[ex1-12,Y(96)],[ex1-30,Y(96)],[ex1-30,Y(104)],[ex1-12,Y(104)],[ex1-12,Y(112)],[ex1-30,Y(112)]];
-    for(let k=0;k<mea.length-1;k++){const a=mea[k],b=mea[k+1];H.bx(Math.min(a[0],b[0])-.6,Math.min(a[1],b[1])-.6,Math.max(a[0],b[0])+.6,Math.max(a[1],b[1])+.6,pz+4.4,pz+4.7,'#cdb064')}
-    H.txt((ex1-124+ex1-38)/2,Y(99),pz+10.5,'ESP32',5.2,'lo');
-    H.bx(ex0+62,Y(120),ex0+70,Y(128),pz+3.5,pz+5,'#e0524b');
+    const top=pz+3.5,pcb='#22335c',sm=(x0,y0,x1,y1,h,hex)=>H.bx(x0,y0,x1,y1,top,top+h,hex);
+    H.bx(ex0,Y(47),ex1,Y(147),pz,top,pcb,{r:3});
+    H.bx(ex0+1.2,Y(48.2),ex1-1.2,Y(145.8),top,top+.12,'#2c4278',{r:2});
+    for(const [hx,hy] of [[ex0+5,Y(52)],[ex0+5,Y(142)],[ex1-5,Y(52)],[ex1-5,Y(142)]]){H.cyl(hx,hy,2.4,top+.2,.3,'#cdb064');H.cyl(hx,hy,1.2,top+.5,.2,'#0b0d12')}
+    /* micro-USB */
+    H.bx(ex0-3,Y(82),ex0+24,Y(112),top,top+8.5,'#b9bcc2');H.bx(ex0-3.2,Y(86),ex0-1,Y(108),top+2,top+6.4,'#0b0d12');H.bx(ex0+5,Y(81.5),ex0+7,Y(112.5),top+.5,top+7.5,'#8f939b');
+    /* EN and BOOT buttons */
+    for(const by of [Y(62),Y(132)]){H.bx(ex0+30,by-5,ex0+40,by+5,top,top+3,'#c9ccd1');H.cyl(ex0+35,by,2.7,top+6.2,3.2,'#17191f');H.cyl(ex0+35,by,1.5,top+6.5,.3,'#e9e6dc')}
+    /* CP2102 bridge, regulator, crystal */
+    sm(ex0+46,Y(89),ex0+58,Y(105),1.6,'#15171c');
+    for(let k=0;k<7;k++){sm(ex0+45,Y(90+k*2.2),ex0+46,Y(91+k*2.2),.3,'#cdb064');sm(ex0+58,Y(90+k*2.2),ex0+59,Y(91+k*2.2),.3,'#cdb064')}
+    H.cyl(ex0+48,Y(91),.9,top+1.65,.2,'#e9e6dc');
+    sm(ex0+62,Y(88),ex0+72,Y(104),2.2,'#16181d');sm(ex0+72,Y(92),ex0+76,Y(100),1,'#bdb8ab');
+    sm(ex0+78,Y(66),ex0+88,Y(74),1.8,'#c3c6cc');
+    for(const [cx,cy,hex] of [[ex0+62,Y(112),'#b99a5c'],[ex0+68,Y(112),'#b99a5c'],[ex0+76,Y(112),'#2a2a2e'],[ex0+80,Y(118),'#b99a5c'],[ex0+44,Y(116),'#2a2a2e'],[ex0+50,Y(74),'#b99a5c'],[ex0+56,Y(74),'#2a2a2e'],[ex0+64,Y(76),'#b99a5c'],[ex0+90,Y(132),'#2a2a2e']])sm(cx,cy,cx+4.2,cy+2.4,1.1,hex);
+    sm(ex0+62,Y(120),ex0+68,Y(126),2.2,'#171a22');
+    /* module can, antenna */
+    H.bx(ex1-124,Y(63),ex1-38,Y(131),top,top+10.5-3.5,'#8b919e');H.bx(ex1-123,Y(64),ex1-39,Y(130),top+7,top+7.35,'#a3a9b6');
+    for(let k=0;k<5;k++)H.bx(ex1-120+k*3.2,Y(64.5),ex1-119+k*3.2,Y(130.5),top+7.35,top+7.6,'#737a88');
+    H.bx(ex1-36,Y(66),ex1-3,Y(128),top,top+.9,'#e2dfd2',{r:1.5});
+    H.txt((ex1-124+ex1-38)/2,Y(92),pz+10.9,'ESP32-WROOM',3.6,'lo');H.txt((ex1-124+ex1-38)/2,Y(106),pz+10.9,'DevKit V1',3,'lo');
+    H.txt(ex0+35,Y(62)+11,pz+3.7,'EN',2.6,'hi');H.txt(ex0+35,Y(132)+11,pz+3.7,'BOOT',2.6,'hi');
+    H.bx(ex0+73,Y(126),ex0+78,Y(131),pz+3.5,pz+5,'#e0524b');H.bx(ex0+84,Y(126),ex0+89,Y(131),pz+3.5,pz+5,'#4da3ff');
     K.BACK.forEach((p,i)=>{H.txt(colX(K.EC0+i),ROW.b+10,pz+3.5,K.pinName(p),3.3,'hi');H.cyl(colX(K.EC0+i),ROW.b,1.5,pz+3.5,.25,'#cdb064')});
     K.FRONT.forEach((p,i)=>{H.txt(colX(K.EC0+i),ROW.i-6,pz+3.5,K.pinName(p),3.3,'hi');H.cyl(colX(K.EC0+i),ROW.i,1.5,pz+3.5,.25,'#cdb064')});
   }
@@ -12731,7 +12893,7 @@ async function mount(host,ids,res,opt={}){
     }finally{BB.bindSvg()}
     const rx0=colX(it.cs)-6,rx1=colX(it.cs+it.sp-1)+6,ya=(it.lane==='back'?ROW.a:ROW.f)-4,yb=(it.lane==='back'?ROW.e:ROW.j)+5;
     const ring=new TH.Line(new TH.BufferGeometry().setFromPoints([[rx0,ya],[rx1,ya],[rx1,yb],[rx0,yb],[rx0,ya]].map(p=>new TH.Vector3(p[0],p[1],ZB+.3))),new TH.LineBasicMaterial({color:accent,transparent:true,opacity:.95}));
-    ring.renderOrder=6;ring.visible=false;root.add(ring);
+    ring.renderOrder=6;ring.userData.noInk=true;ring.visible=false;root.add(ring);
     steps.push({g,w,wires:(it.w3||[]).concat(it.c3||[]),ring,x:xm,pos:it.kind==='off'?[it.bench.cx,it.bench.cy]:[xm,rowPlug],id:it.id});
   });
   /* ----- wires: tubes along each route ----- */
@@ -12770,11 +12932,13 @@ async function mount(host,ids,res,opt={}){
     const hh=hh0/clamp(view.zoom,.4,5),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
-    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),h=Math.round(clamp(w*.64,320,720));
-    if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(window.devicePixelRatio||1,2);R.setPixelRatio(dpr);R.setSize(W,Hh,false);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
+    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.64,th),320,760));
+    if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(window.devicePixelRatio||1,2);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
   }
+  if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0x8a97b8,.5);S.scene.add(hl);S.key.intensity=.8;S.fill.intensity=.2;S.key.shadow.radius=2}
+  let PIPE=COMIC?TOON.pipeline(R):null;
   size();
-  const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>{size()}):null;ro&&ro.observe(host);
+  const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>{size();if(typeof kick==='function')kick()}):null;ro&&ro.observe(host);
   const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
   function apply(now){
     const T=now||performance.now();
@@ -12791,13 +12955,38 @@ async function mount(host,ids,res,opt={}){
   function tick(now){
     raf=0;
     if(!host.isConnected||!alive){dispose();return}
-    if(anim||dirty){apply(now);place();R.render(S.scene,cam);dirty=false}
+    if(anim||dirty){apply(now);place();if(PIPE)PIPE.render(S.scene,cam);else R.render(S.scene,cam);dirty=false}
     if(anim||dirty)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
-  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
+  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
+  /* click to pick a part: a ray through the pointer, and a glowing pad under whatever is selected */
+  const rc=new TH.Raycaster(),selMat=new TH.MeshBasicMaterial({color:accent.clone().convertLinearToSRGB(),transparent:true,opacity:.42,depthWrite:false}),
+    selLine=new TH.LineBasicMaterial({color:accent.clone().convertLinearToSRGB()});
+  const selPad=new TH.Mesh(new TH.PlaneGeometry(1,1),selMat),selEdge=new TH.Line(new TH.BufferGeometry(),selLine);
+  for(const o of [selPad,selEdge]){o.visible=false;o.renderOrder=7;o.userData.noInk=true;root.add(o)}
+  let selI=-1;
+  function pick(cx,cy){
+    const r=canvas.getBoundingClientRect();if(!r.width)return -1;
+    rc.setFromCamera(new TH.Vector2((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height*2-1)),cam);
+    const live=steps.map((st,k)=>st.g.visible?st.g:null);
+    const hit=rc.intersectObjects(live.filter(Boolean),true).find(h=>h.object.visible&&!h.object.userData.cap);
+    if(!hit)return -1;
+    let o=hit.object;while(o){const k=live.indexOf(o);if(k>=0)return k;o=o.parent}
+    return -1;
+  }
+  function mark(i){
+    selI=i;
+    if(i==null||i<0||!steps[i]){selPad.visible=selEdge.visible=false;kick();return}
+    root.updateMatrixWorld(true);
+    const b=new TH.Box3().setFromObject(steps[i].g).applyMatrix4(new TH.Matrix4().copy(root.matrixWorld).invert());
+    const x0=b.min.x-6,x1=b.max.x+6,y0=b.min.y-6,y1=b.max.y+6,z=ZB+.35;
+    selPad.position.set((x0+x1)/2,(y0+y1)/2,z);selPad.scale.set(x1-x0,y1-y0,1);
+    selEdge.geometry.dispose();selEdge.geometry=new TH.BufferGeometry().setFromPoints([[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]].map(q=>new TH.Vector3(q[0],q[1],z+.02)));
+    selPad.visible=selEdge.visible=true;kick();
+  }
   const api={
-    canvas,steps,
+    canvas,steps,pick,mark,
     setView(v){view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null};kick()},
     show(i,tot,quiet){
       total=tot;const k=Math.min(i,steps.length);const fwd=i>cur;cur=i;
@@ -12954,6 +13143,43 @@ NEWTESTS.hc12=function(b){
   pHc(b);
   b.append(hcLinkBlock());
 };
+/* Smooth page scrolling: wheel notches glide with inertia instead of jumping. Skips touch, reduced motion, pinch zoom,
+   scrollable inner panels and anything that already handles the wheel itself. */
+(function(){
+  if(window.__smooth||!matchMedia('(pointer:fine)').matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  window.__smooth=1;
+  let cur=scrollY,tgt=scrollY,raf=0,last=0,own=0;
+  const max=()=>Math.max(0,document.documentElement.scrollHeight-innerHeight);
+  const inner=(el,dy)=>{
+    for(;el&&el!==document.body&&el!==document.documentElement;el=el.parentElement){
+      const cs=getComputedStyle(el),oy=cs.overflowY;
+      if((oy==='auto'||oy==='scroll')&&el.scrollHeight>el.clientHeight+1){
+        if(dy<0&&el.scrollTop>0)return true;
+        if(dy>0&&el.scrollTop+el.clientHeight<el.scrollHeight-1)return true;
+      }
+      if(el.tagName==='TEXTAREA'||el.isContentEditable||el.classList&&(el.classList.contains('bb-gl')||el.classList.contains('bpd-arena')))return true;
+    }
+    return false;
+  };
+  function tick(now){
+    raf=0;const dt=Math.min(.05,last?(now-last)/1000:.016);last=now;
+    cur+=(tgt-cur)*(1-Math.exp(-dt/.085));
+    if(Math.abs(tgt-cur)<.4)cur=tgt;
+    own=Math.round(cur);scrollTo(0,own);
+    if(cur!==tgt)raf=requestAnimationFrame(tick);else last=0;
+  }
+  addEventListener('wheel',e=>{
+    if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+    if(inner(e.target,e.deltaY))return;
+    e.preventDefault();
+    const dy=e.deltaMode===1?e.deltaY*18:e.deltaMode===2?e.deltaY*innerHeight:e.deltaY;
+    if(!raf)cur=scrollY;
+    tgt=Math.max(0,Math.min(max(),(raf?tgt:scrollY)+dy));
+    if(!raf)raf=requestAnimationFrame(tick);
+  },{passive:false});
+  /* keep in step when the page is moved some other way (scrollbar, keys, anchors) */
+  addEventListener('scroll',()=>{if(!raf&&Math.abs(scrollY-own)>2){cur=tgt=scrollY;own=scrollY}},{passive:true});
+})();
 /* ---- hook every new part into the page. Must be the last file of the NEW block. ---- */
 const NEWFN={};
 function specSource(sp){
