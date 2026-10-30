@@ -1519,6 +1519,13 @@ header.top{position:relative;z-index:6}
 .bbp.sel{filter:drop-shadow(0 0 3px var(--accent))}
 @media (max-width:999px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr)}.bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}}
 .isoc .bbp.on,.isoc.bb-all .bbp{pointer-events:auto;cursor:pointer}
+
+.pj-addrow{margin-top:8px}
+.pj-pinmv{margin:0 0 18px;padding:14px 16px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:var(--r-md);background:var(--accent-soft)}
+.pj-pinmv h4{margin:0 0 6px;font:600 15px var(--f-body)}
+.pj-pinmv p{margin:0 0 10px;font:400 14px/1.55 var(--f-body)}
+.pj-flash{margin-top:12px}
+.pj-moved{margin:0 0 10px;padding:8px 10px;border:1px dashed var(--accent-line);border-radius:var(--r-sm);font:400 13.5px/1.5 var(--f-body)}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -2046,7 +2053,7 @@ const Link={
     setStatus();runCleanups();
   }
 };
-const dev=(line,t)=>aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t)).catch(e=>{const m=e&&e.message!=null?e.message:String(e);if(/UOPEN first/.test(m)){const f=new Error('The serial port is not open yet. Press "Find the part" first.');f.stack=e&&e.stack;throw f}throw e});
+const dev=(line,t)=>{if(typeof pjRewrite==='function')line=pjRewrite(line);return aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t)).catch(e=>{const m=e&&e.message!=null?e.message:String(e);if(/UOPEN first/.test(m)){const f=new Error('The serial port is not open yet. Press "Find the part" first.');f.stack=e&&e.stack;throw f}throw e})};
 
 /* ---------- demo device ---------- */
 const Demo={t0:Date.now(),gps:false,gpsT:null,gpsStart:0,hc:false};
@@ -2223,6 +2230,7 @@ function makeLive(fn,ms,onchange){
     get on(){return on},
     async loop(){
       if(!on)return;
+      if(own&&typeof PJ!=='undefined')PJ.ctx=own.part;
       try{await fn()}catch(e){on=false;toast(e.message);onchange&&onchange(on);return}
       if(on)t=setTimeout(()=>o.loop(),typeof ms==='function'?ms():ms);
     },
@@ -6981,6 +6989,44 @@ pinFix('st7735',{n:'ST7735 1.8 inch module',pins:[PFD,'SCL / SCK','SDA / MOSI','
 pinFix('ili9341',{n:'ILI9341 2.8 inch module',pins:['VCC','GND','CS','RES / RST','DC (also called A0 or RS)','SDA / MOSI','SCL / SCK',PFD,'SDO / MISO (only if you want to read the panel, not needed)'],src:'t',
   note:'Common 2.8 inch order VCC, GND, CS, RESET, DC, SDI (MOSI), SCK, LED, SDO (MISO). The touch pins follow on the same header and are not used.',refs:[]});
 pinFix('gc9a01',{n:'GC9A01 round module',src:'t',note:'Order of the rows follows the Waveshare 1.28 inch module. Other makers order the pins differently, so wire by the printed label.',refs:[]});
+/* ---- Outside power supplies as project parts. The ESP32 cannot measure or switch them, so each page is a short checklist,
+   and the Build tab draws the supply on the bench with its ground wire to the board. ---- */
+function pPsu(items,chain){
+  return function(b){
+    const box=el('div');
+    function paint(){
+      box.replaceChildren(...items.map(([k,t])=>{
+        const c=el('input',{type:'checkbox',id:'ps-'+k});c.checked=!!checks['psu.'+k];
+        c.addEventListener('change',()=>{
+          checks['psu.'+k]=c.checked;store.set('cts.checks',checks);
+          const id=b.dataset&&b.dataset.pid||null;
+          const all=items.every(([x])=>checks['psu.'+x]);
+          const part=chain.id;if(all)setResult(part,'pass','checklist complete');else if(R()[part])setResult(part,null);
+        });
+        return el('label',{class:'check',for:'ps-'+k},c,el('span',{},t));
+      }));
+    }
+    paint();
+    b.append(blk('Where it connects',el('ul',{class:'plain'},...chain.rows.map(t=>el('li',{},t)))),blk('Checklist',box));
+  };
+}
+const PSU_GND='The supply − (ground) joins an ESP32 GND pin. The Build tab draws this wire.';
+defPart({id:'psu5',grp:'Power',n:'5 V supply (USB adapter, power bank or bench supply)',s:'Outside 5 to 6 V for servos and other loads, ground shared with the ESP32',alias:'power supply psu 5v usb adapter charger power bank bench',
+  cmds:null,wiring:{title:'Supply ground to the ESP32',part:'5 V supply',rows:[['GND','Supply − (join to the ESP32 ground)','black','gnd']],
+    notes:['Supply + goes to the load (servo V+, driver supply pin), never to an ESP32 pin.','Both grounds must be joined, or the signal wires have no reference.']},
+  criteria:['Open-circuit voltage reads 5.0 to 6.0 V.','Ground is joined to the ESP32 ground.'],
+  page:pPsu([['rate','The label says 5 V (up to 6 V) and at least 2 A for a servo that moves a load'],['volt','A multimeter on the plug reads 5.0 to 6.0 V with nothing connected'],['pol','Barrel jack: the centre is usually +. Check it with the meter before you wire it'],['gnd','Supply − is joined to an ESP32 GND pin'],['off','The supply is off while you connect or unplug anything'],['cap','A 470 to 1000 µF capacitor sits across the supply, close to the load']],{id:'psu5',rows:['Supply + goes to the load: servo V+, PCA9685 V+, or the module supply pin.',PSU_GND]})});
+defPart({id:'psu12',grp:'Power',n:'12 V supply (adapter or bench supply, 12 to 24 V)',s:'Motor supply for stepper drivers, with a shared ground',alias:'power supply psu 12v 24v adapter wall brick motor supply barrel jack stepper',
+  cmds:null,wiring:{title:'Supply ground to the ESP32',part:'12 V supply',rows:[['GND','Supply − (join to the ESP32 ground)','black','gnd']],
+    notes:['Supply + goes to the driver motor-supply pin (VMOT on the A4988, VM on the TMC2209, +12V on the L298N), never to an ESP32 pin.','Switch the supply off before you connect or unplug a motor.']},
+  criteria:['Open-circuit voltage reads 12 V to 24 V, as the driver allows.','Ground is joined to the ESP32 ground.'],
+  page:pPsu([['rate','The label says 12 V to 24 V and at least 2 A for a NEMA 17'],['volt','A multimeter on the plug reads 12 V ±5 % with nothing connected'],['pol','Barrel jack: the centre is usually +. Check it with the meter before you wire it'],['gnd','Supply − is joined to the driver GND and an ESP32 GND pin'],['cap','A 100 µF capacitor sits across the driver supply pins'],['off','The supply is off while you connect or unplug the motor']],{id:'psu12',rows:['Supply + goes to the driver: VMOT (A4988), VM (TMC2209) or +12V (L298N).',PSU_GND]})});
+defPart({id:'psuadj',grp:'Power',n:'Adjustable bench supply (0 to 30 V, current limit)',s:'Any voltage for drivers, radios and modems, ground shared with the ESP32',alias:'power supply psu bench adjustable variable lab 30v current limit sim800l a7670c',
+  cmds:null,wiring:{title:'Supply ground to the ESP32',part:'Bench supply',rows:[['GND','Supply − (join to the ESP32 ground)','black','gnd']],
+    notes:['Set the voltage and the current limit before you connect the load.','Supply + goes to the load, never to an ESP32 pin.']},
+  criteria:['Voltage and current limit are set for the load.','Ground is joined to the ESP32 ground.'],
+  page:pPsu([['volt','The output is set to the voltage the part needs (a SIM800L takes 4.0 V, a motor driver 12 V) with the output off'],['lim','The current limit is set a little above the load (2 A for a SIM800L or a NEMA 17)'],['gnd','Supply − is joined to an ESP32 GND pin'],['on','Output on: the meter on the supply reads the set voltage with the load connected'],['off','The output is off while you connect or unplug the load']],{id:'psuadj',rows:['Supply + goes to the load supply pin.',PSU_GND]})});
+delete NEWCMDS.psu5;delete NEWCMDS.psu12;delete NEWCMDS.psuadj;
 /* ---- connection scan and pin guard. Uses only commands the firmware already has: SCAN, IN with pull-up or pull-down, ADC. ---- */
 const PG_SKIP=[21,22,16,17];
 const PG_DRIVE=new Set(['OUT','PWM','NEO','SERVO','PULSE','CAP','DHT']);
@@ -8311,7 +8357,7 @@ function label(l){
 }
 function chipFam(s){s=String(s||'');return /S3/i.test(s)?'s3':/S2/i.test(s)?'s2':/C3/i.test(s)?'c3':/C6/i.test(s)?'c6':/ESP32/i.test(s)?'esp32':null}
 return {CHIPS,LIST,by,get cur(){return cur},set,fit,need,hidden:p=>!!(cur&&p&&fit(p).hide),onChange:f=>subs.push(f),famName:b=>CHIPS[b.fam].n,
-  ident,reset,alloc,seed,preview,plan,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
+  ident,reset,alloc,seed,preview,plan,pinWords,lineNeeds,sentOk,forgetSent,pickable,label,chipFam,onMap:f=>mapSubs.push(f),get map(){return map}};
 })();
 /* ---- Board figures: every board in the picker, drawn with the Anatomy iso kit (ISO) like the DevKit in homefig.js.
    Shapes are schematic: sizes, ports, buttons, headers and the module are right in kind, not measured to the millimetre.
@@ -10458,7 +10504,7 @@ const RDTIPS=[
 function readTip(label){const l=String(label||'').trim();for(const [r,t] of RDTIPS)if(r.test(l))return t;return ''}
 /* ---- Projects, part 1: storage, the run recorder, statistics, charts and exports. The pages are in projects_ui.js. ---- */
 let PJO=null;   /* the dashboard tile being built; readout() and makeLive() report to it */
-const PJ={pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:12,rec:true};
+const PJ={ovr:{},ctx:null,pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:12,rec:true};
 const pjPart=id=>PARTS.find(p=>p.id===id);
 const pjName=id=>{const p=pjPart(id);return p?p.n:id};
 const pjShort=id=>{let n=String(pjName(id)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28)}return n};
@@ -10596,6 +10642,7 @@ function pjBoard(){try{const b=BRD.cur&&BRD.by(BRD.cur);return b?b.n:'ESP32 DevK
 
 /* ---------- wiring: every wire of every part in one list, with pin and address clashes ---------- */
 const PJ_ADDR={mpu:[0x68],bmp180:[0x77],bmp280:[0x76]};
+const PJ_DRV=new Set(['a4988','tmc2209']);
 function pjBus(n,pp,part){
   const t=pp.trim();
   if(part==='tm1637'||part==='tm1638')return '';
@@ -10610,8 +10657,8 @@ function pjWiring(ids){
     let w=null;try{w=p.wiring?W(p.wiring):null}catch(e){}
     if(!w||!w.rows){nowire.push(id);continue}
     for(const r of w.rows){
-      const esp=String(r[0]),pp=String(r[1]),kind=r[3]||'sig';
-      rows.push({part:id,esp,pp,wire:r[2]||'',kind});
+      const ov=PJ.ovr&&PJ.ovr[id],esp0=String(r[0]),esp=ov?esp0.replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):esp0,pp=String(r[1]),kind=r[3]||'sig';
+      rows.push({part:id,esp,pp,wire:r[2]||'',kind,moved:esp!==esp0});
       const m=/^GPIO(\d+)/.exec(esp);
       if(m&&kind!=='pwr'&&kind!=='gnd'){
         const n=+m[1],o=used.get(n)||{n,owners:[]};
@@ -10625,6 +10672,10 @@ function pjWiring(ids){
   const pins=[...used.values()].sort((a,b)=>a.n-b.n);
   for(const o of pins){
     o.state='ok';
+    /* a NEMA 17 is wired to its driver, and the driver to these pins, so the motor and one driver share them */
+    const drv=o.owners.filter(x=>PJ_DRV.has(x.part)),mot=o.owners.filter(x=>x.part==='nema17'),oth=o.owners.filter(x=>!PJ_DRV.has(x.part)&&x.part!=='nema17');
+    if(o.owners.length>1&&drv.length&&mot.length&&!oth.length&&drv.length===1){o.state='shared';o.bus='STEP';o.owners.forEach(x=>x.bus='STEP');continue}
+    if(o.owners.length>1&&mot.length&&drv.length>1&&!oth.length)o.owners=o.owners.filter(x=>x.part!=='nema17');
     if(o.owners.length>1){
       const bus=o.owners[0].bus;
       if(bus&&o.owners.every(x=>x.bus===bus))o.state='shared';
@@ -10769,6 +10820,59 @@ async function pjRecover(){
     await pjDb.put('sessions',s);toast('Recovered the run that was open when the page closed: '+s.n);return s;
   }catch(e){return null}
 }
+
+
+/* ---------- pin moves: when two parts need one pin, the later part is given a free pin ---------- */
+const PJ_PIN_PREF=[4,13,14,5,16,17,25,26,27,32,33,15,2],PJ_PIN_IN=[35,36,39,34,32,33];
+/* the commands the tester sends carry the pin numbers, so a moved pin only has to be changed in the line */
+function pjRewrite(line){
+  const ctx=PJ.ctx,ov=ctx&&PJ.ovr&&PJ.ovr[ctx];
+  if(!ov||typeof BRD==='undefined'||!BRD.pinWords)return line;
+  const w=String(line).trim().split(/\s+/),c=w[0].toUpperCase(),a=w.slice(1);let hit=false;
+  for(const i of BRD.pinWords(c,a)){const t=a[i];if(t!=null&&/^\d+$/.test(t)&&ov[+t]!=null){a[i]=String(ov[+t]);hit=true}}
+  return hit?[w[0],...a].join(' '):line;
+}
+/* the motor is wired to its driver, so its pins follow the driver (the A4988 page and the TMC2209 page use different ones) */
+function pjSyncStepper(pr){
+  const ids=pr.parts,drv=ids.filter(i=>PJ_DRV.has(i));
+  if(!ids.includes('nema17')||drv.length!==1){if(pr.pins&&pr.pins.nema17){delete pr.pins.nema17;PJ.ovr=pr.pins}return}
+  const w=pjWiring(ids),pin=re=>{const r=w.rows.find(r=>r.part===drv[0]&&re.test(r.pp)&&/^GPIO\d+/.test(r.esp));return r?+/^GPIO(\d+)/.exec(r.esp)[1]:null};
+  const to=[pin(/^STEP/i),pin(/^DIR/i),pin(/^EN/i)],from=[14,27,32],m={};
+  from.forEach((f,i)=>{if(to[i]!=null&&to[i]!==f)m[f]=to[i]});
+  if(Object.keys(m).length)pr.pins.nema17=m;else delete pr.pins.nema17;
+  PJ.ovr=pr.pins;
+}
+function pjAutoPins(pr){
+  const ids=pr.parts,before=JSON.stringify(pr.pins||{});
+  pr.pins=pr.pins||{};PJ.ovr=pr.pins;
+  for(let g=0;g<16;g++){
+    pjSyncStepper(pr);
+    const w=pjWiring(ids),c=w.conflicts.find(x=>x.kind==='pin'&&x.sev==='conflict');
+    if(!c)break;
+    const o=w.pins.find(p=>p.n===c.pin);if(!o)break;
+    const mover=o.owners.filter(x=>!x.opt&&!x.bus).sort((a,b)=>ids.indexOf(b.part)-ids.indexOf(a.part))[0];
+    if(!mover)break;
+    const ov=pr.pins[mover.part]||{},orig=+(Object.keys(ov).find(k=>ov[k]===c.pin)||c.pin);
+    const taken=new Set(w.pins.map(p=>p.n)),analog=orig>=34;
+    const list=(analog?PJ_PIN_IN:PJ_PIN_PREF).filter(n=>!taken.has(n)&&(analog||FW_OUT.includes(n)));
+    if(!list.length)break;
+    pr.pins[mover.part]=Object.assign({},ov,{[orig]:list[0]});PJ.ovr=pr.pins;
+  }
+  pjSyncStepper(pr);
+  return JSON.stringify(pr.pins)!==before;
+}
+/* [{part, signal, from, to}] for the banner and the copy button */
+function pjPinMoves(pr){
+  const out=[];
+  for(const id of Object.keys(pr.pins||{})){
+    const p=pjPart(id);let rows=[];try{rows=p&&p.wiring?W(p.wiring).rows:[]}catch(e){}
+    for(const k of Object.keys(pr.pins[id])){
+      const r=rows.find(r=>new RegExp('^GPIO'+k+'(\\D|$)').test(String(r[0])));
+      out.push({part:id,signal:r?String(r[1]).replace(/\s*\(.*$/,''):'signal',from:+k,to:pr.pins[id][k]});
+    }
+  }
+  return out;
+}
 /* ---- Projects, part 2: the pages. List, parts, wiring, dashboard, runs and compare. ---- */
 const PJ_PRESETS=[
   ['Weather station','Temperature, pressure, humidity and light.',['bme280','bh1750','ds18b20']],
@@ -10813,9 +10917,12 @@ async function pjGo(o){
   const pr=await pjDb.get('projects',PJ.pid);
   if(tok!==PJ.tok)return;
   if(!pr){PJ.pid=null;await pjList(b,tok);return}
+  PJ.ovr=pr.pins||{};PJ.ctx=null;
+  try{if(pjAutoPins(pr))await pjSave(pr)}catch(e){console.warn('pin plan',e)}
   await pjProject(b,pr,tok);
 }
 async function pjLeave(){
+  PJ.ctx=null;PJ.ovr={};
   clearInterval(PJ.timer);PJ.timer=0;
   try{if(PJ.run)await PJ.stop(false)}catch(e){}
   PJ.tiles=[];
@@ -10883,6 +10990,7 @@ async function pjProject(b,pr,tok){
   });
   const body=el('div',{class:'pj-body',role:'tabpanel',id:'pj-panel','aria-labelledby':'pj-t-'+PJ.view});
   b.append(el('div',{class:'pj-bar'},btn('All projects',()=>pjGo({}),'sm'),nameIn),tabs,body);
+  const pb=pjPinBanner(pr);if(pb)body.append(pb);
   if(PJ.view==='parts')pjParts(body,pr);
   else if(PJ.view==='build')pjBuild(body,pr);
   else if(PJ.view==='wire')pjWire(body,pr);
@@ -10910,6 +11018,7 @@ function pjParts(body,pr){
     const has=pr.parts.includes(id);
     if(on&&!has){if(pr.parts.length>=PJ.max){toast('A dashboard holds up to '+PJ.max+' parts. Remove one first.');paint();return}pr.parts.push(id)}
     else if(!on&&has)pr.parts=pr.parts.filter(x=>x!==id);
+    try{pjAutoPins(pr)}catch(e){}
     await pjSave(pr);paint();pjHead('Projects',pjPlural(pr.parts.length,'part'));
   };
   function build(){
@@ -11022,6 +11131,7 @@ function pjDash(body,pr,nRuns){
   for(const id of pr.parts){
     const p=pjPart(id),own=PJ.owner(pr.id,id);PJ.tiles.push(own);
     const tb=el('div',{class:'pj-tb'}),prev=PJO;PJO=own;
+    for(const ev of ['pointerdown','keydown','focusin','change'])tb.addEventListener(ev,()=>{PJ.ctx=id},true);
     try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prev}
     own.st=el('span',{class:'chip dash'},'Manual');own.res=el('span',{class:'pj-res'});
@@ -11161,6 +11271,31 @@ function pjCompare(body,pr,runs){
     stDownload('esp32-project_'+pjSlug(pr.name)+'_comparison.csv',rows.join('\n')+'\n','text/csv;charset=utf-8');toast('Saved the comparison');
   },'sm')));
 }
+
+
+/* ---------- pins moved to avoid a clash: what changed, how to apply it, and a way back ---------- */
+function pjPinBanner(pr){
+  const mv=pjPinMoves(pr);if(!mv.length)return null;
+  const pin=n=>(typeof BRD!=='undefined'&&BRD.label&&BRD.label(n))||'GPIO'+n;
+  const rows=mv.map(m=>el('tr',{},el('td',{},pjShort(m.part)),el('td',{},m.signal),el('td',{class:'m'},pin(m.from)),el('td',{class:'m'},pin(m.to))));
+  const flash=el('div',{class:'pj-flash',hidden:true});
+  let shown=false;
+  const reflash=btn('Reflash the ESP32',()=>{
+    shown=!shown;flash.hidden=!shown;
+    if(shown&&!flash.firstChild){const c=typeof flasherCard==='function'?flasherCard('tester',{title:'Reflash the ESP32'}):null;flash.append(c||el('p',{class:'hint'},'The installer is not in this copy of the page.'))}
+  },'primary');
+  const copy=btn('Copy pin list',async()=>{
+    const t=mv.map(m=>'#define '+(pjShort(m.part)+'_'+m.signal).toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'')+' '+m.to+'  // was GPIO'+m.from).join('\n');
+    try{await navigator.clipboard.writeText(t);toast('Pin list copied')}catch(e){toast('Could not copy. Select the table instead.')}
+  },'sm');
+  const undo=btn('Undo pin changes',async()=>{pr.pins={};PJ.ovr={};await pjSave(pr);toast('Pins back to the defaults');pjGo({pid:pr.id,view:PJ.view})},'sm');
+  return el('section',{class:'pj-pinmv',role:'status','aria-label':'Pins moved'},
+    el('h4',{},'Pins moved so the parts do not fight over one pin'),
+    el('p',{},'Two parts needed the same pin, so the later part was moved to a free one. The Build and Wiring tabs already show the new pins. Rewire these signals, then reflash the ESP32 so it runs with this pin layout.'),
+    el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...['Part','Signal','Was','Now'].map(h=>el('th',{},h)))),el('tbody',{},...rows))),
+    el('p',{class:'hint'},'The tester firmware gets its pins from this page with every command, so the live tests follow the new pins without a reflash. A sketch of your own needs them: reflash it with the list below.'),
+    el('div',{class:'pj-acts'},reflash,copy,undo),flash);
+}
 /* ---- Project checker: pin clashes, voltage levels, power and missing parts. Pure functions plus one list renderer. ----
    Every entry in PJ_NEED comes from a note on that part's own page (wiring notes) or from the module's datasheet. */
 /* [sev, kind, title, why, fix, extra parts to add (optional), [pin A, pin B] they go between (optional)] */
@@ -11231,6 +11366,8 @@ const PJ_REQ=[
 ];
 /* typical running current from the board rails, in mA. Parts with their own supply are left out. */
 const PJ_MA={servo:150,sd:80,gps:45,hc12:40,relay:75,motor:250,neo:120,sk6812:120,lcd:40,mq2:150,mq135:150,step28:240,max98357:100,mhz19b:130,pmsa003:100,hc05:40,ili9341:100,st7789:50,st7735:40,gc9a01:40,oled:20,sh1106:20,scd30:75,tcs34725:20,pir:1,sr04:15,rc522:25,pn532:50,as608:60,dfplayer:30,ad8232:1,max30102:20,tm1637:20,max7219:60};
+/* an outside supply that satisfies each part's "needs its own supply" note, best fit first */
+const PJ_SUPPLY={nema17:['psu12','psuadj'],a4988:['psu12','psuadj'],tmc2209:['psu12','psuadj'],l298n:['psu12','psuadj'],lm2596:['psu12','psuadj'],mg996r:['psu5','psuadj'],pca9685:['psu5','psuadj'],sim800l:['psuadj'],a7670c:['psuadj']};
 const PJ_EXT=new Set(['mg996r','sim800l','a7670c','pca9685','l298n','a4988','tmc2209','nema17','lm2596']);
 const PJ_ADDR_FIX={mpu:'MPU-6050: tie AD0 to 3V3 to move it to 0x69.',bmp280:'BMP280: tie SDO to 3V3 to move it to 0x77.',bme280:'BME280: tie SDO to 3V3 to move it to 0x77.',bh1750:'BH1750: tie ADDR to 3V3 to move it to 0x5C.',sht31:'SHT31: tie ADDR to 3V3 to move it to 0x45.',ina219:'INA219: bridge the A0 or A1 pads to change its address.',pca9685:'PCA9685: bridge an address pad (A0 to A5) to change its address.',lsm6ds3:'LSM6DS3: tie SDO to 3V3 to change its address.',adxl345:'ADXL345: tie SDO to 3V3 to move it to 0x1D.',mpu9250:'MPU-9250: tie AD0 to 3V3 to move it to 0x69.'};
 const pjRail=e=>/3V3|3\.3/i.test(e)?'3V3':/5V|VIN|VBUS/i.test(e)?'5V':/GND/i.test(e)?'GND':/^GPIO/i.test(e)?'GPIO':'ext';
@@ -11267,7 +11404,7 @@ function pjCheck(ids){
   /* 3. partners */
   for(const r of PJ_REQ)if(has.has(r.part)&&!r.any.some(x=>has.has(x))){
     const names=r.any.map(pjShort).join(' or ');
-    add({sev:r.sev,kind:'missing',parts:[r.part],title:r.title,text:pjShort(r.part)+': '+r.why,fix:r.fix+' ('+names+' is in the parts list.)'});
+    add({sev:r.sev,kind:'missing',parts:[r.part],title:r.title,text:pjShort(r.part)+': '+r.why,fix:r.fix+' ('+names+' is in the parts list.)',add:r.any.filter(x=>pjPart(x)&&!has.has(x))});
   }
   /* 4. per-part notes */
   const lvl=has.has('levelshift');
@@ -11276,8 +11413,18 @@ function pjCheck(ids){
       const [sev,kind,title,why,fix,item,between]=n;
       let s=sev,f=fix;
       if(kind==='level'&&lvl){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
-      add({sev:s,kind,parts:[id],title,text:pjShort(id)+': '+why,fix:f});
-      if(item&&kind!=='power')addExtra(id,item,title,between);
+      let addp=null,ok=false;
+      if(kind==='power'&&item&&PJ_SUPPLY[id]){
+        const have=PJ_SUPPLY[id].find(x=>has.has(x));
+        if(have){ok=true;s='info';f='The '+pjShort(have)+' in this project covers it. Connect its + to '+(/VMOT|VM\b/.test(why+fix)?'the driver motor-supply pin':'the supply pin')+' and its − to the driver GND and the ESP32 GND.'}
+        else addp=[PJ_SUPPLY[id][0]];
+      }else if(kind==='missing'&&item){
+        const pid=/capacitor|µF/i.test(item)?'capacitor':/resistor|Ω/i.test(item)?'resistor':null;
+        if(pid&&pjPart(pid)&&!has.has(pid))addp=[pid];
+      }
+      add({sev:s,kind,parts:[id],title,text:pjShort(id)+': '+why,fix:f,add:addp});
+      if(ok){}
+      else if(item&&kind!=='power')addExtra(id,item,title,between);
       else if(item)addExtra(id,item,title);
     }
   }
@@ -11324,12 +11471,26 @@ function pjCheckSummary(res,n){
   return {cls:'good',head:'These parts work together',tail:c.info?'. '+pjPlural(c.info,'tip')+' below.':'.'};
 }
 /* the list: one card per issue, with what is wrong and what to do about it */
+/* add parts to the open project from an issue card, then redraw the page */
+async function pjAddToProject(ids){
+  const pr=PJ.pid&&await pjDb.get('projects',PJ.pid);if(!pr)return;
+  const add=ids.filter(id=>pjPart(id)&&!pr.parts.includes(id));
+  if(!add.length)return;
+  if(pr.parts.length+add.length>PJ.max){toast('A project holds up to '+PJ.max+' parts. Remove one first.');return}
+  pr.parts.push(...add);
+  try{pjAutoPins(pr)}catch(e){}
+  await pjSave(pr);toast('Added '+add.map(pjShort).join(' and '));
+  await pjGo({pid:pr.id,view:PJ.view});
+}
 function pjIssueList(issues,only){
   const list=only?issues.filter(o=>only.includes(o.parts[0])||o.parts.some(p=>only.includes(p))):issues;
   if(!list.length)return null;
-  return el('ul',{class:'plain pj-is'},...list.map(o=>el('li',{class:'pj-i '+o.sev},
+  return el('ul',{class:'plain pj-is'},...list.map(o=>{
+    const ad=(o.add||[]).filter(x=>pjPart(x));
+    return el('li',{class:'pj-i '+o.sev},
     el('span',{class:'pj-ik'},pjKindLabel[o.kind]||'Check'),
-    el('div',{class:'pj-ib'},el('strong',{},o.title),el('p',{},o.text),o.fix?el('p',{class:'pj-fix'},el('b',{},'What to do: '),o.fix):null))));
+    el('div',{class:'pj-ib'},el('strong',{},o.title),el('p',{},o.text),o.fix?el('p',{class:'pj-fix'},el('b',{},'What to do: '),o.fix):null,
+      ad.length?el('div',{class:'pj-acts pj-addrow'},...ad.map(id=>btn('Add '+pjShort(id),()=>pjAddToProject([id]),'sm primary'))):null))}));
 }
 /* ---- Projects: the parts as they look in real life, for the Build tab.
    Everything is drawn from solids (boxes, turned bodies) in board units, 10 units = one 2.54 mm pitch, so a part is
@@ -11758,7 +11919,7 @@ function extraPart(name,x0,x1,y){
 
 /* ---------- parts that stay on the bench, joined to the board by a cable ---------- */
 const BS=MM*.8;
-const BD={servo:[36,16,32],mg996r:[56,24,52],motor:[34,18,18],step28:[80,38,34],nema17:[46,46,66],relay:[50,26,19],ssr:[62,45,24],lcd:[80,36,12],neo:[100,12,6],sk6812:[100,12,6],yfs201:[64,26,36],keypad:[54,60,5],ds18b20:[60,10,8],ph:[60,34,14],pmsa003:[50,38,21],mhz19b:[34,20,12],l298n:[43,43,26],sim800l:[26,24,6],a7670c:[40,40,7],lm2596:[44,22,14],mt3608:[38,18,8],tp4056:[28,18,6],ili9341:[86,50,6]};
+const BD={psu5:[54,36,26],psu12:[54,36,26],psuadj:[54,36,26],servo:[36,16,32],mg996r:[56,24,52],motor:[34,18,18],step28:[80,38,34],nema17:[46,46,66],relay:[50,26,19],ssr:[62,45,24],lcd:[80,36,12],neo:[100,12,6],sk6812:[100,12,6],yfs201:[64,26,36],keypad:[54,60,5],ds18b20:[60,10,8],ph:[60,34,14],pmsa003:[50,38,21],mhz19b:[34,20,12],l298n:[43,43,26],sim800l:[26,24,6],a7670c:[40,40,7],lm2596:[44,22,14],mt3608:[38,18,8],tp4056:[28,18,6],ili9341:[86,50,6]};
 const benchDims=it=>{const d=BD[it.id];return d?d.map(v=>v*BS):null};
 function bf(b,k){
   const s=BS*(k||1),X=u=>b.cx+u*s,Y=v=>b.cy+v*s;
@@ -11801,6 +11962,19 @@ const BENCH={
     return [o];
   },
   mg996r(b){return BENCH.servo(b,'mg996r')},
+  psu(b,id){
+    const f=bf(b,1),lab=id==='psu5'?'5 V':id==='psu12'?'12 V':'0-30 V',body=id==='psuadj'?'#3a4250':'#2d3138';let o='';
+    o+=f.box(-25,-16,25,16,0,22,body,{tone:'lo',r:2.2});
+    o+=f.box(-23,-14,23,14,22,23.2,'#1b1e24',{tone:'lo',r:1.5});
+    o+=f.top(0,-4,23.2,'DC SUPPLY',2.8,'hi');o+=f.top(0,3,23.2,lab,4.2,'hi');
+    o+=f.box(-18,16,2,16.8,9,19,'#0c2a1d',{tone:'faint'});o+=f.face(-8,16.9,12,lab,4,'hi');
+    o+=f.box(7,16,12,18.6,12,17,'#d6453d',{tone:'lo'});o+=f.box(14,16,19,18.6,12,17,'#15161a',{tone:'lo'});
+    o+=f.box(7,16,12,16.8,5,9,'#e9e6dc',{tone:'faint'});o+=f.box(14,16,19,16.8,5,9,'#e9e6dc',{tone:'faint'});
+    for(const sx of [-21,21])for(const sy of [-12,12])o+=f.zc(sx,sy,1.8,-1.2,0,'#15161a',{n:8});
+    o+=f.zc(-18,0,3.6,22,25,'#c9ccd1',{n:18,spec:.5});
+    return [o];
+  },
+  psu5(b){return BENCH.psu(b,'psu5')},psu12(b){return BENCH.psu(b,'psu12')},psuadj(b){return BENCH.psu(b,'psuadj')},
   motor(b){
     const f=bf(b,1),zc=8.6;let o='';
     o+=f.xc(0,zc,8.6,-10,9,'#b9bdc4',{spec:.55,n:30});
@@ -11835,9 +12009,10 @@ const BENCH={
   },
   nema17(b){
     const f=bf(b,1);let o='';
-    o+=f.box(-21,-21,21,21,0,40,'#25272c',{tone:'lo',r:4});
-    o+=f.box(-21,-21,21,21,0,5,'#9ea2a8',{tone:'lo',r:4});
-    o+=f.box(-21,-21,21,21,35,40,'#9ea2a8',{tone:'lo',r:4});
+    o+=f.box(-20.2,-20.2,20.2,20.2,5,35,'#25272c',{tone:'lo',r:3.4});
+    o+=f.box(-21,-21,21,21,0,5,'#7b808a',{tone:'lo',r:4});
+    o+=f.box(-21,-21,21,21,35,40,'#7b808a',{tone:'lo',r:4});
+    for(let z=9;z<=31;z+=4)o+=f.box(-20.6,-20.6,20.6,20.6,z,z+.7,'#1c1e22',{tone:'lo',r:3.7});
     o+=f.zc(0,0,11,40,42,'#b9bdc4',{n:30,spec:.5});
     o+=f.zc(0,0,2.5,42,66,'#c9ccd1',{n:14,spec:.6});o+=f.box(-1,2,1,2.7,44,66,'#c9ccd1');
     for(const sx of [-15.5,15.5])for(const sy of [-15.5,15.5])o+=f.zc(sx,sy,1.7,40,40.1,'#07080a',{n:10});
@@ -12050,9 +12225,9 @@ const ROW={a:54,b:64,c:74,d:84,e:94,f:124,g:134,h:144,i:154,j:164},RAIL={tp:14,t
 const Y=v=>v+OY;
 const colX=c=>X0+(c-1)*PITCH+5;
 const SKIP=new Set(['i2c','studio','breadboard','jumper','esp']);
-const OFF={ili9341:'tft',servo:'servo',mg996r:'servo',motor:'motor',step28:'step',nema17:'step',relay:'relay',ssr:'relay',lcd:'lcd',neo:'strip',sk6812:'strip',yfs201:'flow',keypad:'pad',ds18b20:'probe',ph:'probe',pmsa003:'big',mhz19b:'big',l298n:'big',sim800l:'big',a7670c:'big',lm2596:'big',mt3608:'big',tp4056:'big'};
+const OFF={ili9341:'tft',servo:'servo',mg996r:'servo',motor:'motor',step28:'step',nema17:'step',relay:'relay',ssr:'relay',lcd:'lcd',neo:'strip',sk6812:'strip',yfs201:'flow',keypad:'pad',ds18b20:'probe',ph:'probe',pmsa003:'big',mhz19b:'big',l298n:'big',sim800l:'big',a7670c:'big',lm2596:'big',mt3608:'big',tp4056:'big',psu5:'psu',psu12:'psu',psuadj:'psu'};
 const DISC={led:'led',rgb:'rgbled',gpio:'sw',button:'sw',resistor:'res',ldr:'res',ntc:'res',capacitor:'cap',diode:'dio',transistor:'tr',lm35:'tr',pc817:'dip',irf540n:'to220',abuzz:'buzz',pbuzz:'buzz',pot:'pot'};
-const SIZE={servo:[46,24,44],motor:[34,34,40],step:[44,44,24],relay:[56,40,36],lcd:[84,38,5],strip:[110,12,4],flow:[34,26,34],pad:[64,64,3],probe:[10,10,56],big:[56,38,16]};
+const SIZE={servo:[46,24,44],motor:[34,34,40],step:[44,44,24],relay:[56,40,36],lcd:[84,38,5],strip:[110,12,4],flow:[34,26,34],pad:[64,64,3],probe:[10,10,56],big:[56,38,16],psu:[60,40,28]};
 /* DevKit V1, USB at the left. Back header runs left to right, front header too. */
 const BACK=['VIN','GND',13,12,14,27,26,25,33,32,35,34,39,36,'EN'],FRONT=['3V3','GND',15,2,4,16,17,5,18,19,21,3,1,22,23];
 const EC0=4,ESPPIN={};
@@ -12086,7 +12261,8 @@ function planOf(ids){
     if(SKIP.has(id))continue;
     const p=pjPart(id);if(!p)continue;
     let wr=null;try{wr=p.wiring?W(p.wiring):null}catch(e){}
-    const rows=((wr&&wr.rows)||[]).map(r=>({esp:String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp));
+    const ov=(typeof PJ!=='undefined'&&PJ.ovr&&PJ.ovr[id])||null;
+    const rows=((wr&&wr.rows)||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp));
     const n=Math.max(2,Math.min(9,rows.length||2));
     const kind=OFF[id]?'off':DISC[id]?'disc':'plug';
     const need5=rows.some(r=>r.kind==='pwr'&&pjRail(r.esp)==='5V');
@@ -12512,7 +12688,7 @@ function pjBuild(body,pr){
   const tpanel=el('aside',{class:'bb-test',hidden:true,'aria-label':'Live test of the selected part'});
   let tsel=null,townLives=[];
   function closeTest(){
-    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;tpanel.hidden=true;tpanel.replaceChildren();
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.hidden=true;tpanel.replaceChildren();
     stage.classList.remove('has-test');if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
   function openTest(id,k){
@@ -12523,9 +12699,11 @@ function pjBuild(body,pr){
     const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
     try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prevO;HL=prevHL}
-    townLives=own.lives;
+    townLives=own.lives;PJ.ctx=id;
+    const mv=(pr.pins&&pr.pins[id])?Object.keys(pr.pins[id]).map(k=>'GPIO'+k+' is sent as GPIO'+pr.pins[id][k]):[];
     tpanel.replaceChildren(
       el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
+      mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):null,
       tb,typeof verdictBar==='function'?verdictBar(p):null);
     tpanel.hidden=false;stage.classList.add('has-test');
     if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
