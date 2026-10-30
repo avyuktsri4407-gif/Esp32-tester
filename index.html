@@ -11395,6 +11395,7 @@ function stand(it,c,spec){
     cyl:(u,v,r,t0,t1,hex,o)=>F.push(revolve('y',X(u),Z(v),cylP(yf+t0*MM,yf+t1*MM,r*MM),hex,o)),
     cylB:(u,v,r,t0,t1,hex,o)=>B.push(revolve('y',X(u),Z(v),cylP(yb-t1*MM,yb-t0*MM,r*MM),hex,o)),
     dome:(u,v,r,t0,hex,o)=>F.push(revolve('y',X(u),Z(v),domeP(yf+t0*MM,r*MM,10,1),hex,o)),
+    vtube:(u,t,r,v0,v1,hex,o)=>F.push(revolve('z',X(u),yf+t*MM,[[Z(v0),r*MM-.55],[Z(v0),r*MM],[Z(v1),r*MM],[Z(v1),r*MM-.55]],hex,o)),
     vcyl:(u,t,r,v0,v1,hex,o)=>F.push(revolve('z',X(u),yf+t*MM,cylP(Z(v0),Z(v1),r*MM),hex,o)),
     ring:(u,v,r,t,tone)=>{if(fvis)F.push(ringLine('y',X(u),Z(v),yf+t*MM,r*MM,tone))},
     line:(pts,t,tone)=>{if(fvis)F.push(H.ln(pts.map(p=>[X(p[0]),yf+(t||0)*MM+.05,Z(p[1])]),tone||'mid'))},
@@ -11481,11 +11482,26 @@ const SPEC={
     for(let i=0;i<5;i++)m.ring(16,12.8,2.3+i*2.2,.8+Math.sqrt(Math.max(0,11.5*11.5-(2.3+i*2.2)**2)),'lo');
     trim(m,3.2,3.4,'#e08a2e');trim(m,28.6,3.4,'#e08a2e');m.box(11,1.2,21,3.6,2.5,'#16171a');m.text(16,3.8,'HC-SR501',1.6,'middle','hi');
   },labels:true},
-  hc12:{w:27.4,h:13.2,col:GREEN,draw(m){
-    m.box(3.6,1.5,24.3,11.7,3.4,'#b9bdc4',{tone:'lo'});m.text(14,5.4,'HC-12',2.6,'middle','lo');m.text(14,8.7,'433',1.8,'middle','lo');
-    m.led(2,10.4,'#d6453d');m.smd(1.6,3.4,'r');
-    /* the spring antenna, a coil of wire standing up from the corner */
-    m.vcyl(25.6,.8,.8,13.2,25,'#c9a24a',{band:[0,1.2],n:8,spec:.5});
+  hc12:{w:13.2,h:27.4,col:'#2a6cc0',labels:true,draw(m){
+    /* castellated pads along the foot, five of them on the 2.54 pitch */
+    for(let k=0;k<5;k++){const u=6.6+(k-2)*2.54;m.box(u-.95,0,u+.95,1.6,.12,'#d8b877',{tone:'faint',crease:'none'});m.hole(u,.15,.55)}
+    /* u.FL socket and the antenna pad at the head */
+    m.box(1.3,22.9,4.3,25.9,1.8,'#c9ccd1',{tone:'lo'});m.cyl(2.8,24.4,.9,1.8,2.1,'#d8b877',{n:14,spec:.5});m.cyl(2.8,24.4,.35,2.1,2.4,'#16171a',{n:8});
+    m.hole(11.2,25.9,.95);
+    /* the radio chip, the micro, the crystal and the small regulator */
+    m.chip(7,16.8,4.2,4.2,.9,'');m.box(6.1,16.1,6.5,16.5,.95,'#c9ccd1');
+    m.chip(9.4,8.7,7.2,6.4,1.1,'STM8');
+    for(let i=0;i<10;i++){const v=6.1+i*.65;m.box(5.3,v-.15,5.95,v+.15,.4,'#c9ccd1',{tone:'faint',crease:'none'});m.box(12.85,v-.15,13.5,v+.15,.4,'#c9ccd1',{tone:'faint',crease:'none'})}
+    m.box(9.7,13.4,12.9,15.8,1.25,'#d4d7dc',{tone:'lo'});m.box(9.7,13.4,10.3,15.8,1.3,'#d8b877',{tone:'faint',crease:'none'});m.box(12.3,13.4,12.9,15.8,1.3,'#d8b877',{tone:'faint',crease:'none'});
+    m.chip(9.2,22.6,2.8,2,.8,'');
+    /* inductors and the field of 0402 parts */
+    m.box(.9,11.9,3.6,14.3,1.5,'#8a6a3e',{tone:'lo'});m.box(.9,15,3.4,16.8,1.2,'#8a6a3e',{tone:'lo'});m.box(.8,5.6,3.4,7.4,1.3,'#8a6a3e',{tone:'lo'});
+    [[1.4,19.6,'c'],[3.2,20.2,'r'],[5.6,21.2,'r'],[7,21.8,'c'],[5.4,19,'r'],[7.8,19.6,'r'],[1.6,9,'c'],[3.4,9.6,'r'],[2.2,3.6,'r'],[4.2,3.6,'c'],[9.4,3.6,'r'],[11.4,3.6,'r'],[11.6,6.2,'c'],[5.2,12.4,'r'],[7,12.2,'c'],[11.5,18.4,'r'],[11.4,20.6,'c'],[10,20.2,'r'],[3.8,17.6,'r'],[9.2,18.8,'c'],[2.6,22,'r'],[4.2,7,'r'],[11.8,10.2,'c'],[6,5.2,'r']].forEach(a=>m.smd(a[0],a[1],a[2]));
+    m.led(2,17.8,'#e6e1d4');
+    /* the spring antenna, soldered upright in the pad: a wire coil with a straight tail */
+    m.vcyl(11.2,-.8,.28,22.6,28.4,'#c9ccd1',{n:8,spec:.6});
+    for(let i=0;i<14;i++){const v=28.2+i*1.4;m.vtube(11.2,-.8,2.15,v,v+.62,'#c9ccd1',{n:14,spec:.6})}
+    m.vcyl(11.2,-.8,.28,28.2+13*1.4,28.2+14*1.4,'#c9ccd1',{n:8,spec:.6});
   }},
   nrf24:{w:29,h:15,col:'#14171d',draw(m){
     m.box(7,2.3,16.6,9.6,1.9,'#b9bdc4',{tone:'lo'});m.text(11.8,5.4,'nRF24',1.6,'middle','lo');
