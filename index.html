@@ -1517,7 +1517,11 @@ header.top{position:relative;z-index:6}
 .bb-tb2{min-width:0}
 .bb-click{margin:0 0 8px}
 .bbp.sel{filter:drop-shadow(0 0 3px var(--accent))}
-@media (max-width:999px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr)}.bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}}
+.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr) minmax(300px,400px)}
+.bb-idle{color:var(--muted)}.bb-idle h4{margin:0 0 8px;font:600 16px var(--f-body);color:var(--text)}
+.bb-fig{touch-action:none;cursor:grab}.bb-fig.drag{cursor:grabbing}.bb-fig.mv{cursor:move}
+.bb-sep{flex:0 0 1px;align-self:stretch;background:var(--hair2);margin:0 2px}
+@media (max-width:760px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr)}.bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}.bb-test.idle{display:none}}
 .isoc .bbp.on,.isoc.bb-all .bbp{pointer-events:auto;cursor:pointer}
 
 .pj-addrow{margin-top:8px}
@@ -12269,6 +12273,9 @@ function planOf(ids){
     const dm=kind==='plug'&&BM.dimsOf({id,n,short:pjShort(id),color:PCB[hashN(id)%PCB.length]});
     items.push({id,name:p.n,short:pjShort(id),rows,n,kind,sp:dm?Math.max(n,Math.ceil(dm.w/PITCH)):n,shape:OFF[id]||DISC[id]||'mod',need5,color:PCB[hashN(id)%PCB.length],extras:[]});
   }
+  /* build order: power first, then drivers and regulators, then everything else, motors and actuators last */
+  const RANK=id=>/^psu/.test(id)?0:/^(a4988|tmc2209|l298n|l9110s|pca9685|lm2596|mt3608|tp4056|levelshift|pc817|irf540n|transistor|max98357|dfplayer)$/.test(id)?1:/^(nema17|step28|motor|servo|mg996r|relay|ssr|abuzz|pbuzz|neo|sk6812)$/.test(id)?3:2;
+  items.map((it,i)=>[it,i]).sort((a,b)=>RANK(a[0].id)-RANK(b[0].id)||a[1]-b[1]).forEach((x,i)=>{items[i]=x[0]});
   /* lane: 5 V parts at the back (top rail is 5 V), everything else in front (bottom rail is 3V3). Balance when one lane gets long. */
   const w={back:0,front:0};
   const width=it=>it.sp+2+it.extras.length*3;
@@ -12612,8 +12619,8 @@ function pjBuild(body,pr){
   const pills=el('ol',{class:'bb-pills'});
   const names=['Board and ESP32',...items.map(i=>i.short.length>16?i.short.slice(0,15)+'…':i.short),'All together'];
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let cur=0,timer=0;
-  const play=btn('Play',()=>{timer?stop():start()},'sm primary'),prev=btn('Back',()=>go(cur-1),'sm'),next=btn('Next',()=>go(cur+1),'sm'),restart=btn('Start over',()=>{stop();go(0)},'sm');
+  let cur=0;
+  const prev=btn('Remove part',()=>go(cur-1),'sm'),next=btn('Add next part',()=>go(cur+1),'sm primary');
   const count=el('span',{class:'bb-count'},'');
   /* spin and tilt: redraw the same scene from another angle, without replaying the animation */
   let raf=0;
@@ -12625,19 +12632,33 @@ function pjBuild(body,pr){
     fit();go(cur,true);
     requestAnimationFrame(()=>requestAnimationFrame(()=>svg.classList.remove('bb-noanim')));
   }
-  function zoomBy(f){view={az:view.az,el:view.el,zoom:Math.max(R3?.5:1,Math.min(R3?4:3,view.zoom*f))};if(!raf)raf=requestAnimationFrame(redraw)}
+  function zoomBy(f){if(R3&&R3.zoomAt){const r=fig.getBoundingClientRect();view=R3.zoomAt(f,r.left+r.width/2,r.top+r.height/2);return}view={az:view.az,el:view.el,zoom:Math.max(1,Math.min(3,view.zoom*f))};if(!raf)raf=requestAnimationFrame(redraw)}
   function turn(daz,del){
-    view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom};
+    view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom,pan:view.pan};
     if(!raf)raf=requestAnimationFrame(redraw);
   }
-  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),zin=btn('Zoom in',()=>zoomBy(1.25),'sm'),zout=btn('Zoom out',()=>zoomBy(.8),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,zoom:R3?1:zdef};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
-  let drag=null;
-  fig.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag={x:e.clientX,y:e.clientY};try{fig.setPointerCapture(e.pointerId)}catch(_){}fig.classList.add('drag')});
-  fig.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)<2)return;drag={x:e.clientX,y:e.clientY};turn(-dx*.45,dy*.3)});
-  const endDrag=()=>{drag=null;fig.classList.remove('drag')};
+  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),zin=btn('Zoom in',()=>zoomBy(1.25),'sm'),zout=btn('Zoom out',()=>zoomBy(.8),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,zoom:R3?1.3:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
+  /* drag turns the board; shift, right or middle button, or the Move button, drags it sideways instead. The wheel zooms at the pointer, two fingers pinch and move. */
+  let drag=null,moveMode=false;const ptrs=new Map();let pinch=null;
+  const moveBtn=btn('Move',()=>{moveMode=!moveMode;moveBtn.setAttribute('aria-pressed',String(moveMode));moveBtn.classList.toggle('primary',moveMode);fig.classList.toggle('mv',moveMode)},'sm');moveBtn.setAttribute('aria-pressed','false');moveBtn.title='Drag to slide the board around instead of turning it';
+  fig.addEventListener('contextmenu',e=>{if(R3)e.preventDefault()});
+  fig.addEventListener('pointerdown',e=>{
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});try{fig.setPointerCapture(e.pointerId)}catch(_){}
+    if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),x:(a.x+b.x)/2,y:(a.y+b.y)/2};drag=null;return}
+    drag={x:e.clientX,y:e.clientY,pan:moveMode||e.shiftKey||e.button===2||e.button===1};fig.classList.add('drag');
+  });
+  fig.addEventListener('pointermove',e=>{
+    if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch&&ptrs.size>=2&&R3&&R3.zoomAt){const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      if(pinch.d>0&&d>0)view=R3.zoomAt(d/pinch.d,mx,my);view=R3.panBy(mx-pinch.x,my-pinch.y);pinch={d,x:mx,y:my};return}
+    if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)<2)return;drag.x=e.clientX;drag.y=e.clientY;
+    if(drag.pan&&R3&&R3.panBy)view=R3.panBy(dx,dy);else turn(-dx*.45,dy*.3);
+  });
+  const endDrag=e=>{if(e)ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size){drag=null;fig.classList.remove('drag')}};
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
+  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
-  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>{stop();go(i)}},el('span',{class:'bb-pn'},String(i)),nm))));
+  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i)),nm))));
   function text(i){
     info.replaceChildren();
     if(i===0){
@@ -12676,25 +12697,20 @@ function pjBuild(body,pr){
     if(quiet||R3){}
     else if(it&&fig.scrollWidth>fig.clientWidth){const px=it.x*(svg.getBoundingClientRect().width/sc.W);fig.scrollTo({left:Math.max(0,px-fig.clientWidth/2),behavior:still?'auto':'smooth'})}
     else if(cur===0||cur===total-1)fig.scrollTo({left:0,behavior:still?'auto':'smooth'});
-    if(cur===total-1)stop();
-  }
-  function stop(){if(timer){clearInterval(timer);timer=0}play.textContent=cur===total-1?'Replay':'Play'}
-  function start(){
-    if(cur>=total-1)go(0);
-    play.textContent='Pause';
-    timer=setInterval(()=>{if(!body.isConnected){clearInterval(timer);timer=0;return}go(cur+1)},2000);
   }
   /* click a part on the board and its live test opens to the right, the same page the Test tab shows */
-  const tpanel=el('aside',{class:'bb-test',hidden:true,'aria-label':'Live test of the selected part'});
+  const tpanel=el('aside',{class:'bb-test idle','aria-label':'Live test of the selected part'});
+  const idleView=()=>tpanel.replaceChildren(el('div',{class:'bb-idle'},el('h4',{},'Live test'),el('p',{class:'hint'},'Click a part on the board. Its test opens here, and the part lights up on the board.'),el('p',{class:'hint'},'Drag to turn, scroll to zoom, shift-drag or Move to slide the board.')));
+  idleView();
   let tsel=null,townLives=[];
   function closeTest(){
-    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.hidden=true;tpanel.replaceChildren();
-    stage.classList.remove('has-test');if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');idleView();
+    if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
   function openTest(id,k){
     const p=(typeof PARTS!=='undefined'&&PARTS.find(x=>x.id===id))||null;
     if(!p||typeof TESTS==='undefined'||!TESTS[id]){toast((p?p.n:'That part')+' has no live test.');return}
-    if(tsel===id&&!tpanel.hidden)return;
+    if(tsel===id&&!tpanel.classList.contains('idle'))return;
     townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=id;
     const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
     try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
@@ -12703,11 +12719,11 @@ function pjBuild(body,pr){
     const mv=(pr.pins&&pr.pins[id])?Object.keys(pr.pins[id]).map(k=>'GPIO'+k+' is sent as GPIO'+pr.pins[id][k]):[];
     tpanel.replaceChildren(
       el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
-      mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):null,
-      tb,typeof verdictBar==='function'?verdictBar(p):null);
-    tpanel.hidden=false;stage.classList.add('has-test');
+      mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):'',
+      tb,typeof verdictBar==='function'?verdictBar(p):'');
+    tpanel.classList.remove('idle');
     if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
-    if(innerWidth<1000)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
+    if(innerWidth<760)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
   }
   const partAt=k=>k===0?'esp':(items[k-1]&&items[k-1].id);
   /* a click is a press and a release that barely moved: anything else was a spin */
@@ -12726,22 +12742,21 @@ function pjBuild(body,pr){
     const id=partAt(k);if(id)openTest(id,k);
   });
   fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const id=partAt(cur);if(id){e.preventDefault();openTest(id,cur)}}});
-  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,tpanel),el('div',{class:'bb-ctl'},prev,play,next,restart,spinL,spinR,zin,zout,reset,count));
+  const stage=el('div',{class:'bb-stage has-test'},el('div',{class:'bb-view'},fig,tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count));
   body.append(el('h3',{class:'pj-h'},'Build it on a breadboard'),
     el('p',{class:'hint bb-click'},'Click any part on the board to test it here, right beside the drawing.'),
     el('div',{class:'bb'},
       stage,
       el('div',{class:'bb-side'},pills,info)));
-  /* the first step is on show, and the rest wait for Play or Next */
+  /* the first step is on show, and the rest wait for Add next part */
   go(0);
   if(want3)BB3.mount(fig,pr.parts,res).then(r=>{
-    R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);
+    R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1.3};R3.setView(view);R3.show(cur,total,true);
   }).catch(e=>{
     console.warn('3D view unavailable, using the flat drawing',e);
     R3=null;fig.classList.remove('gl');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
   });
   /* the whole project at a glance when the picture cannot animate */
-  if(still)play.disabled=true;
   /* a plain list for anyone who cannot see the drawing */
   const alt=el('details',{class:'bb-alt'},el('summary',{},'Every step as a list'),el('ol',{},...items.map(it=>el('li',{},it.short+': '+bbWhere(it)+'. Wires: '+it.rows.map(r=>it.short&&r.pp+' to '+bbDest(r)).join('; ')+'.'))));
   body.append(alt);
@@ -12762,7 +12777,7 @@ const TOON=(()=>{
 let TH=null,GRAD=null;
 function grad(){
   if(GRAD)return GRAD;
-  const d=new Uint8Array([88,148,206,244]);GRAD=new TH.DataTexture(d,d.length,1,TH.LuminanceFormat);
+  const d=new Uint8Array([132,172,208,238]);GRAD=new TH.DataTexture(d,d.length,1,TH.LuminanceFormat);
   GRAD.minFilter=GRAD.magFilter=TH.NearestFilter;GRAD.generateMipmaps=false;GRAD.needsUpdate=true;return GRAD;
 }
 const cache=new Map();
@@ -12789,17 +12804,16 @@ void main(){
   vec2 px=thick/res;
   float d0=dep(vUv),dl=dep(vUv-vec2(px.x,0.)),dr=dep(vUv+vec2(px.x,0.)),du=dep(vUv+vec2(0.,px.y)),dd=dep(vUv-vec2(0.,px.y));
   float lap=abs(dl+dr+du+dd-4.*d0)*range;
-  float e=smoothstep(thr,thr*1.7,lap);
+  float e=smoothstep(thr,thr*2.2,lap);
   vec3 col=texture2D(tColor,vUv).rgb;
   if(d0>.9995){
     vec3 s=mix(skyB,skyA,smoothstep(0.,1.,vUv.y));
-    vec2 g=gl_FragCoord.xy/ratio;vec2 c=fract(g/14.)-.5;float dot_=smoothstep(.34,.3,length(c))*smoothstep(.1,.9,vUv.y)*.05;
-    col=s+dot_;
+    col=s;
   }
-  gl_FragColor=vec4(mix(col,ink,e*.94),1.);
+  gl_FragColor=vec4(mix(col,ink,e*.7),1.);
 }`;
 function pipeline(R,opt={}){
-  const o=Object.assign({thick:1.25,thr:1.5,ink:[.08,.09,.14],skyA:[.2,.27,.5],skyB:[.07,.09,.17]},opt);
+  const o=Object.assign({thick:1.15,thr:3.2,ink:[.2,.19,.22],skyA:[.56,.56,.58],skyB:[.44,.44,.47]},opt);
   const ok={v:true};
   let rtC=null,rtD=null,W=0,H=0;
   const mk=(w,h)=>{
@@ -12994,7 +13008,7 @@ async function mount(host,ids,res,opt={}){
   H.bx(-12,-12,BL+12,BDY+12,-5,0,'#262b33',{r:6});
   const btex=boardTexture(geo);
   H.bx(0,0,BL,BDY,0,ZB-4.5,'#cfcabd',{r:3});
-  H.bx(2,2,BL-2,BDY-2,ZB-4.54,ZB-4.5,'#2b261d');
+  H.bx(2,2,BL-2,BDY-2,ZB-4.54,ZB-4.5,'#938c7b');
   /* the two socket plates: a real moulded slab with a square hole for every socket, a gold clip under each */
   {
     const hs=[];for(let k=1;k<=geo.cols;k++)for(const r of 'abcdefghij')hs.push([colX(k),ROW[r]]);
@@ -13106,14 +13120,14 @@ async function mount(host,ids,res,opt={}){
     const asp=W/Hh;hh0=Math.max(hy,hx/asp)*.98;
   }
   function place(){
-    const d=dirOf(view.az,view.el),tg=view.focus?new TH.Vector3(view.focus[0],-view.focus[1],view.focus[2]==null?10:view.focus[2]):centre;cam.position.copy(tg).addScaledVector(d,rad*3);cam.up.set(0,0,1);cam.lookAt(tg);
-    const hh=hh0/clamp(view.zoom,.4,5),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
+    let tg;const d=dirOf(view.az,view.el);tg=view.focus?new TH.Vector3(view.focus[0],-view.focus[1],view.focus[2]==null?10:view.focus[2]):centre;if(view.pan)tg=tg.clone().add(new TH.Vector3(view.pan[0],view.pan[1],view.pan[2]));cam.position.copy(tg).addScaledVector(d,rad*3);cam.up.set(0,0,1);cam.lookAt(tg);
+    const hh=hh0/clamp(view.zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
-    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.64,th),320,760));
-    if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(window.devicePixelRatio||1,2);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
+    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.78,th,430),430,780));
+    if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(Math.max(window.devicePixelRatio||1,2),3);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
   }
-  if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0x8a97b8,.5);S.scene.add(hl);S.key.intensity=.8;S.fill.intensity=.2;S.key.shadow.radius=2}
+  if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0xa3a3ab,.7);S.scene.add(hl);S.key.intensity=.66;S.fill.intensity=.22;S.key.shadow.radius=2}
   let PIPE=COMIC?TOON.pipeline(R):null;
   size();
   const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>{size();if(typeof kick==='function')kick()}):null;ro&&ro.observe(host);
@@ -13139,10 +13153,10 @@ async function mount(host,ids,res,opt={}){
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
   function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
   /* click to pick a part: a ray through the pointer, and a glowing pad under whatever is selected */
-  const rc=new TH.Raycaster(),selMat=new TH.MeshBasicMaterial({color:accent.clone().convertLinearToSRGB(),transparent:true,opacity:.42,depthWrite:false}),
-    selLine=new TH.LineBasicMaterial({color:accent.clone().convertLinearToSRGB()});
-  const selPad=new TH.Mesh(new TH.PlaneGeometry(1,1),selMat),selEdge=new TH.Line(new TH.BufferGeometry(),selLine);
-  for(const o of [selPad,selEdge]){o.visible=false;o.renderOrder=7;o.userData.noInk=true;root.add(o)}
+  const rc=new TH.Raycaster(),selMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffb81c'),transparent:true,opacity:.42,depthWrite:false}),
+    selLine=new TH.LineBasicMaterial({color:new TH.Color('#ffb81c')});
+  const selPad=new TH.Mesh(new TH.PlaneGeometry(1,1),selMat),selEdge=new TH.Group();const selBar=new TH.MeshBasicMaterial({color:new TH.Color('#ffb81c'),depthWrite:false,depthTest:false,transparent:true,opacity:.95}),bars=Array.from({length:12},()=>{const m=new TH.Mesh(new TH.BoxGeometry(1,1,1),selBar);m.renderOrder=9;m.userData.noInk=true;selEdge.add(m);return m});
+  for(const o of [selPad,selEdge]){o.visible=false;o.renderOrder=7;o.userData.noInk=true;root.add(o)}selPad.material.opacity=.55;selMat.color.set('#ffb81c');
   let selI=-1;
   function pick(cx,cy){
     const r=canvas.getBoundingClientRect();if(!r.width)return -1;
@@ -13160,12 +13174,32 @@ async function mount(host,ids,res,opt={}){
     const b=new TH.Box3().setFromObject(steps[i].g).applyMatrix4(new TH.Matrix4().copy(root.matrixWorld).invert());
     const x0=b.min.x-6,x1=b.max.x+6,y0=b.min.y-6,y1=b.max.y+6,z=ZB+.35;
     selPad.position.set((x0+x1)/2,(y0+y1)/2,z);selPad.scale.set(x1-x0,y1-y0,1);
-    selEdge.geometry.dispose();selEdge.geometry=new TH.BufferGeometry().setFromPoints([[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]].map(q=>new TH.Vector3(q[0],q[1],z+.02)));
+    const t=3.2,z0=Math.min(ZB,b.min.z)-.5,z1=Math.max(b.max.z+3,ZB+8),w=x1-x0,h=y1-y0,dz=z1-z0,cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2;
+    const E=[];for(const yy of [y0,y1])for(const zz of [z0,z1])E.push([cx,yy,zz,w+t,t,t]);
+    for(const xx of [x0,x1])for(const zz of [z0,z1])E.push([xx,cy,zz,t,h+t,t]);
+    for(const xx of [x0,x1])for(const yy of [y0,y1])E.push([xx,yy,cz,t,t,dz+t]);
+    E.forEach((q,j)=>{bars[j].position.set(q[0],q[1],q[2]);bars[j].scale.set(q[3],q[4],q[5])});
     selPad.visible=selEdge.visible=true;kick();
   }
   const api={
     canvas,steps,pick,mark,
-    setView(v){view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null};kick()},
+    setView(v){view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null,pan:v.pan===undefined?view.pan:v.pan};kick()},
+    /* zoom toward a screen point, so the part under the pointer stays under it */
+    zoomAt(f,cx,cy){
+      const r=canvas.getBoundingClientRect(),z0=clamp(view.zoom,.6,9),z1=clamp(z0*f,.6,9);
+      const nx=((cx-r.left)/(r.width||W))*2-1,ny=1-((cy-r.top)/(r.height||Hh))*2,asp=W/Hh,h0=hh0/z0,h1=hh0/z1;
+      const e=cam.matrixWorld.elements,rt=new TH.Vector3(e[0],e[1],e[2]),up=new TH.Vector3(e[4],e[5],e[6]);
+      const p=view.pan||[0,0,0],o=rt.multiplyScalar(nx*asp*(h0-h1)).add(up.multiplyScalar(ny*(h0-h1)));
+      view={...view,zoom:z1,pan:z1<=1.001&&z0>z1?null:[p[0]+o.x,p[1]+o.y,p[2]+o.z]};kick();return {...view};
+    },
+    /* slide the board by screen pixels, the picture follows the pointer */
+    panBy(dx,dy){
+      const e=cam.matrixWorld.elements,rt=new TH.Vector3(e[0],e[1],e[2]),up=new TH.Vector3(e[4],e[5],e[6]),k=2*(hh0/clamp(view.zoom,.6,9))/Hh;
+      const p=view.pan||[0,0,0],lim=rad*1.1,o=rt.multiplyScalar(-dx*k).add(up.multiplyScalar(dy*k));
+      const n=[p[0]+o.x,p[1]+o.y,p[2]+o.z],m=Math.hypot(n[0],n[1],n[2]),c=m>lim?lim/m:1;
+      view={...view,pan:[n[0]*c,n[1]*c,n[2]*c]};kick();return {...view};
+    },
+    getView(){return {...view}},
     show(i,tot,quiet){
       total=tot;const k=Math.min(i,steps.length);const fwd=i>cur;cur=i;
       anim=(!quiet&&fwd&&k>=0&&i<tot-1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)?{k,t0:performance.now()}:null;
