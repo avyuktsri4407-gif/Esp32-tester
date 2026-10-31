@@ -1302,7 +1302,7 @@ header.top{position:relative;z-index:6}
 
 /* projects */
 .pj{display:flex;flex-direction:column;gap:0;min-width:0}
-.pj-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
+.pj-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:28px 0 24px}
 .pj-new{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 18px}
 .pj-new[hidden]{display:none}
 .pj-in{font:400 15px var(--f-body);min-height:40px;padding:8px 14px;border:1px solid var(--hair2);border-radius:var(--r-sm);background:var(--bg);color:var(--fg);min-width:0}
@@ -1530,6 +1530,23 @@ header.top{position:relative;z-index:6}
 .pj-pinmv p{margin:0 0 10px;font:400 14px/1.55 var(--f-body)}
 .pj-flash{margin-top:12px}
 .pj-moved{margin:0 0 10px;padding:8px 10px;border:1px dashed var(--accent-line);border-radius:var(--r-sm);font:400 13.5px/1.5 var(--f-body)}
+
+/* Projects is its own page: no parts list, the whole width */
+body.is-projects .layout{grid-template-columns:minmax(0,1fr)}
+body.is-projects .layout>nav{display:none}
+body.is-projects main{max-width:1180px;width:100%;margin-inline:auto}
+@media (min-width:960px){body.is-projects #bSearch{display:inline-flex}}
+body.is-projects .ph{margin-bottom:6px}
+/* the pin-move notice: roomy, never squeezed */
+.pj-pinmv{padding:18px 22px 20px;margin:0 0 26px}
+.pj-pinmv h4{margin:0 0 10px;font:600 16px/1.3 var(--f-body)}
+.pj-pinmv .tw{margin:14px 0 16px;overflow-x:auto}
+.pj-pinmv table.t{min-width:420px;width:100%}
+.pj-pinmv table.t th,.pj-pinmv table.t td{padding:10px 14px;white-space:nowrap}
+.pj-pinmv .pj-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.pj-pinmv .hint{margin:0 0 16px;max-width:70ch}
+.pj-h+.hint{margin:0 0 16px}
+@media (max-width:560px){.pj-pinmv{padding:14px 14px 16px}.pj-pinmv table.t{min-width:0}.pj-pinmv table.t th,.pj-pinmv table.t td{padding:8px 7px;white-space:normal;font-size:13px}.pj-pinmv table.t td.m{white-space:nowrap}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -9351,7 +9368,7 @@ function snap(id,az,elv,zm,lab,t){
 return {fig,snap,get ok(){return DONE},want,fail(){FAILED=true},ready,get TH(){return TH},stage,board,draw,place,mat,lin,palette,MODELS:()=>MODELS,canvas,shared,dpr};
 })();
 /* ---- Home page: idea, how it works, get started, the flashing software, and a board (HF, parts/homefig.js) that turns as you scroll. ---- */
-const HM_VIEW=[[38,34,1,'hero'],[128,38,1.45,'usb'],[190,40,1.05,'how'],[300,42,1.5,'btn'],[232,26,1.5,'usb'],[440,40,1.5,'pins'],[500,42,1.9,'reg'],[560,42,1.6,'bridge'],[650,34,1,'hero']];
+const HM_VIEW=[[38,34,1,'hero'],[128,38,1.45,'usb'],[190,40,1.05,'how'],[300,42,1.5,'btn'],[232,26,1.5,'usb'],[440,40,1.5,'pins'],[500,42,1.9,'reg'],[530,40,1.35,'hero'],[560,42,1.6,'bridge'],[650,34,1,'hero']];
 /* the nine stops of the story for one board: what the camera looks at and what the caption says */
 function hmChapters(b,f){
   const two=/^Two/.test(b.usb),micro=/Micro/i.test(b.usb),nousb=b.id==='espcam',cast=f.spec&&f.spec.rows&&f.spec.rows.some(r=>r.st==='cast');
@@ -9366,8 +9383,9 @@ function hmChapters(b,f){
     ch(4,nousb?{lit:'pins',a:'pins',t:'Programming pins',d:'Join IO0 to GND, reset the board, then flash. Remove the jumper to run.'}:{lit:port.lit,a:port.a,t:'USB cable',d:'Use a cable that carries data. Charge-only cables show no port.'}),
     ch(5,{lit:'pins',a:'pins',t:cast?'Edge pads':'Header pins',d:b.pins.length+' pins are free for tests. '+(b.id==='devkit'?'The Circuit tab lists every pin.':'The pin map lists them.')}),
     ch(6,f.has.reg?{lit:'reg',a:'reg',t:'3.3 V regulator',d:'Powers the chip from USB. The pins are 3.3 V only, so never feed them 5 V signals.'}:{lit:'module',a:'module',t:'3.3 V supply',d:'The board makes 3.3 V from USB. The pins are 3.3 V only, so never feed them 5 V signals.'}),
-    ch(7,f.has.bridge?{lit:'bridge',a:'bridge',t:'USB to serial chip',d:(b.bridge||'CP2102 or CH340')+'. Without its driver no port shows up.'}:{lit:'module',a:'module',t:'USB is built in',d:nousb?'There is no USB chip on the board itself. The adapter you use has one, and needs its driver.':'The chip talks USB itself, so no driver chip is needed. It appears as a USB device.'}),
-    ch(8,{t:'One page per part',d:'Every part has its own page: circuit, live test and code.'})
+    ch(7,{lit:'module',a:'module',t:'Projects',d:'Pick every part of one build and the page checks them against each other, then shows where each one goes.'}),
+    ch(8,f.has.bridge?{lit:'bridge',a:'bridge',t:'USB to serial chip',d:(b.bridge||'CP2102 or CH340')+'. Without its driver no port shows up.'}:{lit:'module',a:'module',t:'USB is built in',d:nousb?'There is no USB chip on the board itself. The adapter you use has one, and needs its driver.':'The chip talks USB itself, so no driver chip is needed. It appears as a USB device.'}),
+    ch(9,{t:'One page per part',d:'Every part has its own page: circuit, live test and code.'})
   ];
 }
 function homeGo(id){
@@ -9426,12 +9444,22 @@ function homePage(b){
         btn('Open the pin map',()=>{show('overview');window.scrollTo(0,0)},'sm'))),
     sec(6,'hm-s4','',
       step('04','Run the test.','Press Live test. The page runs the checks, draws the readings and shows the pass criteria. Mark the result by hand or let the automatic check do it. Simulated mode runs every page without a board.')),
-    sec(7,'hm-flash','hm-wide',
+    sec(7,'hm-proj','',
+      kick('Projects'),
+      el('h3',{class:'hm-h'},'Then test the whole build together.'),
+      el('p',{},'Quick testing checks one part at a time. A project is for the finished build: you pick all the parts, and the page checks them against each other before you wire anything. It opens as its own page, with no parts list on the left.'),
+      el('ol',{class:'hm-flowl'},
+        el('li',{},el('b',{},'Pick the parts.'),el('p',{},'Start from a template or a blank project, then add the parts you own.')),
+        el('li',{},el('b',{},'Fix problems before you build.'),el('p',{},'It finds two parts on one pin, a missing power supply, resistor or level shifter. One button adds the missing part. Clashing pins are moved for you, and you are told what to rewire and reflash.')),
+        el('li',{},el('b',{},'Build it on a breadboard.'),el('p',{},'A 3D board shows one part at a time in the right order: power supply first, drivers before motors. Click any part to test it right beside the board.')),
+        el('li',{},el('b',{},'Watch it all on one dashboard.'),el('p',{},'Every live test side by side. Press Start all, then save the run. Runs stay in this browser, and you can download a backup.'))),
+      el('div',{class:'hm-cta'},btn('Open Projects',()=>{show('projects');window.scrollTo(0,0)},'primary'))),
+    sec(8,'hm-flash','hm-wide',
       kick('The flashing software'),
       el('h3',{class:'hm-h'},'Install the tester from this page.'),
       el('p',{},'The installer is built into this page. It uses Web Serial to write the tester firmware for the '+bd.n+' ('+BRD.CHIPS[bd.fam].n+'). It checks the chip first and refuses a different one. The Arduino IDE route below it does the same job by hand.'),
       el('div',{class:'hm-fw'},firmwareBlock())),
-    sec(8,'hm-pick','hm-end'));
+    sec(9,'hm-pick','hm-end'));
   const stage=homeStage(FG.spec&&FG.spec.big||'ESP32',bd);
   const root=el('div',{class:'hm'},stage.node,flow,...stage.extra);
   b.append(root,homeIndex());
@@ -13498,10 +13526,11 @@ async function show(id){
   id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
   try{history.replaceState(null,'','#'+id)}catch(e){}
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
-  const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),noRes(p)?null:el('div',{class:'ph-c'},chip,null));
+  const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),p.projects?el('div',{class:'ph-c'},btn('Quick test a part',()=>{show('home');window.scrollTo(0,0)},'sm')):noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
   panel.className=p.overview||p.home||p.projects?'':'w2';
   document.body.classList.toggle('is-home',!!p.home);
+  document.body.classList.toggle('is-projects',!!p.projects);
   document.body.classList.remove('has-tabs');if(spyOff){spyOff();spyOff=null}phoneBar(null);
   headChip=chip;
   if(navQuery&&!navMatch(p)){navQuery='';const q=$('#navQ');if(q)q.value=''}
