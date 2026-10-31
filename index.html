@@ -840,8 +840,9 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{z-index:4}}
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
-.hm-big{position:absolute;left:0;right:0;top:31%;margin:0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.hm-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 42%,rgba(216,184,119,.14) 100%);-webkit-background-clip:text;background-clip:text;padding:.3em .22em .3em .22em;margin:-.3em -.22em -.3em -.22em;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
+.hm-big{position:absolute;left:0;right:0;top:31%;margin:0;padding:.35em 0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
+.hm-big span{flex:none;white-space:nowrap}
+.hm-big span{display:inline-block;color:#e4c887;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
 .hm-sub{display:none;position:absolute;left:0;right:0;bottom:4.5vh;margin:0 auto;max-width:20em;font:700 clamp(22px,3.6vw,50px)/1.05 var(--f-disp);letter-spacing:-.025em;color:var(--fg);text-wrap:balance;animation:hmfade .8s .95s both}
 .hm-scrollcue{position:absolute;left:0;right:0;bottom:-20vh;display:none;margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;font:500 12px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);animation:hmfade .8s 1.4s both}
 .hm-scrollcue span{width:1px;height:30px;background:linear-gradient(var(--accent),transparent);transform-origin:top;animation:hmcue 1.8s 2s ease-in-out infinite}
@@ -9528,7 +9529,7 @@ function homeMount(root,S,FG,HM_CH){
     if(innerWidth>=700&&innerHeight>=500){bigEl.style.top='';ihit.style.top='';return}
     const h=document.querySelector('header.top'),hb=h?Math.round(h.getBoundingClientRect().bottom+scrollY):90;
     ihit.style.top=Math.max(Math.round(innerHeight*.16),hb+6)+'px';
-    bigEl.style.top=Math.round(hb+22+bigEl.offsetHeight/2)+'px';
+    bigEl.style.top=Math.round(hb+22+(bigEl.offsetHeight-.7*parseFloat(getComputedStyle(bigEl).fontSize))/2)+'px';
   }
   function size(){W=document.documentElement.clientWidth;H=innerHeight;park();svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
   function target(){
