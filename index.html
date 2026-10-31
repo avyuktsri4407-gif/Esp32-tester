@@ -841,7 +841,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
 .hm-big{position:absolute;left:0;right:0;top:31%;margin:0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.hm-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 42%,rgba(216,184,119,.14) 100%);-webkit-background-clip:text;background-clip:text;padding:.08em .1em .08em .05em;margin:-.08em -.1em -.08em -.05em;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
+.hm-big span{display:inline-block;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 42%,rgba(216,184,119,.14) 100%);-webkit-background-clip:text;background-clip:text;padding:.3em .22em .3em .22em;margin:-.3em -.22em -.3em -.22em;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
 .hm-sub{display:none;position:absolute;left:0;right:0;bottom:4.5vh;margin:0 auto;max-width:20em;font:700 clamp(22px,3.6vw,50px)/1.05 var(--f-disp);letter-spacing:-.025em;color:var(--fg);text-wrap:balance;animation:hmfade .8s .95s both}
 .hm-scrollcue{position:absolute;left:0;right:0;bottom:-20vh;display:none;margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;font:500 12px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);animation:hmfade .8s 1.4s both}
 .hm-scrollcue span{width:1px;height:30px;background:linear-gradient(var(--accent),transparent);transform-origin:top;animation:hmcue 1.8s 2s ease-in-out infinite}
@@ -9548,7 +9548,7 @@ function homeMount(root,S,FG,HM_CH){
     const age=mq.matches?9:(now-t0)/1000,e=1-Math.pow(1-hmClamp(age/1.5,0,1),4);
     const az=st.az+user.az+(1-e)*-200,elv=hmClamp(st.el+user.el,12,70),sl=geo();
     const nar=!hmWide(),rs=0;
-    const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*.5,sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*.64,sl.h-rs,pS);
+    const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*(nar?.56:.62),sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*(nar?.62:.56),sl.h-rs,pS);
     const P=FG.cam(W,H,az,elv,st.zoom*lerp(.4,1,e)*lerp(1.12,nar?.85:1,pS),st.f,{cx,cy,fw,fh});
     const t1=performance.now();
     if(GLS.on)GLH.draw(GLS.S,P,{W,H,dpr:GLH.dpr(),t:now/1000,lit});
