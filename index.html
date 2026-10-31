@@ -5,7 +5,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Inter:wght@800&display=swap">
 <style>
 /* Atelier bench. Graphite ground, ivory type, one champagne accent. Geist throughout. Rounded, hairline, generous. Single committed dark theme. */
 :root{
@@ -840,7 +840,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{z-index:4}}
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
-.hm-big{position:absolute;left:0;right:0;top:31%;margin:0;padding:.35em 0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
+.hm-big{position:absolute;left:0;right:0;top:31%;margin:0;padding:.35em 0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
 .hm-big span{flex:none;white-space:nowrap}
 .hm-big span{display:inline-block;color:#e4c887;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
 .hm-sub{display:none;position:absolute;left:0;right:0;bottom:4.5vh;margin:0 auto;max-width:20em;font:700 clamp(22px,3.6vw,50px)/1.05 var(--f-disp);letter-spacing:-.025em;color:var(--fg);text-wrap:balance;animation:hmfade .8s .95s both}
