@@ -1733,6 +1733,27 @@ details[open]::details-content{height:auto}
 .bb-pnone{padding:8px 10px}
 .bb-fig.arr{cursor:default}
 .bb-fig.grab,.bb-fig.grab *{cursor:grabbing!important}
+
+/* dep_x86: the live test floats over the board and eases in, so nothing reflows; the board slides aside (pj_build.js shiftView) */
+@media (min-width:761px){
+  .bb-stage.has-test .bb-view,.bb-stage.has-test .bb-view:has(.bb-test.idle){grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+  .bb-test,.bb-test.idle:not([hidden]){display:block;position:absolute;top:12px;right:12px;bottom:12px;width:min(430px,calc(100% - 24px));max-height:none;z-index:6;padding:16px 18px 18px;
+    background:color-mix(in srgb,var(--raise,#1b1e24) 93%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid var(--hair2);border-radius:var(--r-md);box-shadow:0 22px 60px rgba(0,0,0,.45);overflow:auto;scrollbar-width:thin;
+    transform:translateX(28px) scale(.985);opacity:0;visibility:hidden;pointer-events:none;
+    transition:transform .44s var(--ease),opacity .3s var(--ease),visibility 0s .44s}
+  .bb-test:not(.idle):not([hidden]){transform:none;opacity:1;visibility:visible;pointer-events:auto;animation:none;transition:transform .44s var(--ease),opacity .32s var(--ease),visibility 0s}
+  .bb-test[hidden]{display:none}
+}
+@media (min-width:1200px) and (max-width:1499.98px){
+  .bb:has(.bb-stage.has-test){grid-template-columns:minmax(0,1fr) minmax(320px,380px)}
+  .bb:has(.bb-stage.has-test) .bb-side{position:sticky;max-height:calc(100vh - 28px);overflow:auto}
+}
+@media (prefers-reduced-motion:reduce){.bb-test{transition:none!important}}
+@media (min-width:761px){
+  .bb-test.left,.bb-test.left.idle:not([hidden]){right:auto;left:12px;transform:translateX(-28px) scale(.985)}
+  .bb-test.left:not(.idle):not([hidden]){transform:none}
+}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -13153,12 +13174,12 @@ function pjBuild(body,pr){
   /* click a part on the board and its live test opens to the right, the same page the Test tab shows */
   const tpanel=el('aside',{class:'bb-test idle','aria-label':'Live test of the selected part'});
   tpanel.hidden=true;
-  let tsel=null,townLives=[];
+  let tsel=null,townLives=[],closeT=0;
   function closeTest(){
-    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');tpanel.hidden=true;tpanel.replaceChildren();stage.classList.remove('has-test');
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');stage.classList.remove('has-test');{const t=tpanel;clearTimeout(closeT);closeT=setTimeout(()=>{if(t.classList.contains('idle')){t.hidden=true;t.replaceChildren()}},innerWidth>760?460:0)}
     if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
-  function openTest(id,k){
+  function openTest(id,k,sx){
     const p=(typeof PARTS!=='undefined'&&PARTS.find(x=>x.id===id))||null;
     if(!p||typeof TESTS==='undefined'||!TESTS[id]){toast((p?p.n:'That part')+' has no live test.');return}
     if(tsel===id&&!tpanel.classList.contains('idle'))return;
@@ -13172,7 +13193,7 @@ function pjBuild(body,pr){
       el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
       mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):'',
       tb,typeof verdictBar==='function'?verdictBar(p):'');
-    tpanel.classList.remove('idle');tpanel.hidden=false;stage.classList.add('has-test');
+    clearTimeout(closeT);tpanel.hidden=false;void tpanel.offsetWidth;tpanel.classList.remove('idle');stage.classList.add('has-test');tpanel.classList.toggle('left',sx!=null&&sx>=fig.getBoundingClientRect().left+fig.clientWidth*.5);
     if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
     if(innerWidth<760)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
   }
@@ -13191,7 +13212,7 @@ function pjBuild(body,pr){
     if(R3&&R3.pick)k=R3.pick(e.clientX,e.clientY);
     else{const t=document.elementFromPoint(e.clientX,e.clientY),g=t&&t.closest&&t.closest('.bbp');if(g)k=+g.dataset.i}
     if(k<0){return}
-    const id=partAt(k);if(id)openTest(id,k);
+    const id=partAt(k);if(id)openTest(id,k,e.clientX);
   });
   fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const id=partAt(cur);if(id){e.preventDefault();openTest(id,cur)}}});
   const tipId='bb-tip'+String(pr.id).slice(-4),tip=el('span',{class:'bb-tip',id:tipId,role:'tooltip'},'Click a part on the board to open its live test beside it. Drag to turn, scroll to zoom, shift-drag or Move to slide the board.'),
@@ -13621,7 +13642,7 @@ async function mount(host,ids,res,opt={}){
     const hh=hh0/clamp(view.zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
-    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.62,th,430),430,Math.max(560,Math.min(820,(window.innerHeight||900)-130))));
+    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')&&getComputedStyle(tp).position!=='absolute'?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.62,th,430),430,Math.max(560,Math.min(820,(window.innerHeight||900)-130))));
     if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(Math.max(window.devicePixelRatio||1,2),3);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
   }
   if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0xa3a3ab,.7);S.scene.add(hl);S.key.intensity=.66;S.fill.intensity=.22;S.key.shadow.radius=2}
@@ -13646,15 +13667,16 @@ async function mount(host,ids,res,opt={}){
     raf=0;
     if(!host.isConnected||!alive){dispose();return}
     fading=false;
-    if(hlList.length&&hlMat.opacity<HLO){const q=clamp(((now||performance.now())-hlT0)/240,0,1);hlMat.opacity=HLO*(1-Math.pow(1-q,3));dirty=true;fading=q<1}
+    if(hlList.length&&hlK<HLK){const q=clamp(((now||performance.now())-hlT0)/260,0,1);hlK=HLK*(1-Math.pow(1-q,3));paintHl();dirty=true;fading=q<1}
     if(anim||dirty){apply(now);place();if(PIPE)PIPE.render(S.scene,cam);else R.render(S.scene,cam);dirty=false}
     if(anim||dirty||fading)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
-  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();hlMat.dispose();PIPE&&PIPE.dispose();H.dispose();R.dispose();const gl=R.getContext&&R.getContext();if(R.forceContextLoss&&gl&&!gl.isContextLost())R.forceContextLoss()}catch(e){}}
+  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();PIPE&&PIPE.dispose();H.dispose();R.dispose();const gl=R.getContext&&R.getContext();if(R.forceContextLoss&&gl&&!gl.isContextLost())R.forceContextLoss()}catch(e){}}
   /* click to pick a part: a ray through the pointer. The picked part is tinted as a whole: a see-through copy of each of its meshes, drawn just over the original. */
-  const rc=new TH.Raycaster(),hlMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffd98a'),transparent:true,blending:TH.AdditiveBlending,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,toneMapped:false});
-  let hlList=[],hlT0=0;const HLO=.55;
+  /* the picked part is tinted warm: each of its materials is swapped for a copy whose colour leans toward amber, so every texture, edge and label stays */
+  const rc=new TH.Raycaster(),HLC=new TH.Color('#ffc35a').convertSRGBToLinear();
+  let hlList=[],hlT0=0,hlK=0;const HLK=.34;
   let selI=-1,gh=null;
   function pick(cx,cy){
     const r=canvas.getBoundingClientRect();if(!r.width)return -1;
@@ -13665,18 +13687,23 @@ async function mount(host,ids,res,opt={}){
     let o=hit.object;while(o){const k=live.indexOf(o);if(k>=0)return k;o=o.parent}
     return -1;
   }
-  function unmark(){for(const o of hlList){o.parent&&o.parent.remove(o)}hlList=[]}
+  function unmark(){
+    const seen=new Set();
+    for(const h of hlList){h.o.material=h.orig;if(!seen.has(h.m)){seen.add(h.m);h.m.dispose()}}
+    hlList=[];hlK=0;
+  }
+  function paintHl(){for(const h of hlList)h.m.color.copy(h.base).lerp(HLC,hlK)}
   function mark(i){
-    selI=i;unmark();hlMat.opacity=0;hlT0=performance.now();
+    selI=i;unmark();hlT0=performance.now();
     if(i==null||i<0||!steps[i]){kick();return}
-    const srcs=[];steps[i].g.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&o.geometry&&o.material&&!o.userData.noInk&&!o.userData.hl){const ms=Array.isArray(o.material)?o.material:[o.material];if(!ms.some(m=>m.transparent||m.alphaTest>0))srcs.push(o)}});
-    for(const o of srcs){
-      const c=o.isInstancedMesh?new TH.InstancedMesh(o.geometry,hlMat,o.count):new TH.Mesh(o.geometry,hlMat);
-      if(o.isInstancedMesh){c.instanceMatrix=o.instanceMatrix;c.frustumCulled=false}
-      c.position.copy(o.position);c.quaternion.copy(o.quaternion);c.scale.copy(o.scale);c.renderOrder=8;c.raycast=()=>{};
-      c.userData.noInk=true;c.userData.hl=true;o.parent.add(c);hlList.push(c);
-    }
-    kick();
+    const cache=new Map();
+    steps[i].g.traverse(o=>{
+      if(!(o.isMesh||o.isInstancedMesh)||!o.material||o.userData.noInk||Array.isArray(o.material)||!o.material.color)return;
+      let m=cache.get(o.material);
+      if(!m){m=o.material.clone();cache.set(o.material,m)}
+      hlList.push({o,orig:o.material,m,base:o.material.color.clone()});o.material=m;
+    });
+    paintHl();kick();
   }
   const api={
     canvas,steps,pick,mark,
