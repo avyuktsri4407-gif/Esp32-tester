@@ -1520,7 +1520,7 @@ header.top{position:relative;z-index:6}
 .bb-click{margin:0 0 8px}
 .bbp.sel{filter:drop-shadow(0 0 3px var(--accent))}
 .bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr) minmax(300px,400px)}
-.bb-idle{color:var(--muted)}.bb-idle h4{margin:0 0 8px;font:600 16px var(--f-body);color:var(--text)}
+.bb-idle{color:var(--muted)}.bb-idle h4{margin:0 0 8px;font:600 16px var(--f-body);color:var(--fg)}
 .bb-fig{touch-action:none;cursor:grab}.bb-fig.drag{cursor:grabbing}.bb-fig.mv{cursor:move}
 .bb-sep{flex:0 0 1px;align-self:stretch;background:var(--hair2);margin:0 2px}
 @media (max-width:760px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr)}.bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}.bb-test.idle{display:none}}
@@ -1560,6 +1560,48 @@ body.is-projects .ph{margin-bottom:6px}
 .top .btn.back.on{display:inline-flex}
 @media (max-width:640px){.top .btn.back{order:4;padding:0;width:36px;height:36px;justify-content:center;flex:none}.top .btn.back span{display:none}}
 @media (max-width:340px){.top .btn.back{order:0}}
+
+/* ---- Projects review fixes ---- */
+/* Build: the idle test panel stays slim, and below 980px the board gets the whole width */
+.bb-stage{background:var(--raise,#15171b)}
+.bb-stage.has-test .bb-view:has(.bb-test.idle){grid-template-columns:minmax(0,1fr) 250px}
+@media (max-width:980px){
+  .bb-stage.has-test .bb-view,.bb-stage.has-test .bb-view:has(.bb-test.idle){grid-template-columns:minmax(0,1fr)}
+  .bb-test{border-left:0;border-top:1px solid var(--hair);max-height:none}.bb-test.idle{display:none}
+}
+/* tables keep their numbers whole and scroll inside their own box on phones */
+@media (max-width:640px){
+  table.t.pj-tb2{min-width:520px}table.t.pj-tb2 td,table.t.pj-tb2 td.m,table.t.pj-tb2 th{white-space:nowrap;overflow-wrap:normal}table.t.pj-tb2 td:first-child{white-space:normal;overflow-wrap:break-word;min-width:130px}
+  .pj-lt{min-width:460px}
+  .pj-fig,.pj-ch{max-width:100%}
+}
+.pj-ch{max-width:760px}
+/* long names wrap instead of widening the page */
+.pj-card h3,.pj-link,.pj-meta,.pj-run,.pj-run *,.pj-th h3,.pj-ts{overflow-wrap:anywhere;min-width:0}
+.ph h2{overflow-wrap:anywhere}
+body.is-projects .ph h2{font-size:clamp(28px,3.6vw,44px)}
+body.is-projects #bProj{display:none}
+/* focus rings stay inside their clipping boxes */
+.pj-tab:focus-visible,.pj-gp>summary:focus-visible,.bb-pill:focus-visible{outline-offset:-3px}
+.bb-pills{padding-block:4px}
+/* control borders reach 3:1 */
+.pj-in,.pj-title:focus{border-color:#6c717c}
+/* group count sits at the right, next to the arrow */
+.pj-gn{margin-left:auto}.pj-gp>summary::after{margin-left:0}
+/* dashboard tiles: folded to a header with one result, opened per part */
+.pj-tile.col .pj-tb{max-height:0;padding-top:0;padding-bottom:0;overflow:hidden;visibility:hidden}
+.pj-tile.col .pj-th{border-bottom:0}
+.pj-tile .pj-th{align-items:center}
+.pj-tc{flex-wrap:wrap;justify-content:flex-end}
+/* the moved-pins notice is short; the table opens on request */
+.pj-pmd{margin:10px 0 4px}.pj-pmd>summary{cursor:pointer;color:var(--accent-hi);font:500 14px var(--f-body);padding:6px 0}
+.pj-pmd .tw{margin:8px 0 0}
+/* touch screens: every control reaches 40px */
+@media (pointer:coarse){
+  .pj-in,.pj-title{min-height:44px}.pj-x{min-height:40px}.bb-pill{min-height:40px}
+  .pj-link{display:inline-block;padding-block:10px}.pj-ck{min-height:44px;display:inline-flex;align-items:center}
+}
+.pj-nl{display:flex;align-items:center;gap:10px;flex:1 1 220px;min-width:0}.pj-nl>span{font:500 13px var(--f-body);color:var(--muted);white-space:nowrap}.pj-nl .pj-title{flex:1;min-width:0}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -10573,7 +10615,7 @@ let PJO=null;   /* the dashboard tile being built; readout() and makeLive() repo
 const PJ={ovr:{},ctx:null,pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:12,rec:true};
 const pjPart=id=>PARTS.find(p=>p.id===id);
 const pjName=id=>{const p=pjPart(id);return p?p.n:id};
-const pjShort=id=>{let n=String(pjName(id)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28)}return n};
+const pjShort=id=>{let n=String(pjName(id)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28);let p;do{p=n;n=n.replace(/[\s+\-\/&]+$/,'').replace(/\s(and|or|with|of|for|the|a|to|in|on|1|2|3)$/i,'')}while(n!==p)}return n};
 const pjUid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const pjSlug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'project';
 const pjZ=n=>String(n).padStart(2,'0');
@@ -10594,6 +10636,7 @@ const pjDb=(()=>{
       rq.onupgradeneeded=()=>{const d=rq.result;d.createObjectStore('projects',{keyPath:'id'});d.createObjectStore('sessions',{keyPath:'id'}).createIndex('pid','pid');d.createObjectStore('meta',{keyPath:'k'})};
       rq.onsuccess=()=>{db=rq.result;db.onversionchange=()=>db.close();res(db)};
       rq.onerror=rq.onblocked=()=>{persistent=false;res(null)};
+      setTimeout(()=>{if(!db){persistent=false;res(null)}},3000);
     }catch(e){persistent=false;res(null)}
   }));
   const isRq=r=>typeof IDBRequest!=='undefined'&&r instanceof IDBRequest;
@@ -10618,7 +10661,7 @@ const pjDb=(()=>{
 async function pjAsk(){try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist()}catch(e){}}
 const pjProjects=async()=>(await pjDb.all('projects')).sort((a,b)=>b.updated-a.updated);
 async function pjNew(name,parts){
-  const p={id:pjUid(),name:String(name||'').trim()||'Untitled project',parts:(parts||[]).filter(id=>pjPart(id)).slice(0,PJ.max),created:Date.now(),updated:Date.now(),autosave:false};
+  const p={id:pjUid(),name:String(name||'').trim()||'Untitled project',parts:[...new Set(parts||[])].filter(id=>pjPart(id)).slice(0,PJ.max),created:Date.now(),updated:Date.now(),autosave:false};
   await pjDb.put('projects',p);pjAsk();return p;
 }
 const pjSave=async p=>{p.updated=Date.now();await pjDb.put('projects',p);return p};
@@ -10684,9 +10727,10 @@ PJ.stop=async function(gesture){
   for(const t of PJ.tiles)for(const l of t.lives)l.stop();
   if(!r)return null;
   PJ.run=null;
+  try{localStorage.removeItem('cts.pj.crash')}catch(e){}
   if(!r.rec)return null;
   if(!r.reads.length){toast('Stopped. Nothing was recorded.');return null}
-  const pr=await pjDb.get('projects',r.pid);if(!pr)return null;
+  const pr=await pjDb.get('projects',r.pid);if(!pr){toast('This project was deleted, so the run could not be saved.');return null}
   const old=await pjDb.runs(pr.id);
   const s={id:pjUid(),pid:pr.id,n:r.name||('Run '+(old.length+1)),started:r.ms0,ended:Date.now(),seconds:+((performance.now()-r.t0)/1000).toFixed(1),
     mode:r.mode,simulated:r.mode==='demo',fw:r.fw,tester:(typeof Rec!=='undefined'&&Rec.who)||'',board:pjBoard(),parts:pr.parts.slice(),reads:r.reads,marks:r.marks,capped:r.capped};
@@ -10767,7 +10811,7 @@ function pjConflictText(c){
 const PJ_COL=['#5aa9ff','#f2a33a','#4fd18b','#e07bf0','#ff6b6b','#3fd0d0'];
 const PJ_DASH=['','7 4','2 4','9 4 2 4','','7 4'];
 function pjChart(lines,o={}){
-  const w=o.w||640,h=o.h||190,L=54,R=12,T=10,B=26;
+  const w=o.w||Math.max(360,Math.min(640,(typeof innerWidth==='number'?innerWidth:640)-40)),h=o.h||190,L=54,R=12,T=10,B=26;
   let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const l of lines)for(const p of l.pts){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1]}
   if(!Number.isFinite(x0))return '';
@@ -10795,7 +10839,7 @@ function pjSpark(pts){
 }
 
 /* ---------- exports ---------- */
-const pjQ=s=>{s=String(s);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+const pjQ=s=>{s=String(s);if(/^[=+\-@\t]/.test(s)&&!/^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(s))s="'"+s;return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
 function pjCSV(s,pr){
   const rows=['time_s,date_time,project,run,part,reading,value,number,unit,note,simulated'];
   for(const r of s.reads){const n=pjNum(r.v);rows.push([r.t,new Date(s.started+r.t*1000).toISOString(),pjQ(pr?pr.name:''),pjQ(s.n),r.part,pjQ(r.label),pjQ(r.v),n?n.x:'',pjQ(n?n.u:''),pjQ(r.note),s.simulated?'yes':'no'].join(','))}
@@ -10864,9 +10908,13 @@ async function pjRestore(text){
   const o=JSON.parse(text);
   if(!o||o.schema!=='esp32-live-tester/project-backup@1'||!o.project)throw new Error('This is not a project backup file.');
   const pr={...o.project,id:pjUid(),created:Date.now(),updated:Date.now(),autosave:false};
-  pr.parts=(pr.parts||[]).filter(id=>pjPart(id));
+  pr.name=String(pr.name==null?'':pr.name).trim().slice(0,60)||'Restored project';
+  pr.parts=[...new Set(Array.isArray(pr.parts)?pr.parts:[])].filter(id=>pjPart(id)).slice(0,PJ.max);
+  if(!pr.pins||typeof pr.pins!=='object'||Array.isArray(pr.pins))pr.pins={};
+  const runs=(Array.isArray(o.runs)?o.runs:[]).filter(r=>r&&typeof r==='object'&&Array.isArray(r.reads));
+  /* the project is written last, so a bad file never leaves a half restored project behind */
+  for(const r of runs)await pjDb.put('sessions',{...r,marks:Array.isArray(r.marks)?r.marks:[],id:pjUid(),pid:pr.id});
   await pjDb.put('projects',pr);
-  for(const r of o.runs||[])await pjDb.put('sessions',{...r,id:pjUid(),pid:pr.id});
   return pr;
 }
 
@@ -10910,7 +10958,11 @@ function pjSyncStepper(pr){
 }
 function pjAutoPins(pr){
   const ids=pr.parts,before=JSON.stringify(pr.pins||{});
-  pr.pins=pr.pins||{};PJ.ovr=pr.pins;
+  pr.pins=pr.pins||{};
+  /* moves for parts that left the project mean nothing, and Undo (autopin false) keeps the original pins until the parts change */
+  for(const k of Object.keys(pr.pins))if(!ids.includes(k))delete pr.pins[k];
+  PJ.ovr=pr.pins;
+  if(pr.autopin===false)return JSON.stringify(pr.pins)!==before;
   for(let g=0;g<16;g++){
     pjSyncStepper(pr);
     const w=pjWiring(ids),c=w.conflicts.find(x=>x.kind==='pin'&&x.sev==='conflict');
@@ -10948,7 +11000,7 @@ const PJ_PRESETS=[
   ['Distance and obstacle sensing','Three ways to measure how far away things are.',['sr04','vl53l0x','irobs']],
   ['Power and battery log','Voltage and current of a battery powered build.',['ina219','batt']]
 ];
-const PJ_TABS=[['dash','Dashboard'],['parts','Parts'],['build','Build'],['wire','Wiring'],['runs','Runs']];
+const PJ_TABS=[['parts','Parts'],['build','Build'],['wire','Wiring'],['dash','Dashboard'],['runs','Runs']];
 const pjHead=(t,s)=>{const h=$('.ph h2'),u=$('.ph .sub');if(h)h.textContent=t;if(u)u.textContent=s||''};
 const pjPlural=(n,w)=>n+' '+w+(n===1?'':'s');
 function pjSeed(ids){try{BRD.reset();ids.forEach(id=>BRD.seed(pjPart(id)))}catch(e){}}
@@ -10972,28 +11024,28 @@ async function pjGo(o){
   const prevPid=pjShown;
   const tok=++PJ.tok;
   await runCleanups();
-  if(tok!==PJ.tok)return;
+  if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
   cleanups.push(pjLeave);
   PJ.pid=o.pid||null;PJ.view=o.view||'dash';PJ.openRun=o.run||null;PJ.cmp=o.cmp||null;PJ.tiles=[];PJ.buf={};
-  navRecord({id:'projects',pid:PJ.pid,view:PJ.pid?PJ.view:null},true);
+  navRecord({id:'projects',pid:PJ.pid,view:PJ.pid?PJ.view:null,run:PJ.openRun,cmp:PJ.cmp?[].concat(PJ.cmp).join(','):null},!PJ.openRun&&!PJ.cmp);
   clearInterval(PJ.timer);PJ.timer=0;
   const b=PJ.box;if(!b||!b.isConnected)return;
   /* the old page stays on screen, at its own height, until the new one has its data. No blank frame, no scrollbar flicker. */
   const flip=prevPid!==(o.pid||null);
   b.style.minHeight=b.offsetHeight+'px';
-  PJ.swap=()=>{b.replaceChildren();if(flip){window.scrollTo(0,0);b.classList.add('pj-enter')}pjShown=PJ.pid||null};
+  PJ.swap=()=>{PJ.refocus=b.contains(document.activeElement);b.replaceChildren();if(flip){window.scrollTo(0,0);b.classList.add('pj-enter')}pjShown=PJ.pid||null};
   try{
     await pjDb.ready();
-    if(tok!==PJ.tok)return;
+    if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
     if(!PJ.pid){await pjList(b,tok);return}
     const pr=await pjDb.get('projects',PJ.pid);
-    if(tok!==PJ.tok)return;
+    if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
     if(!pr){PJ.pid=null;await pjList(b,tok);return}
     PJ.ovr=pr.pins||{};PJ.ctx=null;
     try{if(pjAutoPins(pr))await pjSave(pr)}catch(e){console.warn('pin plan',e)}
     await pjProject(b,pr,tok);
   }finally{
-    if(tok===PJ.tok)requestAnimationFrame(()=>{if(tok===PJ.tok){b.style.minHeight='';setTimeout(()=>b.classList.remove('pj-enter'),260)}});
+    if(tok===PJ.tok){requestAnimationFrame(()=>{if(tok===PJ.tok){b.style.minHeight='';setTimeout(()=>b.classList.remove('pj-enter'),260)}});setTimeout(()=>{if(tok===PJ.tok)b.style.minHeight=''},400)}
   }
 }
 let pjShown=null;
@@ -11009,11 +11061,11 @@ async function pjList(b,tok){
   await pjRecover();
   const prs=await pjProjects();
   const info=await Promise.all(prs.map(async p=>{const r=await pjDb.runs(p.id);return {n:r.length,last:r.reduce((m,x)=>Math.max(m,x.started),0)}}));
-  if(tok!==PJ.tok)return;
+  if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
   PJ.swap();
   pjHead('Projects','Combine parts, watch them on one dashboard and keep every run.');
   const form=el('form',{class:'pj-new',hidden:true,onsubmit:async e=>{
-    e.preventDefault();const p=await pjNew(nm.value,[]);pjGo({pid:p.id,view:'parts'});
+    e.preventDefault();if(form.dataset.busy)return;form.dataset.busy='1';const p=await pjNew(nm.value,[]);pjGo({pid:p.id,view:'parts'});
   }});
   const nm=el('input',{type:'text',class:'pj-in',placeholder:'Project name, such as Greenhouse monitor','aria-label':'Project name',maxlength:'60',required:true});
   form.append(nm,el('button',{type:'submit',class:'btn primary'},'Create project'),btn('Cancel',()=>{form.hidden=true;newB.hidden=false},'sm'));
@@ -11035,7 +11087,7 @@ async function pjList(b,tok){
         el('h3',{},el('button',{type:'button',class:'pj-link',onclick:open},p.name)),
         el('p',{class:'pj-meta'},pjPlural(p.parts.length,'part')+', '+pjPlural(inf.n,'run')+(inf.last?', last '+pjWhen(inf.last):'')),
         el('div',{class:'pj-chips'},...names.slice(0,5).map(n=>el('span',{class:'chip'},n)),names.length>5?el('span',{class:'chip dash'},'+'+(names.length-5)):null,!names.length?el('span',{class:'chip dash'},'No parts yet'):null),
-        el('div',{class:'pj-acts'},btn('Open',open,'sm primary'),pjTwoStep('Delete','Delete project and runs?',async()=>{await pjDb.delRuns(p.id);await pjDb.del('projects',p.id);await pjDb.del('meta','dir:'+p.id);pjGo({})}))));
+        el('div',{class:'pj-acts'},Object.assign(btn('Open',open,'sm primary'),{ariaLabel:'Open '+p.name}),pjTwoStep('Delete','Delete project and runs?',async()=>{await pjDb.delRuns(p.id);await pjDb.del('projects',p.id);await pjDb.del('meta','dir:'+p.id);pjGo({})}))));
     });
     b.append(el('h3',{class:'pj-h'},'Your projects'),grid);
   }
@@ -11045,7 +11097,7 @@ async function pjList(b,tok){
     const ok=ids.filter(i=>have.has(i));if(ok.length<2)continue;
     tpl.append(el('article',{class:'pj-card'},el('h3',{},n),el('p',{class:'pj-meta'},d),
       el('div',{class:'pj-chips'},...ok.map(i=>el('span',{class:'chip'},pjShort(i)))),
-      el('div',{class:'pj-acts'},btn('Use this template',async()=>{const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'))));
+      el('div',{class:'pj-acts'},btn('Use this template',async function(){if(this.disabled)return;this.disabled=true;const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'))));
   }
   b.append(el('h3',{class:'pj-h'},prs.length?'Start from a template':'Start with a template or a blank project'),
     el('p',{class:'hint'},'A project is a set of parts that run together. You can change the parts afterwards.'),tpl);
@@ -11054,11 +11106,11 @@ async function pjList(b,tok){
 /* ---------- one project ---------- */
 async function pjProject(b,pr,tok){
   const runs=await pjDb.runs(pr.id);
-  if(tok!==PJ.tok)return;
+  if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
   PJ.swap();
-  pjHead('Projects',pjPlural(pr.parts.length,'part')+', '+pjPlural(runs.length,'saved run'));
+  pjHead(pr.name,pjPlural(pr.parts.length,'part')+', '+pjPlural(runs.length,'saved run'));
   const nameIn=el('input',{type:'text',class:'pj-title',value:pr.name,maxlength:'60','aria-label':'Project name',onchange:async()=>{
-    const v=nameIn.value.trim();if(!v){nameIn.value=pr.name;return}pr.name=v;await pjSave(pr);toast('Renamed')}});
+    const v=nameIn.value.trim();if(!v){nameIn.value=pr.name;return}pr.name=v;await pjSave(pr);pjHead(pr.name,$('.ph .sub')&&$('.ph .sub').textContent);toast('Renamed')}});
   const tabs=el('div',{class:'pj-tabs',role:'tablist','aria-label':'Project sections'});
   for(const [k,l] of PJ_TABS)tabs.append(el('button',{type:'button',role:'tab',class:'pj-tab',id:'pj-t-'+k,'aria-selected':String(k===PJ.view),'aria-controls':'pj-panel',tabindex:k===PJ.view?'0':'-1',onclick:()=>pjGo({pid:pr.id,view:k})},l,k==='runs'&&runs.length?el('span',{class:'pj-n'},String(runs.length)):null));
   tabs.addEventListener('keydown',e=>{
@@ -11067,8 +11119,12 @@ async function pjProject(b,pr,tok){
     if(j<0)return;e.preventDefault();bs[(j+bs.length)%bs.length].focus();
   });
   const body=el('div',{class:'pj-body',role:'tabpanel',id:'pj-panel','aria-labelledby':'pj-t-'+PJ.view});
-  b.append(el('div',{class:'pj-bar'},btn('All projects',()=>pjGo({}),'sm'),nameIn),tabs,body);
-  const pb=pjPinBanner(pr);if(pb)body.append(pb);
+  b.append(el('div',{class:'pj-bar'},btn('All projects',()=>pjGo({}),'sm'),el('label',{class:'pj-nl'},el('span',{},'Project name'),nameIn)),tabs,body);
+  {const t=tabs.querySelector('[aria-selected=true]');
+   if(t){try{tabs.scrollLeft=Math.max(0,t.offsetLeft-12)}catch(e){}
+     if(PJ.refocus){PJ.refocus=false;try{t.focus({preventScroll:true})}catch(e){}}}}
+  if(!pjDb.persistent)body.append(el('p',{class:'pj-warn',role:'status'},'This browser blocks saved storage. Runs last only until you close the page, so download a backup after each run.'));
+  const pb=PJ.view==='runs'||PJ.view==='build'?null:pjPinBanner(pr);if(pb)body.append(pb);
   if(PJ.view==='parts')pjParts(body,pr);
   else if(PJ.view==='build')pjBuild(body,pr);
   else if(PJ.view==='wire')pjWire(body,pr);
@@ -11080,15 +11136,15 @@ async function pjProject(b,pr,tok){
 function pjParts(body,pr){
   const chips=el('div',{class:'pj-chips'}),count=el('p',{class:'pj-count',role:'status'}),list=el('div',{class:'pj-pl'});
   const q=el('input',{type:'search',class:'pj-in',placeholder:'Search parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',oninput:()=>build()});
-  const rm=btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build();paint();pjHead('Projects',pjPlural(0,'part'))},'sm');
+  const rm=btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build();paint();pjHead(pr.name,pjPlural(0,'part'))},'sm');
   const chk=el('p',{class:'pj-chk',role:'status'});
   const boxes=new Map();
   const paint=()=>{
     rm.hidden=!pr.parts.length;
     chk.replaceChildren();
-    try{const r=pjCheck(pr.parts),c=r.counts,n=c.error+c.warn;if(pr.parts.length&&n)chk.append(el('span',{class:'chip '+(c.error?'fail':'dash')},c.error?pjPlural(c.error,'fix'):pjPlural(c.warn,'check')),' '+pjPlural(n,'thing')+' to look at. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'See the Build tab'))}catch(e){}
+    try{const r=pjCheck(pr.parts),c=r.counts,n=c.error+c.warn;if(pr.parts.length&&n)chk.append(el('span',{class:'chip '+(c.error?'fail':'dash')},pjPlural(n,'thing')),' to look at. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'See the Build tab'))}catch(e){}
     count.textContent=pr.parts.length?pjPlural(pr.parts.length,'part')+' in this project (up to '+PJ.max+')':'No parts yet. Tick the parts below.';
-    chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),onclick:()=>toggle(id,false)},pjName(id)+' ×')));
+    chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),title:pjName(id),onclick:()=>toggle(id,false)},pjShort(id)+' ×')));
     for(const [id,c] of boxes)c.checked=pr.parts.includes(id);
     list.querySelectorAll('.pj-gp').forEach(g=>{const n=[...g.querySelectorAll('input')].filter(i=>i.checked).length;g.querySelector('.pj-gn').textContent=n?n+' selected':''});
   };
@@ -11096,8 +11152,8 @@ function pjParts(body,pr){
     const has=pr.parts.includes(id);
     if(on&&!has){if(pr.parts.length>=PJ.max){toast('A dashboard holds up to '+PJ.max+' parts. Remove one first.');paint();return}pr.parts.push(id)}
     else if(!on&&has)pr.parts=pr.parts.filter(x=>x!==id);
-    try{pjAutoPins(pr)}catch(e){}
-    await pjSave(pr);paint();pjHead('Projects',pjPlural(pr.parts.length,'part'));
+    delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
+    await pjSave(pr);paint();pjHead(pr.name,pjPlural(pr.parts.length,'part'));
   };
   function build(){
     boxes.clear();list.replaceChildren();
@@ -11167,6 +11223,7 @@ function pjDash(body,pr,nRuns){
   const nameIn=el('input',{type:'text',class:'pj-in pj-rn',value:'Run '+next,maxlength:'40','aria-label':'Run name'});
   const recCk=el('input',{type:'checkbox',id:'pj-rec',checked:true,onchange:()=>{PJ.rec=recCk.checked}});
   const go=btn('Start all',()=>toggle(),'primary');
+  if(Link.mode==='none'){go.disabled=true;go.title='Turn on Simulated mode or connect your ESP32 first'}
   const mk=el('input',{type:'text',class:'pj-in pj-mk',placeholder:'Marker, such as lid closed','aria-label':'Marker text',disabled:true,onkeydown:e=>{if(e.key==='Enter'){e.preventDefault();mkb.click()}}});
   const mkb=btn('Add marker',()=>{if(PJ.mark(mk.value)){toast('Marker added');mk.value=''}},'sm');mkb.disabled=true;
   const pill=el('span',{class:'linkp '+Link.mode},linkText());
@@ -11176,7 +11233,7 @@ function pjDash(body,pr,nRuns){
     el('div',{class:'pj-ctl'},mk,mkb));
   if(Link.mode==='none')tbar.append(el('div',{class:'pj-ctl'},el('p',{class:'hint'},'Not connected. Turn on Simulated mode or connect your ESP32 to run the dashboard.'),btn('Turn on Simulated mode',()=>$('#bDemo').click(),'sm')));
   if(wr.hard)body.append(el('p',{class:'pj-warn',role:'status'},pjPlural(wr.hard,'pin clash')+' in the wiring. Parts on one pin cannot run together. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'wire'})},'See the wiring')));
-  body.append(tbar,el('p',{class:'hint'},'Start all turns on the Live mode of every part. A tile marked Manual has no live mode, so use its own buttons while recording. Everything it reads is added to the run.'));
+  body.append(tbar,el('p',{class:'hint'},'Start all streams every part that can stream. A part marked No live mode needs its own buttons while recording. Everything read is added to the run.'));
   /* the combined readings table */
   const lt=el('tbody',{});
   const order=new Map(pr.parts.map((id,i)=>[id,i]));
@@ -11212,9 +11269,14 @@ function pjDash(body,pr,nRuns){
     for(const ev of ['pointerdown','keydown','focusin','change'])tb.addEventListener(ev,()=>{PJ.ctx=id},true);
     try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prev}
-    own.st=el('span',{class:'chip dash'},'Manual');own.res=el('span',{class:'pj-res'});
-    grid.append(el('section',{class:'pj-tile','aria-label':p.n},
-      el('header',{class:'pj-th'},el('div',{},el('h3',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'pj-tc'},own.st,own.res)),tb));
+    own.st=el('span',{class:'chip dash'},'No live mode');own.res=el('span',{class:'pj-res'});
+    /* with several parts the tests start folded, so the dashboard is a short list with one result per part. Folded with max-height, not display:none, so the tests still size themselves correctly. */
+    const tile=el('section',{class:'pj-tile'+(pr.parts.length>1?' col':''),'aria-label':p.n});
+    tb.id='pj-tb-'+id;
+    const tog=btn('',()=>{const c=tile.classList.toggle('col');tog.textContent=c?'Open test':'Close test';tog.setAttribute('aria-expanded',String(!c))},'sm');
+    tog.setAttribute('aria-controls',tb.id);tog.textContent=pr.parts.length>1?'Open test':'Close test';tog.setAttribute('aria-expanded',String(pr.parts.length<=1));
+    tile.append(el('header',{class:'pj-th'},el('div',{},el('h3',{},pjShort(id)),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'pj-tc'},own.st,own.res,tog)),tb);
+    grid.append(tile);
   }
   body.append(el('h3',{class:'pj-h'},'Parts'),grid);
   function tick(){
@@ -11223,7 +11285,7 @@ function pjDash(body,pr,nRuns){
     paintLive();
     for(const t of PJ.tiles){
       const n=t.lives.length,on=t.lives.some(l=>l.on);
-      const cls=!n?'chip dash':on?'chip fill':'chip',txt=!n?'Manual':on?'Live':'Live off';
+      const cls=!n?'chip dash':on?'chip fill':'chip',txt=!n?'No live mode':on?'Streaming':'Not streaming';
       if(t.st.textContent!==txt){t.st.className=cls;t.st.textContent=txt}
       const r=R()[t.part],key=r?r.v:'';
       if(t.res.dataset.k!==key){t.res.dataset.k=key;t.res.replaceChildren(resultChip(t.part))}
@@ -11252,7 +11314,7 @@ async function pjRuns(body,pr,runs,tok){
   if(PJ.openRun){const s=runs.find(r=>r.id===PJ.openRun);if(s){await pjRunView(body,pr,s,tok);return}}
   /* folder panel */
   const dir=await pjDirInfo(pr.id);
-  if(tok!==PJ.tok)return;
+  if(tok!==PJ.tok||!PJ.box||!PJ.box.isConnected)return;
   const fbox=el('div',{class:'pj-folder'});
   if(PJ.canFolder){
     const nameEl=el('span',{class:'pj-fn'},dir&&dir.name?dir.name:'No folder chosen');
@@ -11315,7 +11377,7 @@ function pjCompare(body,pr,runs){
   const keys=[...new Set(all.flatMap(m=>[...m.keys()]))].filter(k=>all.filter(m=>m.has(k)).length>=2);
   body.append(el('h3',{class:'pj-h'},'Comparing '+sets.map(s=>s.n).join(', ')));
   if(new Set(sets.map(s=>!!s.simulated)).size>1)body.append(el('p',{class:'pj-warn',role:'status'},'These runs mix simulated data and a live board. Compare like with like for real conclusions.'));
-  else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs are simulated simulated data.'));
+  else if(sets[0].simulated)body.append(el('p',{class:'pj-warn',role:'status'},'All of these runs used simulated data.'));
   if(!keys.length){body.append(pjEmpty('Nothing in common','These runs have no numeric reading that appears in more than one of them. Record both with the same parts to compare.'));return}
   const f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
   const label=k=>{const o=all.find(m=>m.has(k)).get(k);return o.name+(o.unit?' ('+o.unit+')':'')};
@@ -11358,21 +11420,21 @@ function pjPinBanner(pr){
   const rows=mv.map(m=>el('tr',{},el('td',{},pjShort(m.part)),el('td',{},m.signal),el('td',{class:'m'},pin(m.from)),el('td',{class:'m'},pin(m.to))));
   const flash=el('div',{class:'pj-flash',hidden:true});
   let shown=false;
-  const reflash=btn('Reflash the ESP32',()=>{
+  const reflash=btn('Reflash for my own sketch',()=>{
     shown=!shown;flash.hidden=!shown;
     if(shown&&!flash.firstChild){const c=typeof flasherCard==='function'?flasherCard('tester',{title:'Reflash the ESP32'}):null;flash.append(c||el('p',{class:'hint'},'The installer is not in this copy of the page.'))}
-  },'primary');
+  },'sm');
   const copy=btn('Copy pin list',async()=>{
     const t=mv.map(m=>'#define '+(pjShort(m.part)+'_'+m.signal).toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'')+' '+m.to+'  // was GPIO'+m.from).join('\n');
     try{await navigator.clipboard.writeText(t);toast('Pin list copied')}catch(e){toast('Could not copy. Select the table instead.')}
-  },'sm');
-  const undo=btn('Undo pin changes',async()=>{pr.pins={};PJ.ovr={};await pjSave(pr);toast('Pins back to the defaults');pjGo({pid:pr.id,view:PJ.view})},'sm');
+  },'sm primary');
+  const undo=btn('Undo pin changes',async()=>{pr.pins={};pr.autopin=false;PJ.ovr={};await pjSave(pr);toast('Pins back to the defaults. Parts that share a pin will clash again.');pjGo({pid:pr.id,view:PJ.view})},'sm');
+  const det=el('details',{class:'pj-pmd'},el('summary',{},'Show the '+pjPlural(mv.length,'moved signal')),el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...['Part','Signal','Was','Now'].map(h=>el('th',{},h)))),el('tbody',{},...rows))));
   return el('section',{class:'pj-pinmv',role:'status','aria-label':'Pins moved'},
-    el('h4',{},'Pins moved so the parts do not fight over one pin'),
-    el('p',{},'Two parts needed the same pin, so the later part was moved to a free one. The Build and Wiring tabs already show the new pins. Rewire these signals, then reflash the ESP32 so it runs with this pin layout.'),
-    el('div',{class:'tw'},el('table',{class:'t'},el('thead',{},el('tr',{},...['Part','Signal','Was','Now'].map(h=>el('th',{},h)))),el('tbody',{},...rows))),
-    el('p',{class:'hint'},'The tester firmware gets its pins from this page with every command, so the live tests follow the new pins without a reflash. A sketch of your own needs them: reflash it with the list below.'),
-    el('div',{class:'pj-acts'},reflash,copy,undo),flash);
+    el('h4',{},pjPlural(mv.length,'signal')+' moved to a free pin'),
+    el('p',{},'Two parts wanted the same pin, so the later one was moved. The Build and Wiring tabs and the live tests already use the new pins. Only a sketch of your own needs them.'),
+    det,
+    el('div',{class:'pj-acts'},copy,undo,reflash),flash);
 }
 /* ---- Project checker: pin clashes, voltage levels, power and missing parts. Pure functions plus one list renderer. ----
    Every entry in PJ_NEED comes from a note on that part's own page (wiring notes) or from the module's datasheet. */
@@ -12676,7 +12738,7 @@ function pjBuild(body,pr){
   if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
   pjSeed(pr.parts);
   const res=pjCheck(pr.parts),sm=pjCheckSummary(res,pr.parts.length);
-  body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('strong',{},sm.head),el('span',{},sm.tail)));
+  body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('span',{},el('strong',{},sm.head),sm.tail)));
   /* parts that exist in the project but not on the breadboard (test-only pages) */
   let view={az:BB.AZ,el:BB.EL},sc=BB.scene(pr.parts,res,view),items=sc.items;const zdef=sc.zdef;view.zoom=zdef;sc=BB.scene(pr.parts,res,view);items=sc.items;
   const skipped=pr.parts.filter(id=>id!=='esp'&&!items.some(i=>i.id===id));
@@ -12711,7 +12773,7 @@ function pjBuild(body,pr){
     view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom,pan:view.pan};
     if(!raf)raf=requestAnimationFrame(redraw);
   }
-  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),zin=btn('Zoom in',()=>zoomBy(1.25),'sm'),zout=btn('Zoom out',()=>zoomBy(.8),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,zoom:R3?1.3:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
+  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),zin=btn('Zoom in',()=>zoomBy(1.25),'sm'),zout=btn('Zoom out',()=>zoomBy(.8),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,zoom:R3?1:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
   /* drag turns the board; shift, right or middle button, or the Move button, drags it sideways instead. The wheel zooms at the pointer, two fingers pinch and move. */
   let drag=null,moveMode=false;const ptrs=new Map();let pinch=null;
   const moveBtn=btn('Move',()=>{moveMode=!moveMode;moveBtn.setAttribute('aria-pressed',String(moveMode));moveBtn.classList.toggle('primary',moveMode);fig.classList.toggle('mv',moveMode)},'sm');moveBtn.setAttribute('aria-pressed','false');moveBtn.title='Drag to slide the board around instead of turning it';
@@ -12732,7 +12794,7 @@ function pjBuild(body,pr){
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
   fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
-  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i)),nm))));
+  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i+1)),nm))));
   function text(i){
     info.replaceChildren();
     if(i===0){
@@ -12825,7 +12887,7 @@ function pjBuild(body,pr){
   /* the first step is on show, and the rest wait for Add next part */
   go(0);
   if(want3)BB3.mount(fig,pr.parts,res).then(r=>{
-    R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1.3};R3.setView(view);R3.show(cur,total,true);
+    R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);
   }).catch(e=>{
     console.warn('3D view unavailable, using the flat drawing',e);
     R3=null;fig.classList.remove('gl');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
@@ -12887,7 +12949,7 @@ void main(){
   gl_FragColor=vec4(mix(col,ink,e*.7),1.);
 }`;
 function pipeline(R,opt={}){
-  const o=Object.assign({thick:1.15,thr:3.2,ink:[.2,.19,.22],skyA:[.56,.56,.58],skyB:[.44,.44,.47]},opt);
+  const o=Object.assign({thick:1.15,thr:3.2,ink:[.2,.19,.22],skyA:[.34,.35,.39],skyB:[.22,.23,.26]},opt);
   const ok={v:true};
   let rtC=null,rtD=null,W=0,H=0;
   const mk=(w,h)=>{
@@ -13198,7 +13260,7 @@ async function mount(host,ids,res,opt={}){
     const hh=hh0/clamp(view.zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
-    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.78,th,430),430,780));
+    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.64,th,430),430,780));
     if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(Math.max(window.devicePixelRatio||1,2),3);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
   }
   if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0xa3a3ab,.7);S.scene.add(hl);S.key.intensity=.66;S.fill.intensity=.22;S.key.shadow.radius=2}
@@ -13568,7 +13630,7 @@ function refreshHead(){
 })();
 /* ---- history: every page change is a history entry, so the header Back button and the browser Back button (or a swipe, or Alt+Left) go back one page ---- */
 const NAV={n:0,key:'',st:null,restoring:false,ready:false};
-const navKey=st=>[st.id,st.pick?1:0,st.pid||'',st.view||''].join('|');
+const navKey=st=>[st.id,st.pick?1:0,st.pid||'',st.view||'',st.run||'',st.cmp||''].join('|');
 const navBtn=()=>{const b=document.getElementById('bBack');if(b)b.classList.toggle('on',NAV.n>0)};
 function navRecord(st,soft){
   const key=navKey(st);
@@ -13589,13 +13651,13 @@ addEventListener('popstate',async e=>{
   try{
     NAV.n=st.n||0;
     BRD.picking=!!st.pick;
-    if(st.id==='projects'&&cur==='projects'&&document.querySelector('.pj'))await pjGo({pid:st.pid||null,view:st.view||'dash'});
+    if(st.id==='projects'&&cur==='projects'&&document.querySelector('.pj'))await pjGo({pid:st.pid||null,view:st.view||'dash',run:st.run||null,cmp:st.cmp?String(st.cmp).split(','):null});
     else{if(st.id==='projects'){PJ.pending=st.pid||null;PJ.pendingView=st.view||null}await show(st.id)}
     window.scrollTo(0,st.y||0);
   }catch(err){console.warn('back',err)}
   finally{
     NAV.restoring=false;
-    NAV.st={id:st.id,pick:!!st.pick,pid:st.pid||null,view:st.view||null};NAV.key=navKey(NAV.st);navBtn();
+    NAV.st={id:st.id,pick:!!st.pick,pid:st.pid||null,view:st.view||null,run:st.run||null,cmp:st.cmp||null};NAV.key=navKey(NAV.st);navBtn();
   }
 });
 document.getElementById('bBack').addEventListener('click',()=>history.back());
@@ -13674,6 +13736,7 @@ function setStatus(){
   else{s.textContent='Not connected';s.className='stat';c.textContent='Connect ESP32'}
   d.setAttribute('aria-pressed',String(Link.mode==='demo'));
   renderNav();
+  if(cur==='projects'&&document.querySelector('.pj')){pjGo({pid:PJ.pid,view:PJ.view,run:PJ.openRun,cmp:PJ.cmp});return}
   if(cur!=='overview'&&cur!=='home'){const y0=scrollY;Promise.resolve(show(cur)).then(()=>{if(y0>0)scrollTo(0,y0)})}
 }
 
@@ -13688,7 +13751,7 @@ $('#bConnect').addEventListener('click',async()=>{
 async function toggleDemo(){
   if(Link.mode==='demo'){await runCleanups();Link.mode='none';clearInterval(Demo.gpsT);Demo.gps=false;demoResults={};setStatus();return}
   if(Link.mode==='serial')await Link.disconnect();
-  Link.mode='demo';Link.fw='demo';demoResults={};setStatus();toast('Simulated mode: simulated readings, nothing saved');
+  Link.mode='demo';Link.fw='demo';demoResults={};setStatus();toast('Simulated mode: the readings are made up. Runs you record are saved and marked Simulated.');
 }
 $('#bProj').addEventListener('click',()=>{Promise.resolve(show('projects')).then(()=>window.scrollTo(0,0))});
 $('#bDemo').addEventListener('click',()=>toggleDemo().catch(e=>toast(e.message)));
