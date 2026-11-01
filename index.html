@@ -1719,6 +1719,20 @@ details[open]::details-content{height:auto}
   ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
 }
 .btn.tgl{white-space:nowrap;flex:none}
+
+/* dep_x85: arrange parts, add a part, more breadboards */
+.bb-stage{position:relative}
+.bb-ctl2{position:relative;padding-top:8px}
+.bb-pop{position:absolute;left:0;bottom:calc(100% + 8px);z-index:30;width:min(430px,calc(100vw - 32px));max-height:min(460px,62vh);display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--raise,#1b1e24);border:1px solid var(--hair2);border-radius:var(--r-md);box-shadow:0 18px 50px rgba(0,0,0,.45);transform-origin:0 100%;animation:popin .18s var(--ease,ease-out)}
+.bb-pop[hidden]{display:none}
+@keyframes popin{from{opacity:0;transform:translateY(6px) scale(.98)}}
+.bb-pl{list-style:none;margin:0;padding:0;overflow:auto;scrollbar-width:thin;display:flex;flex-direction:column;gap:2px;min-height:0}
+.bb-po{width:100%;display:flex;justify-content:space-between;align-items:baseline;gap:14px;text-align:left;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.bb-po:hover,.bb-po:focus-visible{background:var(--hair)}
+.bb-pog{opacity:.6;font-size:12px;white-space:nowrap}
+.bb-pnone{padding:8px 10px}
+.bb-fig.arr{cursor:default}
+.bb-fig.grab,.bb-fig.grab *{cursor:grabbing!important}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -11035,6 +11049,8 @@ async function pjRestore(text){
   pr.name=String(pr.name==null?'':pr.name).trim().slice(0,60)||'Restored project';
   pr.parts=[...new Set(Array.isArray(pr.parts)?pr.parts:[])].filter(id=>pjPart(id)).slice(0,PJ.max);
   if(!pr.pins||typeof pr.pins!=='object'||Array.isArray(pr.pins))pr.pins={};
+  pr.boards=Math.max(1,Math.min(4,Math.round(+pr.boards)||1));
+  {const lo={};if(pr.layout&&typeof pr.layout==='object'&&!Array.isArray(pr.layout))for(const id of Object.keys(pr.layout)){const q=pr.layout[id];if(pr.parts.includes(id)&&q&&(q.lane==='back'||q.lane==='front')&&Number.isFinite(+q.cs))lo[id]={lane:q.lane,cs:Math.max(1,Math.min(400,Math.round(+q.cs)))}}pr.layout=lo}
   const runs=(Array.isArray(o.runs)?o.runs:[]).filter(r=>r&&typeof r==='object'&&Array.isArray(r.reads));
   /* the project is written last, so a bad file never leaves a half restored project behind */
   for(const r of runs)await pjDb.put('sessions',{...r,marks:Array.isArray(r.marks)?r.marks:[],id:pjUid(),pid:pr.id});
@@ -12545,16 +12561,126 @@ function planOf(ids){
   const width=it=>it.sp+2+it.extras.length*3;
   return {items,w,width};
 }
+
+/* which row a part is plugged into, and which row its jumper holes are on: back parts hang off the top, front parts off the bottom */
+const plugRow=it=>it.kind==='off'?(it.lane==='back'?ROW.b:ROW.g):(it.lane==='back'?ROW.e:ROW.f);
+const holeRow=it=>it.lane==='back'?ROW.a:ROW.j;
+/* ---------- the wire router: flat jumpers that follow lanes, never cut through a part ---------- */
+const GS=5,GOX=2,GOY=-6,TURN=3.2,CROSS=7;
+function routeWires(reqs,o){
+  const gx0=Math.ceil((o.x0-GOX)/GS),gx1=Math.floor((o.x1-GOX)/GS),gy0=Math.ceil((o.y0-GOY)/GS),gy1=Math.floor((o.y1-GOY)/GS);
+  const NX=gx1-gx0+1,NY=gy1-gy0+1,N=NX*NY;
+  const gxOf=x=>Math.max(gx0,Math.min(gx1,Math.round((x-GOX)/GS))),gyOf=y=>Math.max(gy0,Math.min(gy1,Math.round((y-GOY)/GS)));
+  const idOf=(gx,gy)=>(gy-gy0)*NX+(gx-gx0),wx=id=>GOX+GS*((id%NX)+gx0),wy=id=>GOY+GS*(Math.floor(id/NX)+gy0);
+  const blk=new Uint8Array(N),occ=new Uint8Array(N),cw=new Array(N);
+  for(const r of o.obs){
+    const ax=gxOf(r[0]-3),bx2=gxOf(r[2]+3),ay=gyOf(r[1]-3),by2=gyOf(r[3]+3);
+    for(let gy=ay;gy<=by2;gy++)for(let gx=ax;gx<=bx2;gx++){const x=GOX+GS*gx,y=GOY+GS*gy;if(x>r[0]-2.3&&x<r[2]+2.3&&y>r[1]-2.3&&y<r[3]+2.3)blk[idOf(gx,gy)]=1}
+  }
+  const ends=reqs.map(r=>[idOf(gxOf(r.a[0]),gyOf(r.a[1])),idOf(gxOf(r.b[0]),gyOf(r.b[1]))]);
+  ends.forEach(e=>{blk[e[0]]=2;blk[e[1]]=2});
+  const DX=[1,0,-1,0],DY=[0,1,0,-1];
+  /* tiny binary heap */
+  const heap=[];const hpush=(f,v)=>{heap.push([f,v]);let i=heap.length-1;while(i>0){const q=(i-1)>>1;if(heap[q][0]<=heap[i][0])break;[heap[q],heap[i]]=[heap[i],heap[q]];i=q}};
+  const hpop=()=>{const t=heap[0],l=heap.pop();if(heap.length){heap[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<heap.length&&heap[a][0]<heap[m][0])m=a;if(b<heap.length&&heap[b][0]<heap[m][0])m=b;if(m===i)break;[heap[m],heap[i]]=[heap[i],heap[m]];i=m}}return t};
+  const order=reqs.map((r,i)=>i).sort((i,j)=>(reqs[i].pri-reqs[j].pri)||((Math.abs(reqs[i].a[0]-reqs[i].b[0])+Math.abs(reqs[i].a[1]-reqs[i].b[1]))-(Math.abs(reqs[j].a[0]-reqs[j].b[0])+Math.abs(reqs[j].a[1]-reqs[j].b[1]))));
+  const out=new Map(),dist=new Float32Array(N*4),prev=new Int32Array(N*4);
+  order.forEach((ri,rank)=>{
+    const [s,t]=ends[ri];if(s===t)return;
+    dist.fill(1e9);prev.fill(-1);heap.length=0;
+    const tx=wx(t),ty=wy(t);
+    for(let d=0;d<4;d++){dist[s*4+d]=0;hpush(0,s*4+d)}
+    let found=-1;
+    while(heap.length){
+      const [f,st]=hpop(),c=st>>2,d=st&3,g=dist[st];
+      if(f>g+(Math.abs(wx(c)-tx)+Math.abs(wy(c)-ty))/GS+1e-3)continue;
+      if(c===t){found=st;break}
+      for(let nd=0;nd<4;nd++){
+        if(nd===((d+2)&3))continue;
+        if(nd!==d&&occ[c])continue;
+        const cx=(c%NX)+DX[nd],cy=Math.floor(c/NX)+DY[nd];
+        if(cx<0||cy<0||cx>=NX||cy>=NY)continue;
+        const n=cy*NX+cx;
+        if(blk[n]===1)continue;
+        if(blk[n]===2&&n!==t)continue;
+        let cost=1+(nd!==d?TURN:0);
+        if(occ[n]){if(occ[n]&4)continue;if(occ[n]&((nd&1)?2:1))continue;cost+=CROSS}
+        /* keep off the rail rows so power wires own them */
+        const ny=wy(n);if(ny<=24.5&&ny>=13&&n!==t)cost+=.6;
+        const ns=n*4+nd,ng=g+cost;
+        if(ng<dist[ns]){dist[ns]=ng;prev[ns]=st;hpush(ng+(Math.abs(wx(n)-tx)+Math.abs(wy(n)-ty))/GS,ns)}
+      }
+    }
+    if(found<0)return;
+    const cells=[];for(let st=found;st>=0;st=prev[st])cells.push(st>>2);cells.reverse();
+    /* mark the lane as used */
+    for(let i=0;i<cells.length;i++){
+      const c=cells[i],a=cells[i-1],b=cells[i+1];
+      const o1=a!=null?((Math.abs(c-a)===1)?1:2):0,o2=b!=null?((Math.abs(c-b)===1)?1:2):0;
+      if(i===0||i===cells.length-1||(o1&&o2&&o1!==o2))occ[c]|=4;else occ[c]|=(o1||o2);
+      (cw[c]||(cw[c]=[])).push(ri);
+    }
+    /* corners only */
+    const pts=[];for(let i=0;i<cells.length;i++){
+      const c=cells[i],a=cells[i-1],b=cells[i+1];
+      if(i===0||i===cells.length-1){pts.push([wx(c),wy(c)]);continue}
+      const o1=(Math.abs(c-a)===1)?1:2,o2=(Math.abs(c-b)===1)?1:2;
+      if(o1!==o2)pts.push([wx(c),wy(c)]);
+    }
+    out.set(reqs[ri].key,{pts,ri});
+  });
+  /* where two lanes cross, the wires lie at different heights */
+  const adj=new Map();
+  cw.forEach(list=>{if(list&&list.length>1)for(const x of list)for(const y of list)if(x!==y){(adj.get(x)||adj.set(x,new Set()).get(x)).add(y)}});
+  const layer=new Map(),ids=[...out.values()].map(v=>v.ri).sort((a,b)=>((adj.get(b)||{size:0}).size)-((adj.get(a)||{size:0}).size));
+  for(const ri of ids){const used=new Set();for(const q of (adj.get(ri)||[]))if(layer.has(q))used.add(layer.get(q));let L=0;while(used.has(L))L++;layer.set(ri,Math.min(L,4))}
+  out.forEach(v=>{v.layer=layer.get(v.ri)||0});
+  return out;
+}
+/* corners of a lane, rounded, as 3D points lying just above the board */
+function flatPoints(a,b,route,z){
+  const P0=[[a[0],a[1]],...route.pts.slice(1,-1),[b[0],b[1]]];
+  /* the end of a vertical run takes the exact hole x so the wire meets the hole squarely */
+  if(P0.length>2){if(Math.abs(P0[1][0]-route.pts[0][0])<.01)P0[1][0]=a[0];const n=P0.length;if(Math.abs(P0[n-2][0]-route.pts[route.pts.length-1][0])<.01)P0[n-2][0]=b[0]}
+  const out=[[a[0],a[1],ZB-.9],[a[0],a[1],z-.6]];
+  const R=3.6,pt=(x,y)=>out.push([x,y,z]);
+  const n=P0.length;
+  const dir=(p,q)=>{const dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy)||1;return [dx/l,dy/l,l]};
+  {const d=dir(P0[0],P0[1]);pt(P0[0][0]+d[0]*Math.min(2.6,d[2]/2),P0[0][1]+d[1]*Math.min(2.6,d[2]/2))}
+  for(let i=1;i<n-1;i++){
+    const p=P0[i],d1=dir(P0[i-1],p),d2=dir(p,P0[i+1]),r=Math.min(R,d1[2]/2.2,d2[2]/2.2);
+    const q1=[p[0]-d1[0]*r,p[1]-d1[1]*r],q2=[p[0]+d2[0]*r,p[1]+d2[1]*r];
+    /* a long straight run gets a point or two so the tube stays straight */
+    const lp=out[out.length-1],seg=Math.hypot(q1[0]-lp[0],q1[1]-lp[1]);for(let k=1;k<Math.floor(seg/9);k++)pt(lp[0]+(q1[0]-lp[0])*k/Math.floor(seg/9),lp[1]+(q1[1]-lp[1])*k/Math.floor(seg/9));
+    for(let t=0;t<=4;t++){const u=t/4,v=1-u;pt(v*v*q1[0]+2*u*v*p[0]+u*u*q2[0],v*v*q1[1]+2*u*v*p[1]+u*u*q2[1])}
+  }
+  {const d=dir(P0[n-2],P0[n-1]),lp=out[out.length-1],e=[P0[n-1][0]-d[0]*Math.min(2.6,d[2]/2),P0[n-1][1]-d[1]*Math.min(2.6,d[2]/2)];const seg=Math.hypot(e[0]-lp[0],e[1]-lp[1]);for(let k=1;k<Math.floor(seg/9);k++)pt(lp[0]+(e[0]-lp[0])*k/Math.floor(seg/9),lp[1]+(e[1]-lp[1])*k/Math.floor(seg/9));pt(e[0],e[1])}
+  out.push([b[0],b[1],z-.6],[b[0],b[1],ZB-.9]);
+  return out;
+}
+let LAYOUT={},NBMIN=1;
+const pjLayout=id=>LAYOUT[id]||null;
 function layout(ids,res){
   const pl=planOf(ids),items=pl.items;
   /* extra components from the checker, drawn beside their part */
   for(const it of items)it.extras=(res.extras||[]).filter(x=>x.part===it.id&&/resistor|capacitor|Ω|µF|diode|MOSFET|transistor/i.test(x.item)&&!/supply/i.test(x.item)).slice(0,3);
-  const start=EC0+16+2,cur={back:start,front:start};
+  const start=EC0+16+2,occ={back:[],front:[]},wid=it=>it.sp+2+it.extras.length*3;
+  const fixedOf=it=>{const o=pjLayout(it.id);return o&&o.cs!=null&&(o.lane==='back'||o.lane==='front')?o:null};
+  /* parts the person has placed stay where they were put */
+  for(const it of items){const o=fixedOf(it);if(o){it.lane=o.lane;it.cs=Math.max(start,Math.round(o.cs));it.fixed=true;occ[it.lane].push([it.cs,it.cs+wid(it)])}}
+  const endOf=l=>occ[l].reduce((m,q)=>Math.max(m,q[1]),start);
   for(const it of items){
-    it.lane=it.need5?'back':(cur.front-start<=cur.back-start+14?'front':'back');
-    it.cs=cur[it.lane];it.c0=it.cs+Math.floor((it.sp-it.n)/2);cur[it.lane]+=it.sp+2+it.extras.length*3;
+    if(!it.fixed){
+      const side=it.rows.reduce((v,r)=>{const m=/GPIO(\d+)/.exec(r.esp);if(m){const q=ESPPIN[+m[1]];if(q)v+=q.row==='back'?1:-1}return v},0);
+      const ov=pjLayout(it.id),eb=endOf('back')-start,ef=endOf('front')-start;
+      it.lane=ov&&(ov.lane==='back'||ov.lane==='front')?ov.lane:it.need5?'back':(side>0?(eb<=ef+16?'back':'front'):side<0?(ef<=eb+16?'front':'back'):(ef<=eb+14?'front':'back'));
+      const w=wid(it);let pos=start;
+      for(;;){const hit=occ[it.lane].find(q=>pos<q[1]&&pos+w>q[0]);if(!hit)break;pos=hit[1]}
+      it.cs=pos;occ[it.lane].push([pos,pos+w]);
+    }
+    it.c0=it.cs+Math.floor((it.sp-it.n)/2);
   }
-  const cols=Math.max(Math.max(cur.back,cur.front)+1,EC0+17);
+  const cols=Math.max(Math.max(endOf('back'),endOf('front'))+1,EC0+17);
   return {items,cols};
 }
 /* ---------- the scene ---------- */
@@ -12563,7 +12689,7 @@ function scene(ids,res,view){
   const L=layout(ids,res),items=L.items,need=L.cols;
   const AZv=view&&view.az!=null?view.az:AZ,ELv=view&&view.el!=null?view.el:EL;
   /* real sizes: 400 points (30 columns), 830 points (63 columns), or 830 boards clipped side by side */
-  const nb=need<=30?1:Math.ceil(need/63),cols=need<=30?30:nb*63;
+  const nb=Math.max(need<=30?1:Math.ceil(need/63),NBMIN),cols=nb===1&&need<=30?30:nb*63;
   const BL=X0*2+(cols-1)*PITCH+PITCH;
   const bounds=[0];for(let k=1;k<nb;k++)bounds.push(colX(63*k)+5);bounds.push(BL);
   const label=need<=30?'400':nb===1?'830':'830 x '+nb;
@@ -12660,10 +12786,35 @@ function scene(ids,res,view){
   /* hole of an ESP pin: row a for the back header, row j for the front one */
   const espHole=n=>{const q=ESPPIN[n];return q?[colX(EC0+q.idx),q.row==='back'?ROW.a:ROW.j]:null};
   const lift=(a,b,k)=>9+Math.min(34,Math.hypot(a[0]-b[0],a[1]-b[1])*.12)+((k||0)%4)*3;
+  /* every jumper the project needs, then one routing pass over all of them */
+  const usedRail=new Set(),railHole=(x,y)=>{const c=railX.slice().sort((p,q)=>Math.abs(p-x)-Math.abs(q-x)).find(v=>!usedRail.has(v+':'+y))||nearRail(x);usedRail.add(c+':'+y);return [c,y]};
+  const reqs=[],pinSrc={};
+  const J0=[[[colX(EC0),ROW.a],[colX(EC0),RAIL.tp],'#e5484d',0],[[colX(EC0+1),ROW.a],[colX(EC0+1)+14,RAIL.tm],'#2b2b2b',1],[[colX(EC0),ROW.j],[colX(EC0),RAIL.bp],'#e9954a',0],[[colX(EC0+1),ROW.j],[colX(EC0+1)+14,RAIL.bm],'#2b2b2b',1]].map(q=>({a:q[0],b:railHole(q[1][0],q[1][1]),hex:q[2],k:q[3]}));
+  J0.forEach((j,n)=>reqs.push({key:'j0:'+n,a:j.a,b:j.b,pri:-1}));
+  const wireEnds=(it,k,r)=>{
+    const a=[colX(it.c0+Math.min(k,it.n-1)),holeRow(it)],rail=pjRail(r.esp);let b=null,pri=0;
+    if(rail==='GPIO'){const m=/GPIO(\d+)/.exec(r.esp);if(m){const g=+m[1];pri=1;if(pinSrc[g])b=pinSrc[g];else{b=espHole(g);if(b)pinSrc[g]=a}}}
+    else if(rail==='5V')b=railHole(a[0],RAIL.tp);
+    else if(rail==='3V3')b=railHole(a[0],RAIL.bp);
+    else if(rail==='GND')b=railHole(a[0]+(k%2?7:-7),it.lane==='back'?RAIL.tm:RAIL.bm);
+    return b?{a,b,pri}:null;
+  };
+  items.forEach(it=>{it.ends=it.rows.map((r,k)=>wireEnds(it,k,r));it.ends.forEach((e,k)=>{if(e)reqs.push({key:it.id+':'+k,a:e.a,b:e.b,pri:e.pri})})});
+  const obs=[[ex0-2,Y(47)-1,ex1+2,Y(147)+1]];
+  for(const it of items){
+    const pr=plugRow(it),x0=colX(it.c0),x1=colX(it.c0+it.n-1);
+    if(it.kind==='plug')obs.push([colX(it.cs)-5,pr-3.5,colX(it.cs+it.sp-1)+5,pr+3.5]);
+    else if(it.kind==='disc')obs.push([x0-5,pr-6,x1+5,pr+6]);
+    else obs.push([x0-6,pr-3,x1+6,pr+3]);
+    it.extras.forEach((x,k)=>obs.push([colX(it.cs+it.sp+k*3)-3,(it.lane==='back'?ROW.c:ROW.h)-5,colX(it.cs+it.sp+2+k*3)+3,(it.lane==='back'?ROW.c:ROW.h)+5]));
+  }
+  let ROUTES=new Map();
+  try{ROUTES=routeWires(reqs,{x0:4,x1:BL-4,y0:4,y1:BDY-4,obs})}catch(e){console.warn('wire router',e)}
   let W3=[];
-  function wire(a,b,hex,k,cls){
-    const h=lift(a,b,k),N=18,p3=[];
-    for(let t=0;t<=N;t++){const u=t/N;p3.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,ZB+.8+h*Math.pow(Math.sin(Math.PI*u),.7)])}
+  function wire(a,b,hex,k,cls,key){
+    const rt=key&&ROUTES.get(key);let p3=[];
+    if(rt)p3=flatPoints(a,b,rt,ZB+1.9+3.3*rt.layer);
+    else{const h=lift(a,b,k),N=18;for(let t=0;t<=N;t++){const u=t/N;p3.push([a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,ZB+.8+h*Math.pow(Math.sin(Math.PI*u),.7)])}}
     W3.push({p:p3,hex,opt:cls==='opt'});
     const d=K.pathOf(p3.map(p=>at(p[0],p[1],p[2]))),e1=at(a[0],a[1],ZB),e2=at(b[0],b[1],ZB);
     return `<g class="bbw-w ${cls||''}"><path class="bbw-o" pathLength="1" d="${d}"/><path class="bbw-c" pathLength="1" style="stroke:${hex}" d="${d}"/>`+
@@ -12671,19 +12822,13 @@ function scene(ids,res,view){
   }
   /* step 0 also lays the four short power jumpers */
   const j0=[];const j3=W3=[];
-  const jump=(a,b,hex,k)=>j0.push(wire(a,b,hex,k));
-  jump([colX(EC0),ROW.a],[nearRail(colX(EC0)),RAIL.tp],'#e5484d',0);
-  jump([colX(EC0+1),ROW.a],[nearRail(colX(EC0+1)+14),RAIL.tm],'#2b2b2b',1);
-  jump([colX(EC0),ROW.j],[nearRail(colX(EC0)),RAIL.bp],'#e9954a',0);
-  jump([colX(EC0+1),ROW.j],[nearRail(colX(EC0+1)+14),RAIL.bm],'#2b2b2b',1);
+  J0.forEach((j,n)=>j0.push(wire(j.a,j.b,j.hex,j.k,'','j0:'+n)));
   wires.push({i:0,svg:j0.join('')});
   /* ---- one group per part ---- */
   items.forEach((it,s)=>{
     W3=it.w3=[];it.c3=[];
     const i=s+1,svg=[],ww=[],x0=colX(it.c0),x1=colX(it.c0+it.n-1),xm=(x0+x1)/2;
-    const rowPlug=it.kind==='off'?(it.lane==='back'?ROW.b:ROW.g):(it.lane==='back'?ROW.a:ROW.f);
-    const rowHole=it.lane==='back'?ROW.c:ROW.h;
-    const hole=k=>[colX(it.c0+k),rowHole];
+    const rowPlug=plugRow(it);
     let ref=[xm,rowPlug];
     const mod=it.kind==='plug'?BM.module(it,{xm,x0,x1,y:rowPlug}):null;
     if(mod)svg.push(...mod);
@@ -12708,16 +12853,9 @@ function scene(ids,res,view){
     });
     /* wires */
     it.rows.forEach((r,k)=>{
-      const a=hole(Math.min(k,it.n-1)),rail=pjRail(r.esp),hex=(typeof wireHex==='function'&&wireHex(r.wire))||'#d8b877';
-      let b=null;
-      if(rail==='GPIO'){const m=/GPIO(\d+)/.exec(r.esp);if(m)b=espHole(+m[1])}
-      else if(rail==='5V')b=[nearRail(a[0]),RAIL.tp];
-      else if(rail==='3V3')b=[nearRail(a[0]),RAIL.bp];
-      else if(rail==='GND')b=[nearRail(a[0]+(k%2?7:-7)),it.lane==='back'?RAIL.tm:RAIL.bm];
-      if(b){
-        /* a power wire to the far side crosses the board, so lift it higher */
-        ww.push(wire(a,b,hex,k+it.c0,r.kind==='opt'?'opt':''));
-      }
+      const e=it.ends[k];if(!e)return;
+      const hex=(typeof wireHex==='function'&&wireHex(r.wire))||'#d8b877';
+      ww.push(wire(e.a,e.b,hex,k+it.c0,r.kind==='opt'?'opt':'',it.id+':'+k));
     });
     /* off board body on the bench, joined by a cable */
     if(it.kind==='off'){
@@ -12740,7 +12878,7 @@ function scene(ids,res,view){
   for(const d of dyn)if(d.ring)out+=`<g class="bbh" data-i="${d.i}">${d.ring}</g>`;
   for(const d of wires)out+=`<g class="bbw" data-i="${d.i}">${d.svg}</g>`;
   out+='</svg>';
-  return {svg:out,W,H,items,cols,P,zdef,geo:{BL,BDY,nb,cols,bounds,railX,railSeg,label,items,j3,ex0,ex1}};
+  return {svg:out,W,H,items,cols,P,zdef,geo:{BL,BDY,nb,nbAuto:need<=30?1:Math.ceil(need/63),cols,bounds,railX,railSeg,label,items,j3,ex0,ex1}};
 }
 function extraSvg(name,x0,x1,y){
   const xm=(x0+x1)/2,o=[];
@@ -12827,7 +12965,7 @@ function benchSvg(it,xm,plugY){
   });
   return {svg:o.join(''),cable:`<g class="bbw-w cab">${cab.join('')}</g>`,cx,cy};
 }
-return {scene,layout,planOf,colX,ROW,AZ,EL,EMIN,EMAX,RAIL,ZB,BDY,TR0,TR1,TC,X0,PITCH,EC0,BACK,FRONT,ESPPIN,pinName,Y,bindSvg:()=>BM.bind(SVGH),bind3:h=>BM.bind(h)};
+return {scene,layout,plugRow,holeRow,setLayout:(o,b)=>{LAYOUT=o||{};NBMIN=Math.max(1,Math.min(4,b|0||1))},planOf,colX,ROW,AZ,EL,EMIN,EMAX,RAIL,ZB,BDY,TR0,TR1,TC,X0,PITCH,EC0,BACK,FRONT,ESPPIN,pinName,Y,bindSvg:()=>BM.bind(SVGH),bind3:h=>BM.bind(h)};
 })();
 
 /* ---------- the tab ---------- */
@@ -12864,7 +13002,8 @@ function bbStepText(it,n,total,res){
 }
 function pjBuild(body,pr){
   if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
-  pjSeed(pr.parts);
+  pjSeed(pr.parts);BB.setLayout(pr.layout,pr.boards);
+  const keep=PJ.bbKeep&&PJ.bbKeep.pid===pr.id?PJ.bbKeep:null;PJ.bbKeep=null;
   const res=pjCheck(pr.parts),sm=pjCheckSummary(res,pr.parts.length);
   body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('span',{},el('strong',{},sm.head),sm.tail)));
   /* parts that exist in the project but not on the breadboard (test-only pages) */
@@ -12884,7 +13023,7 @@ function pjBuild(body,pr){
   const pills=el('ol',{class:'bb-pills'});
   const names=['Board and ESP32',...items.map(i=>i.short.length>26?i.short.slice(0,25)+'…':i.short),'All together'];
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let cur=0;
+  let cur=keep?Math.max(0,Math.min(total-1,keep.cur)):0;
   const prev=btn('Remove part',()=>go(cur-1),'sm'),next=btn('Add next part',()=>go(cur+1),'sm primary');
   const count=el('span',{class:'bb-count'},'');
   /* spin and tilt: redraw the same scene from another angle, without replaying the animation */
@@ -12921,16 +13060,53 @@ function pjBuild(body,pr){
   fig.addEventListener('pointerdown',e=>{
     cancelAnimationFrame(twRaf);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});try{fig.setPointerCapture(e.pointerId)}catch(_){}
     if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),x:(a.x+b.x)/2,y:(a.y+b.y)/2};drag=null;return}
+    if(arrange&&R3&&R3.pick&&ptrs.size===1&&e.button===0&&!e.shiftKey){
+      const k=R3.pick(e.clientX,e.clientY),g=k>=1&&items[k-1]?R3.ground(e.clientX,e.clientY):null;
+      if(g){pd={k,it:items[k-1],g0:g,moved:false,slot:null,x:e.clientX,y:e.clientY};drag=null;fig.classList.add('grab');return}
+    }
     drag={x:e.clientX,y:e.clientY,pan:moveMode||e.shiftKey||e.button===2||e.button===1};fig.classList.add('drag');
   });
   fig.addEventListener('pointermove',e=>{
     if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(pinch&&ptrs.size>=2&&R3&&R3.zoomAt){const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
       if(pinch.d>0&&d>0)view=R3.zoomAt(d/pinch.d,mx,my);view=R3.panBy(mx-pinch.x,my-pinch.y);pinch={d,x:mx,y:my};return}
+    if(pd){carry(e);return}
     if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)<2)return;drag.x=e.clientX;drag.y=e.clientY;
     if(drag.pan&&R3&&R3.panBy)view=R3.panBy(dx,dy);else turn(-dx*.45,dy*.3);
   });
   const endDrag=e=>{if(e)ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size){drag=null;fig.classList.remove('drag')}};
+  /* ---- arrange: carry a part along the board. It snaps to the columns and lands in the back or front half. ---- */
+  let arrange=false,pd=null;
+  const START=BB.EC0+18,foot=it=>it.sp+2+it.extras.length*3;
+  const laneRect=(lane,cs,w)=>[BB.colX(cs)-5,(lane==='back'?BB.ROW.a:BB.ROW.f)-5,BB.colX(cs+w-1)+5,(lane==='back'?BB.ROW.e:BB.ROW.j)+5];
+  /* nearest free run of columns for this part in that lane, or null */
+  function freeSpot(it,lane,want){
+    const w=foot(it),last=sc.geo.cols,others=items.filter(o=>o!==it&&o.lane===lane);
+    const ok=c=>c>=START&&c+w-1<=last&&!others.some(o=>c<o.cs+foot(o)&&c+w>o.cs);
+    for(let d=0;d<=last;d++){if(ok(want+d))return want+d;if(d&&ok(want-d))return want-d}
+    return null;
+  }
+  function carry(e){
+    const g=R3.ground(e.clientX,e.clientY);if(!g)return;
+    if(!pd.moved){if(Math.abs(e.clientX-pd.x)+Math.abs(e.clientY-pd.y)<6)return;pd.moved=true;if(typeof closeTest==='function'&&tsel)closeTest()}
+    const it=pd.it,pr0=BB.plugRow(it),lane=pr0+(g[1]-pd.g0[1])<BB.TC?'back':'front';
+    const cs=freeSpot(it,lane,it.cs+Math.round((g[0]-pd.g0[0])/BB.PITCH));
+    pd.slot=cs==null?null:{lane,cs};
+    const to=cs==null?it.cs:cs,dy=BB.plugRow({kind:it.kind,lane})-pr0;
+    R3.lift(pd.k,(to-it.cs)*BB.PITCH,dy);
+    R3.ghost(laneRect(cs==null?it.lane:lane,to,foot(it)),cs!=null);
+  }
+  function rebuild(c){PJ.bbKeep={pid:pr.id,cur:c,view:{...view},arr:arrange};pjGo({pid:pr.id,view:'build'})}
+  fig.addEventListener('pointerup',async()=>{
+    const p=pd;if(!p)return;pd=null;fig.classList.remove('grab');
+    if(!p.moved)return;
+    R3.lift(p.k);R3.ghost(null);
+    const sl=p.slot;if(!sl){toast('No free space for '+p.it.short+' there.');return}
+    if(sl.cs===p.it.cs&&sl.lane===p.it.lane)return;
+    pr.layout={...(pr.layout||{}),[p.it.id]:{lane:sl.lane,cs:sl.cs}};
+    await pjSave(pr);rebuild(cur);
+  });
+  fig.addEventListener('pointercancel',()=>{const p=pd;pd=null;fig.classList.remove('grab');if(p&&R3){R3.lift(p.k);R3.ghost(null)}});
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
   fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();cancelAnimationFrame(twRaf);view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
@@ -13006,7 +13182,8 @@ function pjBuild(body,pr){
   fig.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}},true);
   fig.addEventListener('pointermove',e=>{
     if(drag||!R3||!R3.pick)return;
-    fig.style.cursor=R3.pick(e.clientX,e.clientY)>=0?'pointer':'';
+    if(pd){fig.style.cursor='grabbing';return}
+    const k=R3.pick(e.clientX,e.clientY);fig.style.cursor=k<0?'':arrange&&k>=1?'grab':'pointer';
   });
   fig.addEventListener('pointerup',e=>{
     if(!down||e.button!==0)return;const moved=Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y);down=null;if(moved>5)return;
@@ -13020,21 +13197,60 @@ function pjBuild(body,pr){
   const tipId='bb-tip'+String(pr.id).slice(-4),tip=el('span',{class:'bb-tip',id:tipId,role:'tooltip'},'Click a part on the board to open its live test beside it. Drag to turn, scroll to zoom, shift-drag or Move to slide the board.'),
     ibtn=el('button',{type:'button',class:'bb-i','aria-label':'How to use the board','aria-describedby':tipId,'aria-expanded':'false',onclick:()=>{const o=!tip.classList.contains('open');tip.classList.toggle('open',o);ibtn.setAttribute('aria-expanded',String(o))}},'i');
   ibtn.addEventListener('blur',()=>{tip.classList.remove('open');ibtn.setAttribute('aria-expanded','false')});
-  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip),tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count));
+  const arrBtn=btn('Arrange',()=>{arrange=!arrange;arrBtn.setAttribute('aria-pressed',String(arrange));arrBtn.classList.toggle('primary',arrange);fig.classList.toggle('arr',arrange);if(arrange&&cur<total-1)go(total-1,true)},'sm');
+  arrBtn.setAttribute('aria-pressed','false');arrBtn.hidden=!want3;arrBtn.title='Drag a part to move it along the board, or into the other half';
+  const autoBtn=btn('Auto layout',async()=>{pr.layout={};await pjSave(pr);rebuild(cur)},'sm');autoBtn.hidden=!(pr.layout&&Object.keys(pr.layout).length);
+  /* boards: clip another 830 point board on the right, or take the last empty one off */
+  const nbNow=sc.geo.nb,nbAuto=sc.geo.nbAuto;
+  const setBoards=async n=>{pr.boards=n;await pjSave(pr);rebuild(cur)};
+  const bAdd=btn('Add breadboard',()=>setBoards(nbNow+1),'sm'),bDel=btn('Remove breadboard',()=>setBoards(Math.max(1,nbNow-1)),'sm');
+  bAdd.disabled=nbNow>=4;bDel.disabled=nbNow<=nbAuto;
+  bDel.title=nbNow<=nbAuto?'The parts need every board that is there':'Take the last empty board off';
+  const bCount=el('span',{class:'bb-count'},nbNow===1?'1 breadboard':nbNow+' breadboards');
+  /* add a part from here, without leaving the build */
+  const pop=el('div',{class:'bb-pop',role:'dialog','aria-label':'Add a part to this project'});pop.hidden=true;
+  const pq=el('input',{type:'search',class:'pj-in','aria-label':'Search parts',placeholder:'Search parts, such as BME280, servo or GPS',autocomplete:'off',oninput:()=>fillPop()}),plist=el('ul',{class:'bb-pl'});
+  const drawable=new Map(),canDraw=id=>{if(!drawable.has(id)){let ok=false;try{const it=BB.planOf([id]).items;ok=it.length>0&&it[0].rows.length>0&&id!=='gpio'}catch(e){}drawable.set(id,ok)}return drawable.get(id)};
+  function fillPop(){
+    const t=pq.value.trim().toLowerCase().split(/\s+/).filter(Boolean);plist.replaceChildren();let n=0;
+    for(const g of GROUPS){
+      if(g.n==='Start')continue;
+      for(const id of g.ids){
+        const p=pjPart(id);if(!p||id==='esp'||BRD.hidden(p)||p.home||p.overview||p.projects||pr.parts.includes(id))continue;
+        if(!canDraw(id))continue;
+        if(t.length&&!t.every(w=>navHay(p).includes(w)))continue;
+        if(n>=80)break;n++;
+        plist.append(el('li',{},el('button',{type:'button',class:'bb-po',onclick:()=>addPart(id)},el('span',{class:'bb-pon'},p.n),el('span',{class:'bb-pog'},g.n))));
+      }
+    }
+    if(!n)plist.append(el('li',{class:'pj-dim bb-pnone'},'No matching parts.'));
+  }
+  async function addPart(id){
+    if(pr.parts.length>=PJ.max){toast('A project holds up to '+PJ.max+' parts. Remove one first.');return}
+    pr.parts.push(id);delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
+    await pjSave(pr);toast('Added '+pjName(id));rebuild(999);
+  }
+  pop.append(pq,plist);
+  const addBtn=btn('Add part',()=>{const o=pop.hidden;pop.hidden=!o;addBtn.setAttribute('aria-expanded',String(o));if(o){fillPop();pq.value='';setTimeout(()=>pq.focus(),30)}},'sm');
+  addBtn.setAttribute('aria-expanded','false');addBtn.setAttribute('aria-haspopup','dialog');
+  pop.addEventListener('keydown',e=>{if(e.key==='Escape'){pop.hidden=true;addBtn.setAttribute('aria-expanded','false');addBtn.focus()}});
+  const ctl2=el('div',{class:'bb-ctl bb-ctl2'},addBtn,arrBtn,autoBtn,el('span',{class:'bb-sep','aria-hidden':'true'}),bAdd,bDel,bCount,pop);
+  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip),tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count),ctl2);
+  document.addEventListener('pointerdown',function away(e){if(!stage.isConnected){document.removeEventListener('pointerdown',away);return}if(!pop.hidden&&!pop.contains(e.target)&&e.target!==addBtn){pop.hidden=true;addBtn.setAttribute('aria-expanded','false')}});
   body.append(figHelp,el('h3',{class:'pj-h'},'Build it on a breadboard'),
     el('div',{class:'bb'},
       stage,
       el('div',{class:'bb-side'},pills,info)));
   /* the first step is on show, and the rest wait for Add next part */
-  go(0);
+  go(cur,true);
   /* the flat drawing: used when 3D is not available, and when the browser takes the graphics memory back mid-session */
   const flat=why=>{
     if(R3){try{R3.dispose()}catch(e){}}
-    R3=null;fig.classList.remove('gl');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
+    R3=null;arrange=false;pd=null;arrBtn.hidden=true;fig.classList.remove('gl','arr');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
     if(why){const n=el('p',{class:'pj-warn',role:'status'},why+' ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'Try 3D again'));fig.parentNode&&fig.parentNode.insertBefore(n,fig)}
   };
   if(want3)BB3.mount(fig,pr.parts,res,{onLost:()=>flat('The 3D view stopped because the browser took back the graphics memory. This is the flat drawing.')}).then(r=>{
-    R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);
+    R3=r;fig.classList.add('gl');view=keep&&keep.view?{...keep.view}:{az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);arrBtn.hidden=false;if(keep&&keep.arr)arrBtn.click();
   }).catch(e=>{
     console.warn('3D view unavailable, using the flat drawing',e);
     flat();
@@ -13355,7 +13571,7 @@ async function mount(host,ids,res,opt={}){
   const accent=new TH.Color(getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#3ea6ff').convertSRGBToLinear();
   items.forEach((it,s)=>{
     const g=new TH.Group(),w=new TH.Group();root.add(g,w);H.cur=g;
-    const x0=colX(it.c0),x1=colX(it.c0+it.n-1),xm=(x0+x1)/2,rowPlug=it.kind==='off'?(it.lane==='back'?ROW.b:ROW.g):(it.lane==='back'?ROW.a:ROW.f);
+    const x0=colX(it.c0),x1=colX(it.c0+it.n-1),xm=(x0+x1)/2,rowPlug=K.plugRow(it);
     try{
       BB.bind3(H);
       if(it.kind==='plug')BM.module(it,{xm,x0,x1,y:rowPlug});
@@ -13418,7 +13634,7 @@ async function mount(host,ids,res,opt={}){
     steps.forEach((st,k)=>{
       const on=k<=Math.min(cur,steps.length);let dz=0,wf=1;
       if(anim&&anim.k===k){const p=clamp((T-anim.t0)/520,0,1);dz=(1-ease(p))*46;wf=clamp((T-anim.t0-380)/620,0,1)}
-      st.g.visible=on;st.g.position.z=dz;st.w.visible=on&&wf>0;
+      st.g.visible=on;st.g.position.set(st.ox||0,st.oy||0,dz+(st.held?7:0));st.w.visible=on&&wf>0&&!st.held;
       st.w.children.forEach(m=>{if(m.userData.n){const n=Math.floor(m.userData.n*wf/3)*3;m.geometry.setDrawRange(0,n)}else if(m.userData.cap)m.visible=wf>.02});
       if(st.ring)st.ring.visible=on&&k===cur&&cur<total-1;
     });
@@ -13435,11 +13651,11 @@ async function mount(host,ids,res,opt={}){
     if(anim||dirty||fading)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
-  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();hlMat.dispose();PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
+  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();hlMat.dispose();PIPE&&PIPE.dispose();H.dispose();R.dispose();const gl=R.getContext&&R.getContext();if(R.forceContextLoss&&gl&&!gl.isContextLost())R.forceContextLoss()}catch(e){}}
   /* click to pick a part: a ray through the pointer. The picked part is tinted as a whole: a see-through copy of each of its meshes, drawn just over the original. */
   const rc=new TH.Raycaster(),hlMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffd98a'),transparent:true,blending:TH.AdditiveBlending,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,toneMapped:false});
   let hlList=[],hlT0=0;const HLO=.55;
-  let selI=-1;
+  let selI=-1,gh=null;
   function pick(cx,cy){
     const r=canvas.getBoundingClientRect();if(!r.width)return -1;
     rc.setFromCamera(new TH.Vector2((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height*2-1)),cam);
@@ -13464,6 +13680,26 @@ async function mount(host,ids,res,opt={}){
   }
   const api={
     canvas,steps,pick,mark,
+    /* board coordinates under a screen point, on the top face of the breadboard */
+    ground(cx,cy){
+      const r=canvas.getBoundingClientRect();if(!r.width)return null;
+      rc.setFromCamera(new TH.Vector2((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height*2-1)),cam);
+      const pt=new TH.Vector3();if(!rc.ray.intersectPlane(new TH.Plane(new TH.Vector3(0,0,1),-ZB),pt))return null;
+      return [pt.x,-pt.y];
+    },
+    /* carry a part by (dx,dy) board units; its wires hide while it is held. lift(k) puts it back. */
+    lift(k,dx,dy){
+      const st=steps[k];if(!st)return;
+      if(dx==null){st.held=false;st.ox=0;st.oy=0}else{st.held=true;st.ox=dx;st.oy=dy}
+      kick();
+    },
+    /* a flat marker on the board where the held part will land: ok is green, otherwise red */
+    ghost(rect,ok){
+      if(!rect){if(gh)gh.visible=false;kick();return}
+      if(!gh){gh=new TH.Mesh(new TH.PlaneGeometry(1,1),new TH.MeshBasicMaterial({transparent:true,opacity:.42,depthWrite:false,toneMapped:false,side:TH.DoubleSide}));gh.renderOrder=7;gh.raycast=()=>{};gh.userData.noInk=true;root.add(gh)}
+      gh.visible=true;gh.material.color.set(ok?'#5fd38d':'#ee6a5e');
+      gh.scale.set(rect[2]-rect[0],rect[3]-rect[1],1);gh.position.set((rect[0]+rect[2])/2,(rect[1]+rect[3])/2,ZB+.35);kick();
+    },
     setView(v){view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null,pan:v.pan===undefined?view.pan:v.pan};kick()},
     /* zoom toward a screen point, so the part under the pointer stays under it */
     zoomAt(f,cx,cy){
