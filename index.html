@@ -1602,6 +1602,64 @@ body.is-projects #bProj{display:none}
   .pj-link{display:inline-block;padding-block:10px}.pj-ck{min-height:44px;display:inline-flex;align-items:center}
 }
 .pj-nl{display:flex;align-items:center;gap:10px;flex:1 1 220px;min-width:0}.pj-nl>span{font:500 13px var(--f-body);color:var(--muted);white-space:nowrap}.pj-nl .pj-title{flex:1;min-width:0}
+
+/* Runs: the folder panel sits under the list, folded */
+.pj-fdet{margin:22px 0 4px;border:1px solid var(--hair);border-radius:var(--r-md);background:var(--raise)}
+.pj-fdet>summary{cursor:pointer;padding:12px 16px;font:500 14px var(--f-body);color:var(--fg);min-height:44px;display:flex;align-items:center}
+.pj-fdet>summary:focus-visible{outline-offset:-3px}
+.pj-fdet .pj-folder{margin:0;border:0;border-top:1px solid var(--hair);border-radius:0}
+.pj-fn{font:400 14px var(--f-body);color:var(--muted)}
+.pj-fdet>summary{list-style:none}.pj-fdet>summary::-webkit-details-marker{display:none}
+.pj-fdet>summary::after{content:'';width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin-left:auto;transition:transform .15s}
+.pj-fdet[open]>summary::after{transform:rotate(-135deg)}
+@media (prefers-reduced-motion:reduce){.pj-fdet>summary::after{transition:none}}
+
+/* ---- dep_x83: the whole width, fewer boxes, a quiet selection, no yellow lines ---- */
+body.is-projects main{max-width:1760px;width:100%;margin-inline:auto;background:transparent;border:0;box-shadow:none;border-radius:0;padding:4px clamp(14px,2.4vw,44px) 56px}
+.pj-pinmv{border:1px solid var(--hair2);border-left-width:1px;background:var(--raise)}
+.pj-i{border:0;border-top:1px solid var(--hair);border-radius:0;background:transparent;padding:14px 2px}
+.pj-is{gap:0}
+.pj-is>.pj-i:first-child{border-top:0}
+.pj-pl{border:0;border-top:1px solid var(--hair);border-radius:0}
+.pj-gp>summary{background:transparent}
+.bb-stage{border:0;border-radius:0;background:transparent;overflow:visible}
+.bb-view{position:relative}
+.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr) minmax(340px,430px);gap:20px}
+.bb-fig.gl{border-radius:var(--r-md);overflow:hidden}
+.bb-test{border:0;background:transparent;max-height:min(900px,calc(100vh - 110px));padding:2px 6px 8px 0}
+.bb-test[hidden],.bb-test.idle{display:none}
+.bb-ctl{border-top:0;padding:14px 2px 2px}
+.bb-info{border:0;background:transparent;min-height:0;padding:6px 2px 0;max-width:84ch}
+.bb-side{gap:10px}
+.bb-pills{padding:2px 2px 16px;scrollbar-width:thin;scrollbar-color:var(--hair2) transparent}
+@media (min-width:760px){.bb-pills{flex-wrap:wrap;overflow:visible;padding-bottom:2px}}
+.bb-ih{position:absolute;left:12px;top:12px;z-index:4}
+.bb-i{width:30px;height:30px;padding:0;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(20,22,26,.74);color:#fff;font:italic 600 15px Georgia,'Times New Roman',serif;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.bb-i:hover,.bb-i:focus-visible{background:rgba(20,22,26,.94);border-color:#fff}
+.bb-i:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bb-tip{position:absolute;left:0;top:38px;width:max-content;max-width:min(300px,calc(100vw - 56px));padding:10px 12px;border-radius:10px;background:rgba(20,22,26,.97);border:1px solid var(--hair2);font:400 13px/1.5 var(--f-body);color:var(--fg);box-shadow:0 8px 24px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-3px);transition:opacity .12s,transform .12s,visibility 0s .12s;pointer-events:none}
+.bb-ih:hover .bb-tip,.bb-i:focus-visible+.bb-tip,.bb-tip.open{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+@media (max-width:760px){.bb-stage.has-test .bb-view{grid-template-columns:minmax(0,1fr);gap:14px}.bb-test{padding:0}}
+@media (prefers-reduced-motion:reduce){.bb-tip{transition:none}}
+.isoc .bb-ring{display:none}
+.bbp.sel{filter:brightness(1.3) saturate(1.15)}
+/* wide screens: the step list and its text sit beside the board, so both are on one screen */
+@media (min-width:1200px){
+  .bb{grid-template-columns:minmax(0,1fr) minmax(320px,380px);gap:8px 32px;align-items:start}
+  .bb-side{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;scrollbar-width:thin}
+  .bb-pills{flex-wrap:wrap;overflow:visible;padding-bottom:4px}
+  .bb-info{max-width:none}
+}
+@media (min-width:1200px) and (max-width:1499.98px){.bb:has(.bb-stage.has-test){grid-template-columns:minmax(0,1fr)}.bb:has(.bb-stage.has-test) .bb-side{position:static;max-height:none;overflow:visible}}
+body.is-projects .pj .notice{border:0;background:transparent;padding:2px 0;margin:0 0 14px}
+body.is-projects .pj .tw{border:0;border-radius:0}
+.pj-tbar{border:0;border-bottom:1px solid var(--hair);border-radius:0;background:var(--bg);padding:12px 0}
+.pj-th{background:transparent}
+.pj-runs{border:0;border-top:1px solid var(--hair);border-radius:0}
+.pj-run{padding-inline:2px}
+.pj-sum{border:0;border-radius:0;padding:2px 0;margin:0 0 14px}
+.pj-empty{margin-bottom:14px}
+body.is-projects .logwrap{max-width:1760px;margin-inline:auto;width:calc(100% - 2*clamp(14px,2.4vw,44px));box-sizing:border-box}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1922,7 +1980,8 @@ body.is-projects #bProj{display:none}
     <div class="logbar"><button id="bLogClear" class="btn sm" type="button">Clear log</button></div>
   </details>
 </div>
-<div id="toast" role="status" aria-live="polite" hidden></div>
+<div id="toast" hidden></div>
+<div id="srLive" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
@@ -1970,7 +2029,10 @@ let cal=store.get('cts.cal',1);
 const R=()=>Link.mode==='demo'?demoResults:results;
 
 let toastT=null;
+/* screen readers: a live region that is always in the page, so a message is read even though the toast itself comes and goes */
+function srSay(msg){const L=document.getElementById('srLive');if(!L)return;L.textContent='';setTimeout(()=>{L.textContent=msg},40)}
 function toast(msg){
+  srSay(msg);
   const t=$('#toast');t.textContent=msg;t.hidden=false;
   clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},4200);
 }
@@ -10629,7 +10691,10 @@ const pjFmt=(v,span)=>{const a=Math.abs(span||v);return Number(v).toFixed(a>=100
 /* ---------- storage: IndexedDB, with a memory fallback when the browser blocks it ---------- */
 const pjDb=(()=>{
   const mem={projects:new Map(),sessions:new Map(),meta:new Map()};
-  let db=null,tried=null,persistent=true;
+  let db=null,tried=null,persistent=true,degraded=false;
+  /* a write the browser refuses (storage full or blocked) is kept in memory for this visit, and the user is told once */
+  const fail=()=>{persistent=false;if(!degraded){degraded=true;try{toast('This browser could not save that (storage may be full or blocked). Your work stays until you close the page. Download a backup now.')}catch(_){}}};
+  const merged=(st,rows)=>{if(!degraded||!rows)return rows;const m=new Map(rows.map(r=>[r.id||r.k,r]));for(const [k,v] of mem[st])m.set(k,v);return [...m.values()]};
   const open=()=>tried||(tried=new Promise(res=>{
     try{
       const rq=indexedDB.open('esp32-live-tester-projects',1);
@@ -10650,11 +10715,11 @@ const pjDb=(()=>{
   return {
     get persistent(){return persistent&&!!db},
     ready:()=>open().then(()=>true),
-    all:st=>op(st,'readonly',(s,m)=>s?s.getAll():[...m.values()]),
-    get:(st,k)=>op(st,'readonly',(s,m)=>s?s.get(k):m.get(k)),
-    put:(st,v)=>op(st,'readwrite',(s,m)=>{if(s)return s.put(v);m.set(v.id||v.k,v);return v}),
-    del:(st,k)=>op(st,'readwrite',(s,m)=>s?s.delete(k):m.delete(k)),
-    runs:pid=>op('sessions','readonly',(s,m)=>s?s.index('pid').getAll(pid):[...m.values()].filter(x=>x.pid===pid)),
+    all:async st=>merged(st,await op(st,'readonly',(s,m)=>s?s.getAll():[...m.values()])),
+    get:async(st,k)=>(degraded&&mem[st].get(k))||await op(st,'readonly',(s,m)=>s?s.get(k):m.get(k)),
+    put:async(st,v)=>{try{return await op(st,'readwrite',(s,m)=>{if(s)return s.put(v);m.set(v.id||v.k,v);return v})}catch(e){fail();mem[st].set(v.id||v.k,v);return v}},
+    del:async(st,k)=>{mem[st].delete(k);try{return await op(st,'readwrite',(s,m)=>s?s.delete(k):m.delete(k))}catch(e){fail()}},
+    runs:async pid=>merged('sessions',await op('sessions','readonly',(s,m)=>s?s.index('pid').getAll(pid):[...m.values()].filter(x=>x.pid===pid))).filter(x=>x.pid===pid),
     delRuns:async pid=>{const a=await pjDb.runs(pid);for(const r of a)await pjDb.del('sessions',r.id)}
   };
 })();
@@ -11006,12 +11071,14 @@ const pjPlural=(n,w)=>n+' '+w+(n===1?'':'s');
 function pjSeed(ids){try{BRD.reset();ids.forEach(id=>BRD.seed(pjPart(id)))}catch(e){}}
 const pjPin=s=>{try{return BRD.ident()?s:String(s).replace(/GPIO(\d+)/g,(m,n)=>BRD.label(+n)||m)}catch(e){return s}};
 function pjEmpty(title,text,...acts){return el('div',{class:'pj-empty'},el('h3',{},title),el('p',{},text),el('div',{class:'pj-acts'},...acts))}
-function pjTwoStep(label,confirm,fn,cls){
+function pjTwoStep(label,confirm,fn,cls,what){
   const b=btn(label,()=>{
     if(b.dataset.arm){clearTimeout(+b.dataset.arm);delete b.dataset.arm;return fn()}
-    b.textContent=confirm;b.classList.add('danger');
-    b.dataset.arm=setTimeout(()=>{delete b.dataset.arm;b.textContent=label;b.classList.remove('danger')},3500);
+    b.textContent=confirm;b.classList.add('danger');b.setAttribute('aria-label',confirm+' Press again to confirm.');
+    try{srSay(confirm+' Press the button again to confirm.')}catch(e){}
+    b.dataset.arm=setTimeout(()=>{delete b.dataset.arm;b.textContent=label;b.classList.remove('danger');b.setAttribute('aria-label',label+(what?' '+what:''))},3500);
   },cls||'sm');
+  b.setAttribute('aria-label',label+(what?' '+what:''));
   return b;
 }
 
@@ -11068,8 +11135,9 @@ async function pjList(b,tok){
     e.preventDefault();if(form.dataset.busy)return;form.dataset.busy='1';const p=await pjNew(nm.value,[]);pjGo({pid:p.id,view:'parts'});
   }});
   const nm=el('input',{type:'text',class:'pj-in',placeholder:'Project name, such as Greenhouse monitor','aria-label':'Project name',maxlength:'60',required:true});
-  form.append(nm,el('button',{type:'submit',class:'btn primary'},'Create project'),btn('Cancel',()=>{form.hidden=true;newB.hidden=false},'sm'));
+  form.append(nm,el('button',{type:'submit',class:'btn primary'},'Create project'),btn('Cancel',()=>{form.hidden=true;newB.hidden=false;newB.focus()},'sm'));
   const newB=btn('New project',()=>{form.hidden=false;newB.hidden=true;nm.focus()},'primary');
+  form.addEventListener('keydown',e=>{if(e.key==='Escape'){form.hidden=true;newB.hidden=false;newB.focus()}});
   const file=el('input',{type:'file',accept:'application/json,.json',hidden:true,onchange:async()=>{
     const f=file.files[0];if(!f)return;
     try{const p=await pjRestore(await f.text());toast('Restored '+p.name);pjGo({pid:p.id,view:'runs'})}catch(e){toast(e.message||'Could not read that file.')}
@@ -11087,7 +11155,7 @@ async function pjList(b,tok){
         el('h3',{},el('button',{type:'button',class:'pj-link',onclick:open},p.name)),
         el('p',{class:'pj-meta'},pjPlural(p.parts.length,'part')+', '+pjPlural(inf.n,'run')+(inf.last?', last '+pjWhen(inf.last):'')),
         el('div',{class:'pj-chips'},...names.slice(0,5).map(n=>el('span',{class:'chip'},n)),names.length>5?el('span',{class:'chip dash'},'+'+(names.length-5)):null,!names.length?el('span',{class:'chip dash'},'No parts yet'):null),
-        el('div',{class:'pj-acts'},Object.assign(btn('Open',open,'sm primary'),{ariaLabel:'Open '+p.name}),pjTwoStep('Delete','Delete project and runs?',async()=>{await pjDb.delRuns(p.id);await pjDb.del('projects',p.id);await pjDb.del('meta','dir:'+p.id);pjGo({})}))));
+        el('div',{class:'pj-acts'},Object.assign(btn('Open',open,'sm primary'),{ariaLabel:'Open '+p.name}),pjTwoStep('Delete','Delete project and runs?',async()=>{await pjDb.delRuns(p.id);await pjDb.del('projects',p.id);await pjDb.del('meta','dir:'+p.id);toast('Deleted '+p.name);pjGo({})},'sm',p.name))));
     });
     b.append(el('h3',{class:'pj-h'},'Your projects'),grid);
   }
@@ -11097,7 +11165,7 @@ async function pjList(b,tok){
     const ok=ids.filter(i=>have.has(i));if(ok.length<2)continue;
     tpl.append(el('article',{class:'pj-card'},el('h3',{},n),el('p',{class:'pj-meta'},d),
       el('div',{class:'pj-chips'},...ok.map(i=>el('span',{class:'chip'},pjShort(i)))),
-      el('div',{class:'pj-acts'},btn('Use this template',async function(){if(this.disabled)return;this.disabled=true;const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'))));
+      el('div',{class:'pj-acts'},Object.assign(btn('Use this template',async function(){if(this.disabled)return;this.disabled=true;const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'),{ariaLabel:'Use the '+n+' template'}))));
   }
   b.append(el('h3',{class:'pj-h'},prs.length?'Start from a template':'Start with a template or a blank project'),
     el('p',{class:'hint'},'A project is a set of parts that run together. You can change the parts afterwards.'),tpl);
@@ -11295,13 +11363,14 @@ function pjDash(body,pr,nRuns){
     if(PJ.run){
       go.disabled=true;mkb.disabled=true;mk.disabled=true;
       let s=null;try{s=await PJ.stop(true)}catch(e){toast(e&&e.message||String(e))}
-      go.disabled=false;mkb.disabled=false;mk.disabled=false;go.textContent='Start all';go.classList.add('primary');clock.textContent='00:00';
+      go.disabled=false;mkb.disabled=false;mk.disabled=false;go.textContent='Start all';go.setAttribute('aria-pressed','false');go.classList.add('primary');clock.textContent='00:00';
       if(s){next++;nameIn.value='Run '+next;const t=$('#pj-t-runs');if(t){t.textContent='Runs';t.append(el('span',{class:'pj-n'},String(next-1)))}}
       return;
     }
     PJ.start(nameIn.value.trim()||'Run '+next,recCk.checked);
     if(!PJ.run)return;
-    go.textContent='■ Stop and save';mk.disabled=!PJ.run.rec;mkb.disabled=!PJ.run.rec;
+    go.setAttribute('aria-pressed','true');try{srSay('Recording started')}catch(e){}
+    go.textContent='Stop and save';mk.disabled=!PJ.run.rec;mkb.disabled=!PJ.run.rec;
     if(!PJ.live()&&PJ.tiles.every(t=>!t.lives.length))toast('These parts have no live mode. Use each tile’s buttons; readings are still recorded.');
   }
   PJ.timer=setInterval(tick,500);tick();
@@ -11324,9 +11393,9 @@ async function pjRuns(body,pr,runs,tok){
         try{const h=await pjPickDir(pr.id);nameEl.textContent=h.name;ck.disabled=false;ck.checked=pr.autosave=true;await pjSave(pr);toast('Folder set. New runs save there automatically.')}catch(e){if(e&&e.name!=='AbortError')toast(e.message||'Could not use that folder.')}
       },'sm'),el('label',{class:'pj-ck'},ck,'Save every new run there')));
   }else fbox.append(el('div',{},el('strong',{},'Save to your PC'),el('p',{class:'hint'},'This browser cannot write to a folder. Use Download on each run, or open the page in Chrome or Edge to save straight to a folder.')));
-  body.append(fbox);
+  const fdet=el('details',{class:'pj-fdet'},el('summary',{},'Save runs to a folder on your PC'),fbox);
   if(!runs.length){body.append(pjEmpty('No runs yet','Open the Dashboard, press Start all, then Stop and save. Each run appears here.',btn('Open the dashboard',()=>pjGo({pid:pr.id,view:'dash'}),'primary')),
-    el('div',{class:'pj-acts'},btn('Back up this project',()=>pjBackup(pr),'sm')));return}
+    el('div',{class:'pj-acts'},btn('Back up this project',()=>pjBackup(pr),'sm')),fdet);return}
   const picked=new Set();
   const cmpB=btn('Compare selected',()=>pjGo({pid:pr.id,view:'runs',cmp:[...picked]}),'sm primary');cmpB.disabled=true;
   const note=el('span',{class:'hint',role:'status'},'Tick two to four runs to compare them.');
@@ -11339,9 +11408,9 @@ async function pjRuns(body,pr,runs,tok){
       el('div',{class:'pj-ri'},el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'runs',run:s.id})},s.n),
         el('span',{class:'pj-meta'},pjWhen(s.started)+', '+pjSpan(s.seconds)+', '+s.reads.length+' readings')),
       el('span',{class:'chip '+(s.simulated?'dash':'fill')},s.simulated?'Simulated':'Live board'),
-      el('div',{class:'pj-acts'},btn('Open',()=>pjGo({pid:pr.id,view:'runs',run:s.id}),'sm'),btn('CSV',()=>pjDownload(s,pr,'csv'),'sm'))));
+      el('div',{class:'pj-acts'},Object.assign(btn('Open',()=>pjGo({pid:pr.id,view:'runs',run:s.id}),'sm'),{ariaLabel:'Open '+s.n}),Object.assign(btn('CSV',()=>pjDownload(s,pr,'csv'),'sm'),{ariaLabel:'Download '+s.n+' as CSV'}))));
   }
-  body.append(list);
+  body.append(list,fdet);
 }
 async function pjRunView(body,pr,s,tok){
   const ser=pjSeries(s);
@@ -11355,7 +11424,7 @@ async function pjRunView(body,pr,s,tok){
     await pjWriteRun(h,s,pr);toast('Saved to '+h.name+'/'+pjSlug(pr.name));
   },'sm');
   body.append(el('div',{class:'pj-acts'},btn('Download CSV',()=>pjDownload(s,pr,'csv'),'sm'),btn('Download JSON',()=>pjDownload(s,pr,'json'),'sm'),btn('Download report',()=>pjDownload(s,pr,'html'),'sm'),PJ.canFolder?folder:null,
-    pjTwoStep('Delete run','Delete this run?',async()=>{await pjDb.del('sessions',s.id);pjGo({pid:pr.id,view:'runs'})})));
+    pjTwoStep('Delete run','Delete this run?',async()=>{await pjDb.del('sessions',s.id);toast('Deleted '+s.n);pjGo({pid:pr.id,view:'runs'})},'sm',s.n)));
   const f=v=>Number.isFinite(v)?pjFmt(v,Math.max(Math.abs(v),1)):'n/a';
   if(!ser.length)body.append(pjEmpty('No numeric readings','This run has readings, but none are numbers that can be charted. The CSV still has every one.'));
   else{
@@ -12743,7 +12812,8 @@ function pjBuild(body,pr){
   let view={az:BB.AZ,el:BB.EL},sc=BB.scene(pr.parts,res,view),items=sc.items;const zdef=sc.zdef;view.zoom=zdef;sc=BB.scene(pr.parts,res,view);items=sc.items;
   const skipped=pr.parts.filter(id=>id!=='esp'&&!items.some(i=>i.id===id));
   const total=items.length+2;
-  const fig=el('div',{class:'bb-fig',tabindex:'0','aria-label':'Breadboard drawing. Drag or use the arrow keys to spin it. It scrolls sideways on a small screen.'});
+  const figHelp=el('p',{class:'sr-only',id:'bb-fig-help'},'Arrow keys spin the board. Enter or Space opens the test of the part just added. The same steps are listed as text under the drawing.');
+  const fig=el('div',{class:'bb-fig',role:'group','aria-roledescription':'3D breadboard',tabindex:'0','aria-label':'Breadboard with the project parts','aria-describedby':'bb-fig-help'});
   fig.innerHTML=sc.svg;
   let svg=fig.firstChild;
   /* real 3D when WebGL is there: the flat drawing is the fallback */
@@ -12753,7 +12823,7 @@ function pjBuild(body,pr){
   if(!want3)fit();
   const info=el('div',{class:'bb-info','aria-live':'polite'});
   const pills=el('ol',{class:'bb-pills'});
-  const names=['Board and ESP32',...items.map(i=>i.short.length>16?i.short.slice(0,15)+'…':i.short),'All together'];
+  const names=['Board and ESP32',...items.map(i=>i.short.length>26?i.short.slice(0,25)+'…':i.short),'All together'];
   const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
   let cur=0;
   const prev=btn('Remove part',()=>go(cur-1),'sm'),next=btn('Add next part',()=>go(cur+1),'sm primary');
@@ -12836,11 +12906,10 @@ function pjBuild(body,pr){
   }
   /* click a part on the board and its live test opens to the right, the same page the Test tab shows */
   const tpanel=el('aside',{class:'bb-test idle','aria-label':'Live test of the selected part'});
-  const idleView=()=>tpanel.replaceChildren(el('div',{class:'bb-idle'},el('h4',{},'Live test'),el('p',{class:'hint'},'Click a part on the board. Its test opens here, and the part lights up on the board.'),el('p',{class:'hint'},'Drag to turn, scroll to zoom, shift-drag or Move to slide the board.')));
-  idleView();
+  tpanel.hidden=true;
   let tsel=null,townLives=[];
   function closeTest(){
-    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');idleView();
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');tpanel.hidden=true;tpanel.replaceChildren();stage.classList.remove('has-test');
     if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
   function openTest(id,k){
@@ -12857,7 +12926,7 @@ function pjBuild(body,pr){
       el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
       mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):'',
       tb,typeof verdictBar==='function'?verdictBar(p):'');
-    tpanel.classList.remove('idle');
+    tpanel.classList.remove('idle');tpanel.hidden=false;stage.classList.add('has-test');
     if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
     if(innerWidth<760)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
   }
@@ -12878,19 +12947,27 @@ function pjBuild(body,pr){
     const id=partAt(k);if(id)openTest(id,k);
   });
   fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const id=partAt(cur);if(id){e.preventDefault();openTest(id,cur)}}});
-  const stage=el('div',{class:'bb-stage has-test'},el('div',{class:'bb-view'},fig,tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count));
-  body.append(el('h3',{class:'pj-h'},'Build it on a breadboard'),
-    el('p',{class:'hint bb-click'},'Click any part on the board to test it here, right beside the drawing.'),
+  const tipId='bb-tip'+String(pr.id).slice(-4),tip=el('span',{class:'bb-tip',id:tipId,role:'tooltip'},'Click a part on the board to open its live test beside it. Drag to turn, scroll to zoom, shift-drag or Move to slide the board.'),
+    ibtn=el('button',{type:'button',class:'bb-i','aria-label':'How to use the board','aria-describedby':tipId,'aria-expanded':'false',onclick:()=>{const o=!tip.classList.contains('open');tip.classList.toggle('open',o);ibtn.setAttribute('aria-expanded',String(o))}},'i');
+  ibtn.addEventListener('blur',()=>{tip.classList.remove('open');ibtn.setAttribute('aria-expanded','false')});
+  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip),tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count));
+  body.append(figHelp,el('h3',{class:'pj-h'},'Build it on a breadboard'),
     el('div',{class:'bb'},
       stage,
       el('div',{class:'bb-side'},pills,info)));
   /* the first step is on show, and the rest wait for Add next part */
   go(0);
-  if(want3)BB3.mount(fig,pr.parts,res).then(r=>{
+  /* the flat drawing: used when 3D is not available, and when the browser takes the graphics memory back mid-session */
+  const flat=why=>{
+    if(R3){try{R3.dispose()}catch(e){}}
+    R3=null;fig.classList.remove('gl');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
+    if(why){const n=el('p',{class:'pj-warn',role:'status'},why+' ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'Try 3D again'));fig.parentNode&&fig.parentNode.insertBefore(n,fig)}
+  };
+  if(want3)BB3.mount(fig,pr.parts,res,{onLost:()=>flat('The 3D view stopped because the browser took back the graphics memory. This is the flat drawing.')}).then(r=>{
     R3=r;fig.classList.add('gl');view={az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);
   }).catch(e=>{
     console.warn('3D view unavailable, using the flat drawing',e);
-    R3=null;fig.classList.remove('gl');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
+    flat();
   });
   /* the whole project at a glance when the picture cannot animate */
   /* a plain list for anyone who cannot see the drawing */
@@ -13129,9 +13206,10 @@ function topPlane(g,x0,y0,x1,y1,z,tex){
 async function mount(host,ids,res,opt={}){
   await GLH.ready();TH=GLH.TH;
   const sc0=BB.scene(ids,res,{az:BB.AZ,el:BB.EL}),geo=sc0.geo,items=geo.items,K=BB,ZB=K.ZB,ROW=K.ROW,RAIL=K.RAIL,colX=K.colX;
-  const canvas=document.createElement('canvas');canvas.className='bb-gl';canvas.setAttribute('role','img');
-  canvas.setAttribute('aria-label','Three dimensional breadboard with the ESP32 and the project parts being added one step at a time. Drag to spin it.');
+  const canvas=document.createElement('canvas');canvas.className='bb-gl';canvas.setAttribute('aria-hidden','true');
   host.replaceChildren(canvas);
+  /* the browser can take the graphics memory back (many tabs, a sleeping laptop). Say so, so the page can show the flat drawing instead of a frozen picture. */
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();try{opt.onLost&&opt.onLost()}catch(_){}});
   const S=GLH.stage(canvas,{shadow:2048});
   S.floor.visible=false;S.blob.visible=false;S.root.visible=false;
   const R=S.renderer;R.shadowMap.type=TH.PCFSoftShadowMap;
@@ -13219,10 +13297,7 @@ async function mount(host,ids,res,opt={}){
       }
       it.extras.forEach((x,k)=>BM.extra(x.item,colX(it.cs+it.sp+k*3),colX(it.cs+it.sp+2+k*3),it.lane==='back'?ROW.c:ROW.h));
     }finally{BB.bindSvg()}
-    const rx0=colX(it.cs)-6,rx1=colX(it.cs+it.sp-1)+6,ya=(it.lane==='back'?ROW.a:ROW.f)-4,yb=(it.lane==='back'?ROW.e:ROW.j)+5;
-    const ring=new TH.Line(new TH.BufferGeometry().setFromPoints([[rx0,ya],[rx1,ya],[rx1,yb],[rx0,yb],[rx0,ya]].map(p=>new TH.Vector3(p[0],p[1],ZB+.3))),new TH.LineBasicMaterial({color:accent,transparent:true,opacity:.95}));
-    ring.renderOrder=6;ring.userData.noInk=true;ring.visible=false;root.add(ring);
-    steps.push({g,w,wires:(it.w3||[]).concat(it.c3||[]),ring,x:xm,pos:it.kind==='off'?[it.bench.cx,it.bench.cy]:[xm,rowPlug],id:it.id});
+    steps.push({g,w,wires:(it.w3||[]).concat(it.c3||[]),ring:null,x:xm,pos:it.kind==='off'?[it.bench.cx,it.bench.cy]:[xm,rowPlug],id:it.id});
   });
   /* ----- wires: tubes along each route ----- */
   const wmats=new Map();
@@ -13260,7 +13335,7 @@ async function mount(host,ids,res,opt={}){
     const hh=hh0/clamp(view.zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
-    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.64,th,430),430,780));
+    const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.62,th,430),430,Math.max(560,Math.min(820,(window.innerHeight||900)-130))));
     if(w===W&&h===Hh)return;W=w;Hh=h;const dpr=Math.min(Math.max(window.devicePixelRatio||1,2),3);R.setPixelRatio(dpr);R.setSize(W,Hh,false);PIPE&&PIPE.resize(W,Hh,dpr);canvas.style.width=W+'px';canvas.style.height=Hh+'px';fit();place();dirty=true;
   }
   if(COMIC){TOON.apply(S.scene);const hl=new TH.HemisphereLight(0xffffff,0xa3a3ab,.7);S.scene.add(hl);S.key.intensity=.66;S.fill.intensity=.22;S.key.shadow.radius=2}
@@ -13287,12 +13362,10 @@ async function mount(host,ids,res,opt={}){
     if(anim||dirty)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
-  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
-  /* click to pick a part: a ray through the pointer, and a glowing pad under whatever is selected */
-  const rc=new TH.Raycaster(),selMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffb81c'),transparent:true,opacity:.42,depthWrite:false}),
-    selLine=new TH.LineBasicMaterial({color:new TH.Color('#ffb81c')});
-  const selPad=new TH.Mesh(new TH.PlaneGeometry(1,1),selMat),selEdge=new TH.Group();const selBar=new TH.MeshBasicMaterial({color:new TH.Color('#ffb81c'),depthWrite:false,depthTest:false,transparent:true,opacity:.95}),bars=Array.from({length:12},()=>{const m=new TH.Mesh(new TH.BoxGeometry(1,1,1),selBar);m.renderOrder=9;m.userData.noInk=true;selEdge.add(m);return m});
-  for(const o of [selPad,selEdge]){o.visible=false;o.renderOrder=7;o.userData.noInk=true;root.add(o)}selPad.material.opacity=.55;selMat.color.set('#ffb81c');
+  function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();hlMat.dispose();PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
+  /* click to pick a part: a ray through the pointer. The picked part is tinted as a whole: a see-through copy of each of its meshes, drawn just over the original. */
+  const rc=new TH.Raycaster(),hlMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffd98a'),transparent:true,blending:TH.AdditiveBlending,opacity:.55,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,toneMapped:false});
+  let hlList=[];
   let selI=-1;
   function pick(cx,cy){
     const r=canvas.getBoundingClientRect();if(!r.width)return -1;
@@ -13303,19 +13376,18 @@ async function mount(host,ids,res,opt={}){
     let o=hit.object;while(o){const k=live.indexOf(o);if(k>=0)return k;o=o.parent}
     return -1;
   }
+  function unmark(){for(const o of hlList){o.parent&&o.parent.remove(o)}hlList=[]}
   function mark(i){
-    selI=i;
-    if(i==null||i<0||!steps[i]){selPad.visible=selEdge.visible=false;kick();return}
-    root.updateMatrixWorld(true);
-    const b=new TH.Box3().setFromObject(steps[i].g).applyMatrix4(new TH.Matrix4().copy(root.matrixWorld).invert());
-    const x0=b.min.x-6,x1=b.max.x+6,y0=b.min.y-6,y1=b.max.y+6,z=ZB+.35;
-    selPad.position.set((x0+x1)/2,(y0+y1)/2,z);selPad.scale.set(x1-x0,y1-y0,1);
-    const t=3.2,z0=Math.min(ZB,b.min.z)-.5,z1=Math.max(b.max.z+3,ZB+8),w=x1-x0,h=y1-y0,dz=z1-z0,cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2;
-    const E=[];for(const yy of [y0,y1])for(const zz of [z0,z1])E.push([cx,yy,zz,w+t,t,t]);
-    for(const xx of [x0,x1])for(const zz of [z0,z1])E.push([xx,cy,zz,t,h+t,t]);
-    for(const xx of [x0,x1])for(const yy of [y0,y1])E.push([xx,yy,cz,t,t,dz+t]);
-    E.forEach((q,j)=>{bars[j].position.set(q[0],q[1],q[2]);bars[j].scale.set(q[3],q[4],q[5])});
-    selPad.visible=selEdge.visible=true;kick();
+    selI=i;unmark();
+    if(i==null||i<0||!steps[i]){kick();return}
+    const srcs=[];steps[i].g.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&o.geometry&&o.material&&!o.userData.noInk&&!o.userData.hl){const ms=Array.isArray(o.material)?o.material:[o.material];if(!ms.some(m=>m.transparent||m.alphaTest>0))srcs.push(o)}});
+    for(const o of srcs){
+      const c=o.isInstancedMesh?new TH.InstancedMesh(o.geometry,hlMat,o.count):new TH.Mesh(o.geometry,hlMat);
+      if(o.isInstancedMesh){c.instanceMatrix=o.instanceMatrix;c.frustumCulled=false}
+      c.position.copy(o.position);c.quaternion.copy(o.quaternion);c.scale.copy(o.scale);c.renderOrder=8;c.raycast=()=>{};
+      c.userData.noInk=true;c.userData.hl=true;o.parent.add(c);hlList.push(c);
+    }
+    kick();
   }
   const api={
     canvas,steps,pick,mark,
@@ -13642,8 +13714,10 @@ function navRecord(st,soft){
     if(!NAV.ready||(soft&&same)){history.replaceState(Object.assign({},st,{n:NAV.n}),'','#'+st.id);NAV.ready=true}
     else{NAV.n++;history.pushState(Object.assign({},st,{n:NAV.n}),'','#'+st.id)}
   }catch(e){}
-  NAV.st=st;NAV.key=key;navBtn();
+  NAV.st=st;NAV.key=key;navBtn();navKeep(st);
 }
+/* a reload in the same tab comes back to the open project (a new visit still starts at the board picker) */
+function navKeep(st){try{if(st.id==='projects'&&st.pid&&BRD.cur)sessionStorage.setItem('cts.resume',JSON.stringify({pid:st.pid,view:st.view||'dash',board:BRD.cur}));else sessionStorage.removeItem('cts.resume')}catch(e){}}
 addEventListener('popstate',async e=>{
   const st=e.state;
   if(!st||!st.id)return;
@@ -13786,5 +13860,7 @@ if(!('serial' in navigator)){const n=$('#frameNote');n.textContent=(/Android|iPh
 try{if(window.visualViewport){const vv=()=>document.documentElement.style.setProperty('--vvh',Math.round(visualViewport.height)+'px');visualViewport.addEventListener('resize',vv);vv()}}catch(e){}
 renderNav();
 try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
-show('home'); /* always the board picker first */
+{let rs=null;try{rs=JSON.parse(sessionStorage.getItem('cts.resume')||'null')}catch(e){}
+ if(rs&&rs.pid&&rs.board&&BRD.by(rs.board)){BRD.set(rs.board);BRD.picking=false;PJ.pending=rs.pid;PJ.pendingView=rs.view||null;show('projects')}
+ else show('home'); /* a new visit starts at the board picker */}
 </script>
