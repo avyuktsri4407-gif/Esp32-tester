@@ -1660,6 +1660,65 @@ body.is-projects .pj .tw{border:0;border-radius:0}
 .pj-sum{border:0;border-radius:0;padding:2px 0;margin:0 0 14px}
 .pj-empty{margin-bottom:14px}
 body.is-projects .logwrap{max-width:1760px;margin-inline:auto;width:calc(100% - 2*clamp(14px,2.4vw,44px));box-sizing:border-box}
+
+/* ---- dep_x84: everything eases. One curve, short durations, no snapping. ---- */
+:root{--ease:cubic-bezier(.22,.8,.24,1);--ease-spring:cubic-bezier(.34,1.5,.5,1);interpolate-size:allow-keywords}
+:where(button,.btn,.chip,a,summary,input,select,textarea,label,.pj-tab,.bb-pill,.pj-pr,.ni,.pj-card,.jl,.stat,.seg>*){transition:background-color .22s var(--ease),border-color .22s var(--ease),color .22s var(--ease),box-shadow .26s var(--ease),opacity .22s var(--ease),transform .2s var(--ease),filter .22s var(--ease)}
+.btn:not(:disabled):active,.pj-tab:active,.bb-pill:active,.chip.fill:active{transform:scale(.965)}
+.btn:not(:disabled):hover{transform:translateY(-1px)}
+.btn:not(:disabled):active{transform:translateY(0) scale(.965)}
+.btn.tgl:not(:disabled):hover{transform:none}
+.pj-card{transition:border-color .22s var(--ease),transform .26s var(--ease),box-shadow .26s var(--ease),background-color .22s var(--ease)}
+.pj-card:hover{transform:translateY(-2px);border-color:var(--accent-line);box-shadow:0 14px 30px -18px rgba(0,0,0,.8)}
+.pj-pr{transition:background-color .18s var(--ease)}
+/* the Simulated mode switch */
+.btn.tgl{display:inline-flex;align-items:center;gap:10px;padding-left:10px}
+.tgl-t{position:relative;flex:none;width:38px;height:22px;border-radius:999px;background:var(--hair2);transition:background-color .28s var(--ease)}
+.tgl-k{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#d9dce3;box-shadow:0 1px 3px rgba(0,0,0,.5);transition:transform .34s var(--ease-spring),background-color .28s var(--ease),width .2s var(--ease)}
+.btn.tgl:active .tgl-k{width:20px}
+.btn.tgl[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-hi)}
+.btn.tgl[aria-checked="true"] .tgl-t{background:var(--accent)}
+.btn.tgl[aria-checked="true"] .tgl-k{transform:translateX(16px);background:var(--on-accent)}
+.btn.tgl[aria-checked="true"]:active .tgl-k{transform:translateX(12px)}
+.btn.tgl:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* the same switch for Record data */
+.pj-ck input{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:38px;height:22px;margin:0;border-radius:999px;background:var(--hair2);cursor:pointer;transition:background-color .28s var(--ease)}
+.pj-ck input::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#d9dce3;box-shadow:0 1px 3px rgba(0,0,0,.5);transition:transform .34s var(--ease-spring),background-color .28s var(--ease)}
+.pj-ck input:checked{background:var(--accent)}
+.pj-ck input:checked::after{transform:translateX(16px);background:var(--on-accent)}
+.pj-ck input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* toast, tooltips */
+#toast{opacity:0;transform:translate(-50%,14px) scale(.97);transition:opacity .24s var(--ease),transform .32s var(--ease)}
+#toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.tip{animation:tipin .16s var(--ease) both}
+@keyframes tipin{from{opacity:0;transform:translateY(3px)}}
+/* pages and tabs fade up instead of cutting in */
+@keyframes pgup{from{opacity:0;transform:translateY(10px)}}
+.pg-in>:not(.jump){animation:pgup .36s var(--ease) both}
+.pg-in>:nth-child(2){animation-delay:.04s}.pg-in>:nth-child(3){animation-delay:.08s}.pg-in>:nth-child(n+4){animation-delay:.12s}
+.pj-body{animation:pgup .3s var(--ease) both}
+.pj-cards>*{animation:pgup .34s var(--ease) both}
+.pj-cards>:nth-child(2){animation-delay:.04s}.pj-cards>:nth-child(3){animation-delay:.08s}.pj-cards>:nth-child(n+4){animation-delay:.12s}
+.pj-tab{position:relative;border-bottom-color:transparent!important}
+.pj-tab::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transform-origin:left center;transition:transform .34s var(--ease)}
+.pj-tab[aria-selected="true"]::after{transform:scaleX(1)}
+@starting-style{.pj-tab[aria-selected="true"]::after{transform:scaleX(0)}}
+/* folds open and close */
+details::details-content{height:0;overflow:clip;transition:height .32s var(--ease),content-visibility .32s allow-discrete}
+details[open]::details-content{height:auto}
+.pj-tile .pj-tb{height:auto;transition:height .34s var(--ease),padding .34s var(--ease),visibility 0s}
+.pj-tile.col .pj-tb{height:0;max-height:none;transition:height .34s var(--ease),padding .34s var(--ease),visibility 0s .34s}
+/* the live test slides in beside the board */
+@keyframes slidein{from{opacity:0;transform:translateX(16px)}}
+.bb-test:not([hidden]):not(.idle){animation:slidein .34s var(--ease) both}
+.bb-tip{transition:opacity .18s var(--ease),transform .22s var(--ease),visibility 0s .18s}
+/* a whole-page cross-fade for mode changes */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s;animation-timing-function:var(--ease)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;transition-delay:0s!important;animation-duration:.01ms!important;animation-delay:0s!important}
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}
+.btn.tgl{white-space:nowrap;flex:none}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1956,7 +2015,7 @@ body.is-projects .logwrap{max-width:1760px;margin-inline:auto;width:calc(100% - 
       <button id="bSearch" class="btn srch" type="button" aria-haspopup="dialog" aria-keyshortcuts="Control+K /"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Search</span><kbd></kbd></button>
       <span id="status" class="stat" role="status">Not connected</span>
       <button id="bConnect" class="btn primary" type="button">Connect ESP32</button>
-      <button id="bDemo" class="btn" type="button" aria-pressed="false">Simulated mode</button>
+      <button id="bDemo" class="btn tgl" type="button" role="switch" aria-checked="false"><span class="tgl-t" aria-hidden="true"><span class="tgl-k"></span></span>Simulated mode</button>
     </div>
   </header>
   <div id="frameNote" class="notice" hidden>This page is running inside a frame. Browsers usually block Web Serial here, so Connect may fail. Simulated mode and the wiring diagrams work. To test real hardware or run your own scripts, open the downloaded tester.html in Chrome or Edge.</div>
@@ -2033,8 +2092,8 @@ let toastT=null;
 function srSay(msg){const L=document.getElementById('srLive');if(!L)return;L.textContent='';setTimeout(()=>{L.textContent=msg},40)}
 function toast(msg){
   srSay(msg);
-  const t=$('#toast');t.textContent=msg;t.hidden=false;
-  clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},4200);
+  const t=$('#toast');t.textContent=msg;t.hidden=false;t.classList.remove('on');void t.offsetWidth;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>{t.classList.remove('on');toastT=setTimeout(()=>{t.hidden=true},300)},4200);
 }
 const logEl=$('#log');
 function log(kind,text){
@@ -12843,13 +12902,24 @@ function pjBuild(body,pr){
     view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom,pan:view.pan};
     if(!raf)raf=requestAnimationFrame(redraw);
   }
-  const spinL=btn('Spin left',()=>turn(-30,0),'sm'),spinR=btn('Spin right',()=>turn(30,0),'sm'),zin=btn('Zoom in',()=>zoomBy(1.25),'sm'),zout=btn('Zoom out',()=>zoomBy(.8),'sm'),reset=btn('Reset view',()=>{view={az:BB.AZ,el:BB.EL,zoom:R3?1:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw)},'sm');
+  /* the buttons glide: spin, zoom and reset ease to their target instead of jumping */
+  let twRaf=0;
+  const tween=(dur,fn)=>{cancelAnimationFrame(twRaf);const t0=performance.now(),st=now=>{const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);fn(e);twRaf=p<1?requestAnimationFrame(st):0};twRaf=requestAnimationFrame(st)};
+  const glide=()=>R3&&R3.setView&&!still;
+  function spin(d){if(!glide()){turn(d,0);return}const a0=view.az;tween(420,e=>{view={...view,az:((a0+d*e)%360+360)%360};R3.setView(view)})}
+  function zoomGlide(f){if(!glide()||!R3.zoomAt){zoomBy(f);return}const r=fig.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let done=0;tween(260,e=>{view=R3.zoomAt(Math.pow(f,e-done),cx,cy);done=e})}
+  function resetView(){
+    if(!glide()){view={az:BB.AZ,el:BB.EL,zoom:R3?1:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw);return}
+    const v0={...view},p0=v0.pan||[0,0,0],d=((BB.AZ-v0.az+540)%360)-180;
+    tween(520,e=>{view=e>=1?{az:BB.AZ,el:BB.EL,zoom:1,pan:null}:{az:v0.az+d*e,el:v0.el+(BB.EL-v0.el)*e,zoom:v0.zoom+(1-v0.zoom)*e,pan:p0.map(x=>x*(1-e))};R3.setView(view)});
+  }
+  const spinL=btn('Spin left',()=>spin(-30),'sm'),spinR=btn('Spin right',()=>spin(30),'sm'),zin=btn('Zoom in',()=>zoomGlide(1.25),'sm'),zout=btn('Zoom out',()=>zoomGlide(.8),'sm'),reset=btn('Reset view',resetView,'sm');
   /* drag turns the board; shift, right or middle button, or the Move button, drags it sideways instead. The wheel zooms at the pointer, two fingers pinch and move. */
   let drag=null,moveMode=false;const ptrs=new Map();let pinch=null;
   const moveBtn=btn('Move',()=>{moveMode=!moveMode;moveBtn.setAttribute('aria-pressed',String(moveMode));moveBtn.classList.toggle('primary',moveMode);fig.classList.toggle('mv',moveMode)},'sm');moveBtn.setAttribute('aria-pressed','false');moveBtn.title='Drag to slide the board around instead of turning it';
   fig.addEventListener('contextmenu',e=>{if(R3)e.preventDefault()});
   fig.addEventListener('pointerdown',e=>{
-    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});try{fig.setPointerCapture(e.pointerId)}catch(_){}
+    cancelAnimationFrame(twRaf);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});try{fig.setPointerCapture(e.pointerId)}catch(_){}
     if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),x:(a.x+b.x)/2,y:(a.y+b.y)/2};drag=null;return}
     drag={x:e.clientX,y:e.clientY,pan:moveMode||e.shiftKey||e.button===2||e.button===1};fig.classList.add('drag');
   });
@@ -12862,7 +12932,7 @@ function pjBuild(body,pr){
   });
   const endDrag=e=>{if(e)ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size){drag=null;fig.classList.remove('drag')}};
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
-  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
+  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();cancelAnimationFrame(twRaf);view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
   names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i+1)),nm))));
   function text(i){
@@ -13355,17 +13425,20 @@ async function mount(host,ids,res,opt={}){
     if(anim&&T-anim.t0>1100)anim=null;
   }
   let raf=0,alive=true;
+  let fading=false;
   function tick(now){
     raf=0;
     if(!host.isConnected||!alive){dispose();return}
+    fading=false;
+    if(hlList.length&&hlMat.opacity<HLO){const q=clamp(((now||performance.now())-hlT0)/240,0,1);hlMat.opacity=HLO*(1-Math.pow(1-q,3));dirty=true;fading=q<1}
     if(anim||dirty){apply(now);place();if(PIPE)PIPE.render(S.scene,cam);else R.render(S.scene,cam);dirty=false}
-    if(anim||dirty)raf=requestAnimationFrame(tick);
+    if(anim||dirty||fading)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
   function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();hlMat.dispose();PIPE&&PIPE.dispose();H.dispose();R.dispose();R.forceContextLoss&&R.forceContextLoss()}catch(e){}}
   /* click to pick a part: a ray through the pointer. The picked part is tinted as a whole: a see-through copy of each of its meshes, drawn just over the original. */
-  const rc=new TH.Raycaster(),hlMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffd98a'),transparent:true,blending:TH.AdditiveBlending,opacity:.55,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,toneMapped:false});
-  let hlList=[];
+  const rc=new TH.Raycaster(),hlMat=new TH.MeshBasicMaterial({color:new TH.Color('#ffd98a'),transparent:true,blending:TH.AdditiveBlending,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,toneMapped:false});
+  let hlList=[],hlT0=0;const HLO=.55;
   let selI=-1;
   function pick(cx,cy){
     const r=canvas.getBoundingClientRect();if(!r.width)return -1;
@@ -13378,7 +13451,7 @@ async function mount(host,ids,res,opt={}){
   }
   function unmark(){for(const o of hlList){o.parent&&o.parent.remove(o)}hlList=[]}
   function mark(i){
-    selI=i;unmark();
+    selI=i;unmark();hlMat.opacity=0;hlT0=performance.now();
     if(i==null||i<0||!steps[i]){kick();return}
     const srcs=[];steps[i].g.traverse(o=>{if((o.isMesh||o.isInstancedMesh)&&o.geometry&&o.material&&!o.userData.noInk&&!o.userData.hl){const ms=Array.isArray(o.material)?o.material:[o.material];if(!ms.some(m=>m.transparent||m.alphaTest>0))srcs.push(o)}});
     for(const o of srcs){
@@ -13738,12 +13811,13 @@ document.getElementById('bBack').addEventListener('click',()=>history.back());
 async function show(id){
   await runCleanups();
   const p=PARTS.find(x=>x.id===id)||PARTS[0],panel=$('#panel');
-  id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
+  const was=cur;id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
   if(!p.projects)navRecord({id,pick:p.home?(!BRD.cur||!!BRD.picking):false});
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
   const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),p.projects?el('div',{class:'ph-c'},btn('Quick test a part',()=>{show('home');window.scrollTo(0,0)},'sm')):noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
   panel.className=p.overview||p.home||p.projects?'':'w2';
+  if(was!==id&&!p.home&&!p.projects){panel.classList.add('pg-in');panel.style.animation='none';void panel.offsetWidth;panel.style.animation=''}
   document.body.classList.toggle('is-home',!!p.home);
   document.body.classList.toggle('is-projects',!!p.projects);
   document.body.classList.remove('has-tabs');if(spyOff){spyOff();spyOff=null}phoneBar(null);
@@ -13808,10 +13882,12 @@ function setStatus(){
   if(Link.mode==='serial'){s.textContent='Connected, '+(Link.fw||'');s.className='stat on';c.textContent='Disconnect'}
   else if(Link.mode==='demo'){s.textContent='Simulated, no board';s.className='stat demo';c.textContent='Connect ESP32'}
   else{s.textContent='Not connected';s.className='stat';c.textContent='Connect ESP32'}
-  d.setAttribute('aria-pressed',String(Link.mode==='demo'));
+  d.setAttribute('aria-checked',String(Link.mode==='demo'));
   renderNav();
   if(cur==='projects'&&document.querySelector('.pj')){pjGo({pid:PJ.pid,view:PJ.view,run:PJ.openRun,cmp:PJ.cmp});return}
-  if(cur!=='overview'&&cur!=='home'){const y0=scrollY;Promise.resolve(show(cur)).then(()=>{if(y0>0)scrollTo(0,y0)})}
+  if(cur!=='overview'&&cur!=='home'){const y0=scrollY,run=()=>Promise.resolve(show(cur)).then(()=>{if(y0>0)scrollTo(0,y0)});
+    if(document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){try{document.startViewTransition(run);return}catch(e){}}
+    run()}
 }
 
 $('#bConnect').addEventListener('click',async()=>{
