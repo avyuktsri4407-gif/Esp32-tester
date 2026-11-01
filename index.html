@@ -1754,6 +1754,26 @@ details[open]::details-content{height:auto}
   .bb-test.left,.bb-test.left.idle:not([hidden]){right:auto;left:12px;transform:translateX(-28px) scale(.985)}
   .bb-test.left:not(.idle):not([hidden]){transform:none}
 }
+
+/* dep_x87: the live test opens beside the board (replacing the step list) and the part's code opens under it. Nothing covers or resizes the board. */
+.bb-fold{display:grid;grid-template-rows:0fr;opacity:0;visibility:hidden;pointer-events:none;transition:grid-template-rows .52s var(--ease),opacity .3s var(--ease),visibility 0s .52s}
+.bb-fold>.bb-fi{min-height:0;overflow:hidden}
+.bb-fold.on{grid-template-rows:1fr;opacity:1;visibility:visible;pointer-events:auto;transition:grid-template-rows .52s var(--ease),opacity .42s .1s var(--ease),visibility 0s}
+.bb-fi.bb-col{display:flex;flex-direction:column;gap:10px}
+.bb-side{gap:0}
+.bb-tp{min-width:0;padding:2px 2px 10px}
+.bb-code{padding:18px 0 4px}
+.bb-codef{grid-column:1/-1}
+.bb-fold.on>.bb-fi{overflow:visible}
+.bb-fold.on.bb-codef>.bb-fi,.bb-fold.on.bb-testf>.bb-fi{overflow:clip}
+@media (prefers-reduced-motion:reduce){.bb-fold,.bb-fold.on{transition:none}}
+@media (min-width:1200px){
+  .bb>.bb-stage{grid-column:1;grid-row:1}
+  .bb>.bb-codef{grid-column:1;grid-row:2}
+  .bb>.bb-side{grid-column:2;grid-row:1/span 2}
+  .bb.bb-open>.bb-side{position:static;max-height:none;overflow:visible}
+  .bb{row-gap:0}
+}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -13059,7 +13079,8 @@ function pjBuild(body,pr){
   }
   function zoomBy(f){if(R3&&R3.zoomAt){const r=fig.getBoundingClientRect();view=R3.zoomAt(f,r.left+r.width/2,r.top+r.height/2);return}view={az:view.az,el:view.el,zoom:Math.max(1,Math.min(3,view.zoom*f))};if(!raf)raf=requestAnimationFrame(redraw)}
   function turn(daz,del){
-    view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom,pan:view.pan};
+    if(R3&&R3.getView)view={...R3.getView()};
+    view={az:((view.az+daz)%360+360)%360,el:Math.max(BB.EMIN,Math.min(BB.EMAX,view.el+del)),zoom:view.zoom,focus:view.focus,pan:view.pan};
     if(!raf)raf=requestAnimationFrame(redraw);
   }
   /* the buttons glide: spin, zoom and reset ease to their target instead of jumping */
@@ -13069,9 +13090,9 @@ function pjBuild(body,pr){
   function spin(d){if(!glide()){turn(d,0);return}const a0=view.az;tween(420,e=>{view={...view,az:((a0+d*e)%360+360)%360};R3.setView(view)})}
   function zoomGlide(f){if(!glide()||!R3.zoomAt){zoomBy(f);return}const r=fig.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let done=0;tween(260,e=>{view=R3.zoomAt(Math.pow(f,e-done),cx,cy);done=e})}
   function resetView(){
+    prevView=null;
     if(!glide()){view={az:BB.AZ,el:BB.EL,zoom:R3?1:zdef,pan:null};if(!raf)raf=requestAnimationFrame(redraw);return}
-    const v0={...view},p0=v0.pan||[0,0,0],d=((BB.AZ-v0.az+540)%360)-180;
-    tween(520,e=>{view=e>=1?{az:BB.AZ,el:BB.EL,zoom:1,pan:null}:{az:v0.az+d*e,el:v0.el+(BB.EL-v0.el)*e,zoom:v0.zoom+(1-v0.zoom)*e,pan:p0.map(x=>x*(1-e))};R3.setView(view)});
+    R3.fly({focus:null,pan:null,zoom:1,az:BB.AZ,el:BB.EL,ms:520,done:v=>{view={...v}}});
   }
   const spinL=btn('Spin left',()=>spin(-30),'sm'),spinR=btn('Spin right',()=>spin(30),'sm'),zin=btn('Zoom in',()=>zoomGlide(1.25),'sm'),zout=btn('Zoom out',()=>zoomGlide(.8),'sm'),reset=btn('Reset view',resetView,'sm');
   /* drag turns the board; shift, right or middle button, or the Move button, drags it sideways instead. The wheel zooms at the pointer, two fingers pinch and move. */
@@ -13172,17 +13193,22 @@ function pjBuild(body,pr){
     else if(cur===0||cur===total-1)fig.scrollTo({left:0,behavior:still?'auto':'smooth'});
   }
   /* click a part on the board and its live test opens to the right, the same page the Test tab shows */
-  const tpanel=el('aside',{class:'bb-test idle','aria-label':'Live test of the selected part'});
-  tpanel.hidden=true;
-  let tsel=null,townLives=[],closeT=0;
+  const tpanel=el('aside',{class:'bb-tp','aria-label':'Live test of the selected part'});
+  const fold=(cls,...kids)=>el('div',{class:'bb-fold '+cls},el('div',{class:'bb-fi'},...kids));
+  const stepsFold=fold('bb-steps on',pills,info),testFold=fold('bb-testf',tpanel),codeBox=el('div',{class:'bb-code'}),codeFold=fold('bb-codef',codeBox);
+  stepsFold.querySelector('.bb-fi').classList.add('bb-col');
+  let tsel=null,townLives=[],closeT=0,prevView=null,bbEl=null;
+  const flyTo=o=>{if(R3&&R3.fly&&!still)R3.fly({ms:640,done:v=>{view={...v}},...o});else if(R3&&R3.setView){view={az:o.az==null?view.az:o.az,el:o.el==null?view.el:o.el,zoom:o.zoom==null?view.zoom:o.zoom,focus:o.focus||null,pan:o.pan||null};R3.setView(view)}};
+  const showFolds=open=>{stepsFold.classList.toggle('on',!open);testFold.classList.toggle('on',open);codeFold.classList.toggle('on',open);if(bbEl)bbEl.classList.toggle('bb-open',open)};
   function closeTest(){
-    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;tpanel.classList.add('idle');stage.classList.remove('has-test');{const t=tpanel;clearTimeout(closeT);closeT=setTimeout(()=>{if(t.classList.contains('idle')){t.hidden=true;t.replaceChildren()}},innerWidth>760?460:0)}
+    townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=null;PJ.ctx=null;showFolds(false);clearTimeout(closeT);closeT=setTimeout(()=>{if(!tsel){tpanel.replaceChildren();codeBox.replaceChildren()}},600);
+    if(prevView){const v=prevView;prevView=null;flyTo({focus:v.focus,pan:v.pan,zoom:v.zoom,az:v.az,el:v.el,ms:560})}
     if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
   function openTest(id,k,sx){
     const p=(typeof PARTS!=='undefined'&&PARTS.find(x=>x.id===id))||null;
     if(!p||typeof TESTS==='undefined'||!TESTS[id]){toast((p?p.n:'That part')+' has no live test.');return}
-    if(tsel===id&&!tpanel.classList.contains('idle'))return;
+    if(tsel===id&&testFold.classList.contains('on'))return;
     townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=id;
     const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
     try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
@@ -13193,9 +13219,19 @@ function pjBuild(body,pr){
       el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
       mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):'',
       tb,typeof verdictBar==='function'?verdictBar(p):'');
-    clearTimeout(closeT);tpanel.hidden=false;void tpanel.offsetWidth;tpanel.classList.remove('idle');stage.classList.add('has-test');tpanel.classList.toggle('left',sx!=null&&sx>=fig.getBoundingClientRect().left+fig.clientWidth*.5);
+    clearTimeout(closeT);
+    /* the code page for this part goes under the board */
+    codeBox.replaceChildren();
+    if(id!=='power'&&typeof codePanel==='function'){try{codeBox.append(el('h3',{class:'pj-h'},'Your code for '+p.n),codePanel(p))}catch(e){console.warn('code panel',e)}}
+    showFolds(true);
+    /* and the camera moves in on the part */
+    if(R3&&R3.steps&&R3.steps[k]&&R3.fly){
+      if(!prevView)prevView=R3.getView();
+      const st=R3.steps[k],it=items[k-1],off=it&&it.kind==='off';
+      flyTo({focus:[st.pos[0],st.pos[1],off?Math.min(30,(it.bench.h||20)/2):14],pan:null,zoom:off?2:it&&it.kind==='disc'?3.4:k===0?2.2:3});
+    }
     if(R3&&R3.mark)R3.mark(k);else if(svg){svg.querySelectorAll('.bbp').forEach(g=>g.classList.toggle('sel',+g.dataset.i===k))}
-    if(innerWidth<760)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'});
+    if(innerWidth<1200)setTimeout(()=>{if(tsel===id)tpanel.scrollIntoView({block:'nearest',behavior:still?'auto':'smooth'})},180);
   }
   const partAt=k=>k===0?'esp':(items[k-1]&&items[k-1].id);
   /* a click is a press and a release that barely moved: anything else was a spin */
@@ -13256,12 +13292,13 @@ function pjBuild(body,pr){
   addBtn.setAttribute('aria-expanded','false');addBtn.setAttribute('aria-haspopup','dialog');
   pop.addEventListener('keydown',e=>{if(e.key==='Escape'){pop.hidden=true;addBtn.setAttribute('aria-expanded','false');addBtn.focus()}});
   const ctl2=el('div',{class:'bb-ctl bb-ctl2'},addBtn,arrBtn,autoBtn,el('span',{class:'bb-sep','aria-hidden':'true'}),bAdd,bDel,bCount,pop);
-  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip),tpanel),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count),ctl2);
+  const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip)),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count),ctl2);
   document.addEventListener('pointerdown',function away(e){if(!stage.isConnected){document.removeEventListener('pointerdown',away);return}if(!pop.hidden&&!pop.contains(e.target)&&e.target!==addBtn){pop.hidden=true;addBtn.setAttribute('aria-expanded','false')}});
   body.append(figHelp,el('h3',{class:'pj-h'},'Build it on a breadboard'),
-    el('div',{class:'bb'},
+    bbEl=el('div',{class:'bb'},
       stage,
-      el('div',{class:'bb-side'},pills,info)));
+      el('div',{class:'bb-side'},stepsFold,testFold),
+      codeFold));
   /* the first step is on show, and the rest wait for Add next part */
   go(cur,true);
   /* the flat drawing: used when 3D is not available, and when the browser takes the graphics memory back mid-session */
@@ -13637,9 +13674,21 @@ async function mount(host,ids,res,opt={}){
     let hx=0,hy=0;for(const c of corners){const v=c.clone().sub(centre);hx=Math.max(hx,Math.abs(v.dot(right)));hy=Math.max(hy,Math.abs(v.dot(u2)))}
     const asp=W/Hh;hh0=Math.max(hy,hx/asp)*.98;
   }
+  /* a camera flight: target point, zoom and angles ease together; the end state becomes the view */
+  let fl=null;
+  const tgOf=(f,pan)=>{let t=f?new TH.Vector3(f[0],-f[1],f[2]==null?10:f[2]):centre.clone();if(pan)t.add(new TH.Vector3(pan[0],pan[1],pan[2]));return t};
+  const flNow=T=>{
+    const q=clamp((T-fl.t0)/fl.d,0,1),e=q<.5?4*q*q*q:1-Math.pow(-2*q+2,3)/2;
+    return {q,tg:fl.a.clone().lerp(fl.b,e),zoom:fl.z0+(fl.z1-fl.z0)*e,az:fl.az0+fl.daz*e,el:fl.el0+(fl.el1-fl.el0)*e};
+  };
   function place(){
-    let tg;const d=dirOf(view.az,view.el);tg=view.focus?new TH.Vector3(view.focus[0],-view.focus[1],view.focus[2]==null?10:view.focus[2]):centre;if(view.pan)tg=tg.clone().add(new TH.Vector3(view.pan[0],view.pan[1],view.pan[2]));cam.position.copy(tg).addScaledVector(d,rad*3);cam.up.set(0,0,1);cam.lookAt(tg);
-    const hh=hh0/clamp(view.zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
+    let az=view.az,el=view.el,zoom=view.zoom,tg=tgOf(view.focus,view.pan);
+    if(fl){
+      const f=flNow(performance.now());az=f.az;el=f.el;zoom=f.zoom;tg=f.tg;
+      if(f.q>=1){view={az:fl.to.az,el:fl.to.el,zoom:fl.to.zoom,focus:fl.to.focus,pan:fl.to.pan};const cb=fl.done;fl=null;if(cb)try{cb({...view})}catch(_){}}
+    }
+    const d=dirOf(az,el);cam.position.copy(tg).addScaledVector(d,rad*3);cam.up.set(0,0,1);cam.lookAt(tg);
+    const hh=hh0/clamp(zoom,.6,9),asp=W/Hh;cam.left=-hh*asp;cam.right=hh*asp;cam.top=hh;cam.bottom=-hh;cam.updateProjectionMatrix();cam.updateMatrixWorld();
   }
   function size(){
     const w=Math.max(280,Math.round(host.clientWidth||host.getBoundingClientRect().width||760)),tp=host.parentElement&&host.parentElement.querySelector('.bb-test'),th=tp&&!tp.hidden&&tp.offsetParent&&!tp.classList.contains('idle')&&getComputedStyle(tp).position!=='absolute'?tp.offsetHeight:0,h=Math.round(clamp(Math.max(w*.62,th,430),430,Math.max(560,Math.min(820,(window.innerHeight||900)-130))));
@@ -13669,7 +13718,8 @@ async function mount(host,ids,res,opt={}){
     fading=false;
     if(hlList.length&&hlK<HLK){const q=clamp(((now||performance.now())-hlT0)/260,0,1);hlK=HLK*(1-Math.pow(1-q,3));paintHl();dirty=true;fading=q<1}
     if(anim||dirty){apply(now);place();if(PIPE)PIPE.render(S.scene,cam);else R.render(S.scene,cam);dirty=false}
-    if(anim||dirty||fading)raf=requestAnimationFrame(tick);
+    if(fl)dirty=true;
+    if(anim||dirty||fading||fl)raf=requestAnimationFrame(tick);
   }
   const kick=()=>{dirty=true;if(!raf&&alive)raf=requestAnimationFrame(tick)};
   function dispose(){if(!alive&&!R)return;alive=false;ro&&ro.disconnect();try{unmark();PIPE&&PIPE.dispose();H.dispose();R.dispose();const gl=R.getContext&&R.getContext();if(R.forceContextLoss&&gl&&!gl.isContextLost())R.forceContextLoss()}catch(e){}}
@@ -13727,9 +13777,18 @@ async function mount(host,ids,res,opt={}){
       gh.visible=true;gh.material.color.set(ok?'#5fd38d':'#ee6a5e');
       gh.scale.set(rect[2]-rect[0],rect[3]-rect[1],1);gh.position.set((rect[0]+rect[2])/2,(rect[1]+rect[3])/2,ZB+.35);kick();
     },
-    setView(v){view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null,pan:v.pan===undefined?view.pan:v.pan};kick()},
+    /* fly to o={focus:[x,y,z]|null, pan, zoom, az, el, ms, done} */
+    fly(o){
+      const T=performance.now(),a=fl?flNow(T):{tg:tgOf(view.focus,view.pan),zoom:view.zoom,az:view.az,el:view.el};
+      const to={focus:o.focus||null,pan:o.pan||null,zoom:o.zoom==null?a.zoom:o.zoom,az:o.az==null?a.az:o.az,el:o.el==null?a.el:o.el};
+      const daz=((to.az-a.az+540)%360)-180;
+      fl={t0:T,d:o.ms||650,a:a.tg.clone(),b:tgOf(to.focus,to.pan),z0:a.zoom,z1:to.zoom,az0:a.az,daz,el0:a.el,el1:to.el,to,done:o.done};
+      to.az=a.az+daz;kick();
+    },
+    setView(v){fl=null;view={az:v.az,el:v.el,zoom:v.zoom==null?view.zoom:v.zoom,focus:v.focus||null,pan:v.pan===undefined?view.pan:v.pan};kick()},
     /* zoom toward a screen point, so the part under the pointer stays under it */
     zoomAt(f,cx,cy){
+      if(fl){view=api.getView();fl=null}
       const r=canvas.getBoundingClientRect(),z0=clamp(view.zoom,.6,9),z1=clamp(z0*f,.6,9);
       const nx=((cx-r.left)/(r.width||W))*2-1,ny=1-((cy-r.top)/(r.height||Hh))*2,asp=W/Hh,h0=hh0/z0,h1=hh0/z1;
       const e=cam.matrixWorld.elements,rt=new TH.Vector3(e[0],e[1],e[2]),up=new TH.Vector3(e[4],e[5],e[6]);
@@ -13738,12 +13797,17 @@ async function mount(host,ids,res,opt={}){
     },
     /* slide the board by screen pixels, the picture follows the pointer */
     panBy(dx,dy){
+      if(fl){view=api.getView();fl=null}
       const e=cam.matrixWorld.elements,rt=new TH.Vector3(e[0],e[1],e[2]),up=new TH.Vector3(e[4],e[5],e[6]),k=2*(hh0/clamp(view.zoom,.6,9))/Hh;
       const p=view.pan||[0,0,0],lim=rad*1.1,o=rt.multiplyScalar(-dx*k).add(up.multiplyScalar(dy*k));
       const n=[p[0]+o.x,p[1]+o.y,p[2]+o.z],m=Math.hypot(n[0],n[1],n[2]),c=m>lim?lim/m:1;
       view={...view,pan:[n[0]*c,n[1]*c,n[2]*c]};kick();return {...view};
     },
-    getView(){return {...view}},
+    getView(){
+      if(!fl)return {...view};
+      const f=flNow(performance.now());
+      return {az:f.az,el:f.el,zoom:f.zoom,focus:[f.tg.x,-f.tg.y,f.tg.z],pan:null};
+    },
     show(i,tot,quiet){
       total=tot;const k=Math.min(i,steps.length);const fwd=i>cur;cur=i;
       anim=(!quiet&&fwd&&k>=0&&i<tot-1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)?{k,t0:performance.now()}:null;
