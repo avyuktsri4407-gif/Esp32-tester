@@ -848,9 +848,9 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 .hm-scrollcue span{width:1px;height:30px;background:linear-gradient(var(--accent),transparent);transform-origin:top;animation:hmcue 1.8s 2s ease-in-out infinite}
 .hm-ihit{position:fixed;inset:16vh 8vw 12vh;z-index:3;display:none;cursor:grab;touch-action:pan-y}
 .hm.in-intro .hm-ihit{display:block}
-.hm-bang{position:fixed;left:50%;top:55%;width:120vmax;height:120vmax;margin:-60vmax 0 0 -60vmax;border-radius:50%;pointer-events:none;z-index:3;opacity:0;background:radial-gradient(circle,transparent 57%,rgba(243,221,160,.55) 59.5%,rgba(216,184,119,.12) 63%,transparent 68%);animation:hmbang 1.15s .3s cubic-bezier(.12,.7,.2,1) forwards}
+.hm-bang{will-change:transform,opacity;position:fixed;left:50%;top:55%;width:120vmax;height:120vmax;margin:-60vmax 0 0 -60vmax;border-radius:50%;pointer-events:none;z-index:3;opacity:0;background:radial-gradient(circle,transparent 57%,rgba(243,221,160,.55) 59.5%,rgba(216,184,119,.12) 63%,transparent 68%);animation:hmbang 1.15s .3s cubic-bezier(.12,.7,.2,1) forwards}
 .hm-bang::after{content:'';position:absolute;left:50%;top:50%;width:46vmin;height:46vmin;margin:-23vmin 0 0 -23vmin;border-radius:50%;background:radial-gradient(circle,rgba(243,221,160,.5),transparent 68%);opacity:0;animation:hmflash .7s .3s ease-out forwards}
-@keyframes hmslam{0%{opacity:0;transform:translateY(9vh) scale(1.8);filter:blur(16px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+@keyframes hmslam{0%{opacity:0;transform:translate3d(0,9vh,0) scale(1.8)}55%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes hmfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes hmcue{0%,100%{transform:scaleY(.25);opacity:.5}50%{transform:scaleY(1);opacity:1}}
 @keyframes hmbang{0%{opacity:1;transform:scale(.02)}100%{opacity:0;transform:scale(1)}}
@@ -1021,10 +1021,11 @@ body.has-rec #toast{bottom:104px}
 .bp-help>summary{cursor:pointer;padding:14px 0;font:500 14.5px var(--f-body)}
 .bp-help .hm-list{padding:0 0 16px}
 .bpk.go .bp-card{opacity:.3;transition:opacity .4s}
-.bp-grow{position:fixed;z-index:80;background:var(--bg);border-radius:var(--r-lg);overflow:hidden;pointer-events:none;transition:left .42s cubic-bezier(.23,1,.32,1),top .42s cubic-bezier(.23,1,.32,1),width .42s cubic-bezier(.23,1,.32,1),height .42s cubic-bezier(.23,1,.32,1),border-radius .42s}
-.bp-grow.on{border-radius:0}
-.bp-grow .hm-svg{position:absolute;inset:0;width:100%;height:100%}
+.bp-grow{position:fixed;inset:0;z-index:80;background:var(--bg);pointer-events:none;will-change:clip-path;transition:clip-path .42s cubic-bezier(.23,1,.32,1)}
+.bp-grow .hm-svg{position:absolute;inset:0;width:100%;height:100%;transform-origin:50% 50%;will-change:transform;transition:transform .42s cubic-bezier(.23,1,.32,1)}
 .bp-grow.out{opacity:0;transition:opacity .3s cubic-bezier(.23,1,.32,1)}
+/* the new home page waits, frozen, until its board has drawn */
+.home.hm-held,.home.hm-held *{animation-play-state:paused!important}
 html.bp-busy{overflow:hidden}
 
 #bSearch.locked,#navQ.locked{opacity:.45;cursor:not-allowed}
@@ -1040,8 +1041,8 @@ html.bp-busy{overflow:hidden}
 .bpd-arena{position:relative;height:clamp(520px,calc(100vh - 275px),860px);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
 .bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.bpd-big{position:absolute;left:-4%;right:-4%;top:36%;margin:0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 var(--f-disp);letter-spacing:-.055em;transform:translateY(-50%)}
-.bpd-big span{display:inline-block;padding-bottom:.12em;color:transparent;background:linear-gradient(180deg,#f3dda0 0%,#D8B877 46%,rgba(216,184,119,.5) 100%);-webkit-background-clip:text;background-clip:text;padding:0 .012em;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big{position:absolute;left:-4%;right:-4%;top:36%;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
+.bpd-big span{flex:none;display:inline-block;color:#e2c581;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:.9;transform:none}}
@@ -1548,6 +1549,17 @@ body.is-projects .ph{margin-bottom:6px}
 .pj-pinmv .hint{margin:0 0 16px;max-width:70ch}
 .pj-h+.hint{margin:0 0 16px}
 @media (max-width:560px){.pj-pinmv{padding:14px 14px 16px}.pj-pinmv table.t{min-width:0}.pj-pinmv table.t th,.pj-pinmv table.t td{padding:8px 7px;white-space:normal;font-size:13px}.pj-pinmv table.t td.m{white-space:nowrap}}
+
+/* opening a project or going back to the list: the new page fades in, no layout step */
+.pj.pj-enter>*{animation:pjin .18s cubic-bezier(.23,1,.32,1) both}
+@keyframes pjin{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.pj.pj-enter>*{animation:none}}
+
+/* header Back button: shown once there is a page to go back to */
+.top .btn.back{display:none;align-items:center;gap:6px}
+.top .btn.back.on{display:inline-flex}
+@media (max-width:640px){.top .btn.back{order:4;padding:0;width:36px;height:36px;justify-content:center;flex:none}.top .btn.back span{display:none}}
+@media (max-width:340px){.top .btn.back{order:0}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -1832,6 +1844,7 @@ body.is-projects .ph{margin-bottom:6px}
 <div class="wrap">
   <header class="top">
     <div class="lft">
+    <button id="bBack" class="btn back" type="button" aria-label="Go back to the previous page"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back</span></button>
     <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, choose your board">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g class="pins"><path d="M17 4v6M24 4v6M31 4v6M17 38v6M24 38v6M31 38v6M4 17h6M4 24h6M4 31h6M38 17h6M38 24h6M38 31h6"/></g><rect class="chip" x="10" y="10" width="28" height="28" rx="6.5"/><path class="wave" d="M15 25.5h4.2l2.6-8.2 4.2 13.4 2.7-8.6 1.6 3.4H33"/><circle class="live" cx="32.5" cy="16" r="2"/></svg>
       <h1>ESP32 Live Tester</h1>
@@ -9517,7 +9530,7 @@ function homeMount(root,S,FG,HM_CH){
   const secs=[...root.querySelectorAll('[data-ch]')];
   const mq=matchMedia('(prefers-reduced-motion: reduce)');
   const st={az:HM_CH[0].az,el:HM_CH[0].el,zoom:1,f:FG.focus.hero.slice(),ex:0},user={az:0,el:0};
-  let W=0,H=0,dirty=true,raf=0,last=0,spin=0,lastScroll=0,lit='',chNow=-1,drag=null,rel=0,builtAt=0,fast=0,lastKey='',settle=0,pS=0,t0=0,maskKey='';
+  let W=0,H=0,dirty=true,raf=0,last=0,spin=0,lastScroll=0,lit='',chNow=-1,drag=null,rel=0,builtAt=0,fast=0,lastKey='',settle=0,pS=0,AGE=0,held=HM_HOLD.on,warm=false,maskKey='';
   const lerp=(a,b,t)=>a+(b-a)*t;
   const GLS={on:false,S:null};
   const geo=()=>{const r=slot.getBoundingClientRect();return {l:r.left,t:r.top,w:r.width,h:r.height}};
@@ -9546,7 +9559,7 @@ function homeMount(root,S,FG,HM_CH){
     dirty=true;
   }
   function render(now,lite){
-    const age=mq.matches?9:(now-t0)/1000,e=1-Math.pow(1-hmClamp(age/1.5,0,1),4);
+    const age=mq.matches?9:AGE,e=1-Math.pow(1-hmClamp(age/1.5,0,1),4);
     const az=st.az+user.az+(1-e)*-200,elv=hmClamp(st.el+user.el,12,70),sl=geo();
     const nar=!hmWide(),rs=0;
     const cx=lerp(W/2,sl.l+sl.w/2,pS),cy=lerp(H*(nar?.56:.62),sl.t+(sl.h-rs)/2,pS),fw=lerp(W*.86,sl.w,pS),fh=lerp(H*(nar?.62:.56),sl.h-rs,pS);
@@ -9580,8 +9593,9 @@ function homeMount(root,S,FG,HM_CH){
   function frame(now){
     raf=0;
     if(!root.isConnected){cleanup();return}
-    if(!t0)t0=now;
     const dt=Math.min(.1,last?(now-last)/1000:.016);last=now;
+    /* the spin-in clock counts frames, not wall time: a slow first frame (shader compile) can no longer skip the animation. It waits for the real board, and for the picker overlay. */
+    if(!held&&(GLS.on||!(FG.id&&GLH.want())))AGE+=Math.min(dt,.034);
     const tg=target();say(tg.ch);
     const k=mq.matches?1:1-Math.exp(-dt/.13);
     pS+=(prog()-pS)*(mq.matches?1:1-Math.exp(-dt/.09));if(Math.abs(prog()-pS)<.001)pS=prog();
@@ -9593,14 +9607,14 @@ function homeMount(root,S,FG,HM_CH){
     st.az+=(goal.az-st.az)*k;fast=Math.abs(st.az-az0)/Math.max(dt,.001);st.el+=(goal.el-st.el)*k;st.zoom*=Math.pow(goal.zoom/st.zoom,k);st.ex+=(goal.ex-st.ex)*k;
     for(let a=0;a<3;a++)st.f[a]+=(tg.f[a]-st.f[a])*k;
     chrome();
-    const age=mq.matches?9:(now-t0)/1000;
+    const age=mq.matches?9:AGE;
     const sl=geo();
     const key=[st.az+user.az,st.el+user.el,st.zoom,st.ex,st.f[0],st.f[1],st.f[2],lit,pS,sl.l,sl.t,Math.min(age,2)].map(v=>typeof v==='number'?v.toFixed(2):v).join('|');
     const moving=key!==lastKey||dirty;
     const slow=builtAt>16&&(now-(frame.t||0))<33;
     const coarse=matchMedia('(pointer:coarse)').matches;
     const gap=Math.max(top&&now-lastScroll>400&&age>2?33:0,coarse?45:0);
-    if(moving&&!slow&&now-(frame.t||0)>=gap){lastKey=key;dirty=false;frame.t=now;render(now,fast>(coarse?45:110)||builtAt>30);clearTimeout(settle);if(fast>(coarse?45:110)||builtAt>30)settle=setTimeout(()=>{dirty=true;kick()},180)}
+    if(moving&&!slow&&now-(frame.t||0)>=gap){lastKey=key;dirty=false;frame.t=now;render(now,fast>(coarse?45:110)||builtAt>30);if(!warm&&(GLS.on||!(FG.id&&GLH.want()))){warm=true;root.dataset.warm='1'}clearTimeout(settle);if(fast>(coarse?45:110)||builtAt>30)settle=setTimeout(()=>{dirty=true;kick()},180)}
     const busy=moving||top||drag||rel||age<2||Math.abs(prog()-pS)>.001||Math.abs(goal.az-st.az)>.02||Math.abs(goal.zoom-st.zoom)>.001||Math.abs(goal.ex-st.ex)>.002||tg.f.some((v,a)=>Math.abs(v-st.f[a])>.01);
     if(busy)raf=requestAnimationFrame(frame);
   }
@@ -9619,12 +9633,14 @@ function homeMount(root,S,FG,HM_CH){
   const fabIc=el('span',{class:'ic','aria-hidden':'true'});fabIc.innerHTML='<svg viewBox="0 0 20 20" width="18" height="18"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';const fab=el('button',{class:'hm-fab',type:'button','aria-label':'Search parts',onclick:()=>palOpen()},fabIc,el('span',{class:'tx'},'Search parts'),el('kbd',{},palKey()));root.appendChild(fab);
   const fabUpd=()=>{const idx=document.getElementById('hm-index'),it=idx&&idx.isConnected?idx.getBoundingClientRect().top:1e9,hide=it<innerHeight*.25;document.body.classList.toggle('hm-idxin',it<innerHeight*.85);fab.classList.toggle('on',scrollY>Math.max(260,innerHeight*.7)&&!hide)};addEventListener('scroll',fabUpd,{passive:true});fabUpd();
   if(!mq.matches){const b=document.createElement('div');b.className='hm-bang';b.setAttribute('aria-hidden','true');root.appendChild(b);setTimeout(()=>b.remove(),2200)}
+  HM_HOLD.on=false;
+  if(held){root.classList.add('hm-held');HM_HOLD.warm=()=>warm;HM_HOLD.release=()=>{held=false;root.classList.remove('hm-held');kick()}}
   pS=prog();size();chrome();say(target().ch);kick();
   /* real 3D board: swaps in when three.js and the models are ready, the SVG board stays if anything fails */
   if(FG.id)GLH.ready().then(()=>{
     if(!root.isConnected)return;
-    const S=GLH.shared();GLH.board(S,FG.id);FG=GLH.fig(FG.id);GLS.S=S;GLS.on=true;gl.hidden=false;g.innerHTML='';maskKey='';dirty=true;kick();
-  }).catch(e=>{GLH.fail();GLS.on=false;gl.hidden=true;dirty=true;kick();try{console.warn('3D board unavailable, using the drawing:',e&&e.message)}catch(_){}});
+    const S=GLH.shared();GLH.board(S,FG.id);FG=GLH.fig(FG.id);GLS.S=S;GLS.on=true;AGE=0;gl.hidden=false;g.innerHTML='';maskKey='';dirty=true;kick();
+  }).catch(e=>{GLH.fail();GLS.on=false;gl.hidden=true;dirty=true;AGE=0;kick();try{console.warn('3D board unavailable, using the drawing:',e&&e.message)}catch(_){}});
 }
 
 /* ---- Search palette: Ctrl+K or / from anywhere, and the Search parts button in the header ---- */
@@ -9738,23 +9754,38 @@ function pickerDraw(svg,id,az,t,lab,elv,zm){
   g.innerHTML=f.draw(P,{ex:0,lit:'',t:t||0,lite:false,noLabels:!lab,W,H});
 }
 /* the card grows to fill the window, then the story starts with that board */
+/* the new home page is built under the overlay and held still until its board has drawn, so the spin-in starts on a ready frame */
+const HM_HOLD={on:false,warm:null,release:null};
 function pickerGo(id,card){
-  if(document.documentElement.classList.contains('bp-busy'))return;
+  const html=document.documentElement;
+  if(html.classList.contains('bp-busy'))return;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const done=()=>{BRD.set(id);BRD.picking=false;return show('home')};
   if(reduce||!card){done().then(()=>window.scrollTo(0,0));return}
-  const r=card.getBoundingClientRect(),fig=card.querySelector('.bp-fig'),fr=fig.getBoundingClientRect();
+  const fig=card.querySelector('.bp-fig'),fr=fig.getBoundingClientRect();
+  const W=html.clientWidth,H=innerHeight;
+  /* transforms and a clip only: nothing in this grow changes layout, so it stays on the compositor */
   const g=el('div',{class:'bp-grow isoc','aria-hidden':'true'});
-  g.style.cssText='left:'+fr.left+'px;top:'+fr.top+'px;width:'+fr.width+'px;height:'+fr.height+'px';
   const sv=(card.querySelector('svg.l')||card.querySelector('svg')).cloneNode(true);sv.removeAttribute('style');sv.setAttribute('class','hm-svg');g.append(sv);
-  document.body.append(g);document.documentElement.classList.add('bp-busy');
+  const k=Math.min(fr.width/400,fr.height/300)/Math.min(W/400,H/300);
+  sv.style.transform='translate3d('+(fr.left+fr.width/2-W/2).toFixed(1)+'px,'+(fr.top+fr.height/2-H/2).toFixed(1)+'px,0) scale('+k.toFixed(4)+')';
+  g.style.clipPath='inset('+fr.top.toFixed(1)+'px '+(W-fr.right).toFixed(1)+'px '+(H-fr.bottom).toFixed(1)+'px '+fr.left.toFixed(1)+'px round 22px)';
+  document.body.append(g);html.classList.add('bp-busy');
   const root=$('.bpk');if(root)root.classList.add('go');
   g.getBoundingClientRect();
-  g.style.left='0px';g.style.top='0px';g.style.width='100vw';g.style.height='100vh';g.classList.add('on');
+  g.style.clipPath='inset(0px 0px 0px 0px round 0px)';sv.style.transform='translate3d(0,0,0) scale(1)';
   setTimeout(async()=>{
-    await done();window.scrollTo(0,0);
-    requestAnimationFrame(()=>{g.classList.add('out');setTimeout(()=>{g.remove();document.documentElement.classList.remove('bp-busy')},320)});
-  },430);
+    HM_HOLD.on=true;HM_HOLD.warm=HM_HOLD.release=null;
+    try{await done()}finally{HM_HOLD.on=false}
+    window.scrollTo(0,0);
+    const t=performance.now();
+    const reveal=()=>{
+      if(HM_HOLD.warm&&!HM_HOLD.warm()&&performance.now()-t<1100){requestAnimationFrame(reveal);return}
+      if(HM_HOLD.release)HM_HOLD.release();
+      requestAnimationFrame(()=>{g.classList.add('out');setTimeout(()=>{g.remove();html.classList.remove('bp-busy')},320)});
+    };
+    requestAnimationFrame(reveal);
+  },440);
 }
 function pickerGrid(b){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -9865,16 +9896,18 @@ function pickerDock(b){
     fitBig();render(0);
   }
   function fitBig(){
-    if(!bigEl)return;const len=bigEl.textContent.length;
-    bigEl.style.fontSize=Math.round(Math.min(SH*.62,SW*.8/(len*.56)))+'px';
+    if(!bigEl)return;
+    bigEl.style.fontSize='100px';
+    const w=[...bigEl.children].reduce((a,c)=>a+c.offsetWidth,0)||bigEl.textContent.length*60;
+    bigEl.style.fontSize=Math.round(Math.min(SH*.62,SW*.86*100/w))+'px';
   }
   function setBig(txt){
     const old=bigEl;
     bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i},c===' '?' ':c)));
-    fitBig();
+    bigw.append(bigEl);fitBig();
     if(old){old.classList.add('out');setTimeout(()=>old.remove(),reduce?0:220)}
-    bigw.append(bigEl);
   }
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(b.isConnected)fitBig()});
   const cH=el('h3',{}),cT=el('p',{class:'bpd-t2'}),cM=el('p',{class:'bpd-m'}),cB=btn('Use this board',()=>go(),'primary');
   cap.append(cH,cT,cM,cB);let stT=0;
   function paintCap(){
@@ -10932,28 +10965,38 @@ function pjTwoStep(label,confirm,fn,cls){
 
 /* ---------- routing. Every move goes through pjGo so instruments always stop and a running recording is saved first. ---------- */
 async function projectsPage(b){
-  PJ.box=b;const go=PJ.pending;PJ.pending=null;
-  await pjGo(go?{pid:go}:{});
+  PJ.box=b;pjShown=undefined;const go=PJ.pending,gv=PJ.pendingView;PJ.pending=null;PJ.pendingView=null;
+  await pjGo(go?{pid:go,view:gv||undefined}:{});
 }
 async function pjGo(o){
+  const prevPid=pjShown;
   const tok=++PJ.tok;
   await runCleanups();
   if(tok!==PJ.tok)return;
   cleanups.push(pjLeave);
   PJ.pid=o.pid||null;PJ.view=o.view||'dash';PJ.openRun=o.run||null;PJ.cmp=o.cmp||null;PJ.tiles=[];PJ.buf={};
+  navRecord({id:'projects',pid:PJ.pid,view:PJ.pid?PJ.view:null},true);
   clearInterval(PJ.timer);PJ.timer=0;
   const b=PJ.box;if(!b||!b.isConnected)return;
-  b.replaceChildren();
-  await pjDb.ready();
-  if(tok!==PJ.tok)return;
-  if(!PJ.pid){await pjList(b,tok);return}
-  const pr=await pjDb.get('projects',PJ.pid);
-  if(tok!==PJ.tok)return;
-  if(!pr){PJ.pid=null;await pjList(b,tok);return}
-  PJ.ovr=pr.pins||{};PJ.ctx=null;
-  try{if(pjAutoPins(pr))await pjSave(pr)}catch(e){console.warn('pin plan',e)}
-  await pjProject(b,pr,tok);
+  /* the old page stays on screen, at its own height, until the new one has its data. No blank frame, no scrollbar flicker. */
+  const flip=prevPid!==(o.pid||null);
+  b.style.minHeight=b.offsetHeight+'px';
+  PJ.swap=()=>{b.replaceChildren();if(flip){window.scrollTo(0,0);b.classList.add('pj-enter')}pjShown=PJ.pid||null};
+  try{
+    await pjDb.ready();
+    if(tok!==PJ.tok)return;
+    if(!PJ.pid){await pjList(b,tok);return}
+    const pr=await pjDb.get('projects',PJ.pid);
+    if(tok!==PJ.tok)return;
+    if(!pr){PJ.pid=null;await pjList(b,tok);return}
+    PJ.ovr=pr.pins||{};PJ.ctx=null;
+    try{if(pjAutoPins(pr))await pjSave(pr)}catch(e){console.warn('pin plan',e)}
+    await pjProject(b,pr,tok);
+  }finally{
+    if(tok===PJ.tok)requestAnimationFrame(()=>{if(tok===PJ.tok){b.style.minHeight='';setTimeout(()=>b.classList.remove('pj-enter'),260)}});
+  }
 }
+let pjShown=null;
 async function pjLeave(){
   PJ.ctx=null;PJ.ovr={};
   clearInterval(PJ.timer);PJ.timer=0;
@@ -10963,11 +11006,12 @@ async function pjLeave(){
 
 /* ---------- the project list ---------- */
 async function pjList(b,tok){
-  pjHead('Projects','Combine parts, watch them on one dashboard and keep every run.');
   await pjRecover();
   const prs=await pjProjects();
   const info=await Promise.all(prs.map(async p=>{const r=await pjDb.runs(p.id);return {n:r.length,last:r.reduce((m,x)=>Math.max(m,x.started),0)}}));
   if(tok!==PJ.tok)return;
+  PJ.swap();
+  pjHead('Projects','Combine parts, watch them on one dashboard and keep every run.');
   const form=el('form',{class:'pj-new',hidden:true,onsubmit:async e=>{
     e.preventDefault();const p=await pjNew(nm.value,[]);pjGo({pid:p.id,view:'parts'});
   }});
@@ -11011,6 +11055,7 @@ async function pjList(b,tok){
 async function pjProject(b,pr,tok){
   const runs=await pjDb.runs(pr.id);
   if(tok!==PJ.tok)return;
+  PJ.swap();
   pjHead('Projects',pjPlural(pr.parts.length,'part')+', '+pjPlural(runs.length,'saved run'));
   const nameIn=el('input',{type:'text',class:'pj-title',value:pr.name,maxlength:'60','aria-label':'Project name',onchange:async()=>{
     const v=nameIn.value.trim();if(!v){nameIn.value=pr.name;return}pr.name=v;await pjSave(pr);toast('Renamed')}});
@@ -13521,11 +13566,44 @@ function refreshHead(){
   const go=()=>{const p=document.getElementById('panel');if(!p)return;new MutationObserver(ms=>{for(const m of ms)paint(m.target)}).observe(p,{subtree:true,childList:true,characterData:true})};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();
 })();
+/* ---- history: every page change is a history entry, so the header Back button and the browser Back button (or a swipe, or Alt+Left) go back one page ---- */
+const NAV={n:0,key:'',st:null,restoring:false,ready:false};
+const navKey=st=>[st.id,st.pick?1:0,st.pid||'',st.view||''].join('|');
+const navBtn=()=>{const b=document.getElementById('bBack');if(b)b.classList.toggle('on',NAV.n>0)};
+function navRecord(st,soft){
+  const key=navKey(st);
+  if(NAV.restoring){NAV.st=st;NAV.key=key;return}
+  if(key===NAV.key)return;
+  const same=NAV.st&&NAV.st.id===st.id&&(NAV.st.pid||'')===(st.pid||'');
+  try{
+    if(NAV.st)history.replaceState(Object.assign({},NAV.st,{n:NAV.n,y:Math.round(scrollY)}),'');
+    if(!NAV.ready||(soft&&same)){history.replaceState(Object.assign({},st,{n:NAV.n}),'','#'+st.id);NAV.ready=true}
+    else{NAV.n++;history.pushState(Object.assign({},st,{n:NAV.n}),'','#'+st.id)}
+  }catch(e){}
+  NAV.st=st;NAV.key=key;navBtn();
+}
+addEventListener('popstate',async e=>{
+  const st=e.state;
+  if(!st||!st.id)return;
+  NAV.restoring=true;
+  try{
+    NAV.n=st.n||0;
+    BRD.picking=!!st.pick;
+    if(st.id==='projects'&&cur==='projects'&&document.querySelector('.pj'))await pjGo({pid:st.pid||null,view:st.view||'dash'});
+    else{if(st.id==='projects'){PJ.pending=st.pid||null;PJ.pendingView=st.view||null}await show(st.id)}
+    window.scrollTo(0,st.y||0);
+  }catch(err){console.warn('back',err)}
+  finally{
+    NAV.restoring=false;
+    NAV.st={id:st.id,pick:!!st.pick,pid:st.pid||null,view:st.view||null};NAV.key=navKey(NAV.st);navBtn();
+  }
+});
+document.getElementById('bBack').addEventListener('click',()=>history.back());
 async function show(id){
   await runCleanups();
   const p=PARTS.find(x=>x.id===id)||PARTS[0],panel=$('#panel');
   id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
-  try{history.replaceState(null,'','#'+id)}catch(e){}
+  if(!p.projects)navRecord({id,pick:p.home?(!BRD.cur||!!BRD.picking):false});
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
   const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),p.projects?el('div',{class:'ph-c'},btn('Quick test a part',()=>{show('home');window.scrollTo(0,0)},'sm')):noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
