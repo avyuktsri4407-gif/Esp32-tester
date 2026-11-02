@@ -2,7 +2,7 @@
 
 A browser tool for testing electronic parts on an ESP32 without writing test code. Plug in a board, pick a part, wire it as shown, and the page reads it live and tells you pass or fail.
 
-**Use it:** open the hosted page (GitHub Pages for this repo) in Chrome or Edge.
+**Use it:** [open the live website](https://avyuktsri4407-gif.github.io/Esp32-tester/) in Chrome or Edge. Nothing to install.
 
 ## What it does
 
