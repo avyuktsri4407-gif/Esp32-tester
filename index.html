@@ -10201,12 +10201,15 @@ function pickerDock(b){
       const x=sg*(X[j]+(X[j+1]-X[j])*f),sc=S[j]+(S[j+1]-S[j])*f,ph=clamp(1-ad,0,1);
       const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9;
       const bob=0,pop=ph*ph*(3-2*ph)*SH*.05;
-      const op=clamp(1-(ad-3.2)/.9,0,1);
+      const eg=clamp(1-((SW/2-Math.abs(x))-hw*.12)/(hw*.75),0,1);
+      const op=clamp(1-(ad-3.2)/.9,0,1)*(1-.3*eg);
       const fg=o.fig,vis=op>.02;
       const tr='translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y+pop-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+ang.toFixed(2)+'deg)';
       if(tr!==o._tr){o._tr=tr;fg.style.transform=tr}
       const ops=op.toFixed(3),zs=String(60-Math.round(ad*10)),vs=vis?'visible':'hidden';
       if(ops!==o._op){o._op=ops;fg.style.opacity=ops}
+      const bls=eg>.04?'blur('+(Math.round(eg*eg*10)/2).toFixed(1)+'px)':'';
+      if(bls!==o._bl){o._bl=bls;fg.style.filter=bls}
       if(zs!==o._z){o._z=zs;fg.style.zIndex=zs}
       if(vs!==o._v){o._v=vs;fg.style.visibility=vs}
       const lo=ad>.55?clamp((ad-.55)/.3,0,1)*clamp(1-(ad-3.2)/.6,0,1)*clamp((SW/2-Math.abs(x)-12)/30,0,1):0;
