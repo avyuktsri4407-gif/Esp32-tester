@@ -10944,7 +10944,7 @@ function tipInit(){
     tipInit.cand=null;tipHide();
   });
   for(const t of ['pointerdown','keydown','wheel','touchstart'])document.addEventListener(t,()=>{tipInit.cand=null;tipHide()},{passive:true,capture:true});
-  addEventListener('scroll',()=>{if(tipFor)tipHide()},{passive:true,capture:true});
+  addEventListener('scroll',e=>{const t=e.target;if(tipFor&&(t===document||t===document.documentElement||(t.contains&&t.contains(tipFor))))tipHide()},{passive:true,capture:true});
 }
 tipInit.cand=null;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tipInit);else tipInit();
