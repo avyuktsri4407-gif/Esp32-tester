@@ -13106,7 +13106,7 @@ function layout(ids,res){
 /* ---------- the scene ---------- */
 const EMIN=20,EMAX=60;
 function scene(ids,res,view){
-  const L=layout(ids,res),items=L.items,need=L.cols;
+  const L=layout(ids,res),items=L.items,need=L.cols+14;/* spare columns, so parts can still be carried along the board */
   const AZv=view&&view.az!=null?view.az:AZ,ELv=view&&view.el!=null?view.el:EL;
   /* real sizes: 400 points (30 columns), 830 points (63 columns), or 830 boards clipped side by side */
   const nb=Math.max(need<=30?1:Math.ceil(need/63),NBMIN),cols=nb===1&&need<=30?30:nb*63;
@@ -13424,7 +13424,7 @@ function bbStepText(it,n,total,res){
 }
 function pjBuild(body,pr){
   if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
-  pjSeed(pr.parts);BB.setLayout(pr.layout,0);
+  pjSeed(pr.parts);BB.setLayout(pr.layout,pr.boards);
   /* every breadboard has its own ESP32: this page shows one at a time, and ps is the parts that sit on it */
   const sets=pjSets(pr),set=Math.min(PJ.bbSet&&PJ.bbSet.pid===pr.id?PJ.bbSet.k|0:0,sets.length-1),ps=pjSetParts(pr,set);
   const setBoard=k=>{const b=BRD.by(sets[k].board);return b?b.n:sets[k].board};
