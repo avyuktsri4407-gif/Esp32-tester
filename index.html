@@ -5,21 +5,21 @@
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#0C0D10">
 <meta name="keywords" content="ESP32 tester, ESP32 sensor test, test I2C sensor, ESP32 component tester, ESP32 web serial, ESP32 module checker, BME280, MPU6050, DHT22, OLED, ESP32 wiring">
-<link rel="canonical" href="https://esp32-live-tester.vercel.app/">
+<link rel="canonical" href="__SITE_URL__/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230C0D10'/%3E%3Cpath d='M7 16h5l3-7 4 14 3-7h3' fill='none' stroke='%23D8B877' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ESP32 Live Tester">
 <meta property="og:title" content="ESP32 Live Tester">
 <meta property="og:description" content="Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.">
-<meta property="og:url" content="https://esp32-live-tester.vercel.app/">
-<meta property="og:image" content="https://esp32-live-tester.vercel.app/og.png">
+<meta property="og:url" content="__SITE_URL__/">
+<meta property="og:image" content="__SITE_URL__/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ESP32 Live Tester">
 <meta name="twitter:description" content="Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.">
-<meta name="twitter:image" content="https://esp32-live-tester.vercel.app/og.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ESP32 Live Tester","url":"https://esp32-live-tester.vercel.app/","description":"Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.","applicationCategory":"DeveloperApplication","operatingSystem":"Any with Chrome or Edge","browserRequirements":"Requires Web Serial (Chrome or Edge on desktop)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<meta name="twitter:image" content="__SITE_URL__/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ESP32 Live Tester","url":"__SITE_URL__/","description":"Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.","applicationCategory":"DeveloperApplication","operatingSystem":"Any with Chrome or Edge","browserRequirements":"Requires Web Serial (Chrome or Edge on desktop)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <script>document.documentElement.lang='en'</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1826,6 +1826,29 @@ body{overflow-x:clip}
 
 /* dep_x101: blur only the far left and right of the big type, as a masked backdrop blur over the text */
 .hm-big::after,.bpd-big::after{content:'';position:absolute;inset:0;pointer-events:none;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);-webkit-mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.6) 7%,transparent 17%,transparent 83%,rgba(0,0,0,.6) 93%,#000 100%);mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.6) 7%,transparent 17%,transparent 83%,rgba(0,0,0,.6) 93%,#000 100%)}
+
+/* dep_x107: how many copies of a part, beside each row in the parts list */
+.pj-prw{display:flex;align-items:center;gap:8px;border-top:1px solid var(--hair)}
+.pj-prw>.pj-pr{flex:1 1 auto;min-width:0;border-top:0}
+.pj-st{display:inline-flex;align-items:center;gap:2px;margin-right:12px;flex:none;border:1px solid var(--hair);border-radius:999px;padding:2px;background:var(--panel,transparent)}
+.pj-st[hidden]{display:none}
+.pj-sb{width:32px;height:32px;border-radius:50%;border:0;background:transparent;color:var(--text,inherit);font:600 18px/1 var(--f-body);cursor:pointer;display:grid;place-items:center}
+.pj-sb:hover:not(:disabled){background:var(--hover)}
+.pj-sb:disabled{opacity:.35;cursor:default}
+.pj-sb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pj-sn{min-width:22px;text-align:center;font:600 14px var(--f-mono,monospace)}
+
+/* dep_x108: breadboard tabs, and the board picker on each part's step */
+.bb-sets{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.bb-set{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:44px;padding:8px 14px;border:1px solid var(--hair2);border-radius:var(--r-sm);background:transparent;color:var(--fg);font:500 14px var(--f-body);cursor:pointer;text-align:left;transition:border-color .16s,background .16s}
+.bb-set span{font:400 12px var(--f-body);color:var(--muted)}
+.bb-set:hover{background:var(--hover)}
+.bb-set.on{border-color:var(--accent);background:var(--hover)}
+.bb-set:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bb-bcount{font:500 13px var(--f-mono);color:var(--muted);align-self:center}
+.bb-mv{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.bb-mv .lbl{font:500 13px var(--f-body);color:var(--muted)}
+.bb-mvs{min-height:36px;padding:6px 10px;font-size:14px}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -2363,7 +2386,7 @@ const Link={
     setStatus();runCleanups();
   }
 };
-const dev=(line,t)=>{if(typeof pjRewrite==='function')line=pjRewrite(line);return aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t)).catch(e=>{const m=e&&e.message!=null?e.message:String(e);if(/UOPEN first/.test(m)){const f=new Error('The serial port is not open yet. Press "Find the part" first.');f.stack=e&&e.stack;throw f}throw e})};
+const dev=(line,t)=>{if(typeof pjDrive==='function'){const dv=pjDrive(line);if(dv)return dv}if(typeof pjRewrite==='function')line=pjRewrite(line);return aborted()?Promise.reject(ABORT):(typeof PinGuard!=='undefined'?PinGuard.check(line):Promise.resolve()).then(()=>aborted()?Promise.reject(ABORT):Link.send(line,t)).catch(e=>{const m=e&&e.message!=null?e.message:String(e);if(/UOPEN first/.test(m)){const f=new Error('The serial port is not open yet. Press "Find the part" first.');f.stack=e&&e.stack;throw f}throw e})};
 
 /* ---------- demo device ---------- */
 const Demo={t0:Date.now(),gps:false,gpsT:null,gpsStart:0,hc:false};
@@ -8598,7 +8621,7 @@ const by=id=>LIST.find(b=>b.id===id)||null;
 function set(id){cur=id&&by(id)?id:null;try{reset()}catch(e){}subs.forEach(f=>{try{f(cur)}catch(e){}})}
 /* what a part needs from the board: GPIO wires and analog inputs. Read from the part's wiring rows. */
 const ADC_CLASSIC=new Set([32,33,34,35,36,39]);
-const cmdsOf=p=>(p&&p.cmds)||((typeof PART_CMDS!=='undefined'&&p&&PART_CMDS[p.id])||[]);
+const cmdsOf=p=>(p&&p.cmds)||((typeof PART_CMDS!=='undefined'&&p&&PART_CMDS[p.base||p.id])||[]);
 function need(p){
   const rows=(p&&p.wiring&&p.wiring.rows)||[],g=new Set();let a=0;
   for(const r of rows){const m=/^GPIO(\d+)/.exec(String(r[0]));if(m){g.add(+m[1]);if(ADC_CLASSIC.has(+m[1])&&cmdsOf(p).some(c=>/^ADC/.test(c)))a++}}
@@ -8608,7 +8631,7 @@ function need(p){
 function fit(p,id){
   const b=by(id||cur);if(!b||!p||p.home||p.overview||p.projects)return {ok:true,why:''};
   const n=need(p);
-  if(p.id==='esp32cam')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.',hide:true};
+  if((p.base||p.id)==='esp32cam')return b.id==='espcam'?{ok:true,why:''}:{ok:false,why:'This page is for the ESP32-CAM board.',hide:true};
   if(n.gpio>b.pins.length)return {ok:false,why:'Needs '+n.gpio+' GPIO pins. '+b.n+' has '+b.pins.length+' free.'};
   if(n.adc>b.adc.length)return {ok:false,why:'Needs '+n.adc+' analog input'+(n.adc>1?'s':'')+'. '+b.n+' has '+(b.adc.length?b.adc.length+' analog input'+(b.adc.length>1?'s':''):'no analog input')+' usable here.'};
   return {ok:true,why:''};
@@ -11039,10 +11062,52 @@ const RDTIPS=[
 function readTip(label){const l=String(label||'').trim();for(const [r,t] of RDTIPS)if(r.test(l))return t;return ''}
 /* ---- Projects, part 1: storage, the run recorder, statistics, charts and exports. The pages are in projects_ui.js. ---- */
 let PJO=null;   /* the dashboard tile being built; readout() and makeLive() report to it */
-const PJ={ovr:{},ctx:null,pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:12,rec:true};
-const pjPart=id=>PARTS.find(p=>p.id===id);
+const PJ={ovr:{},ctx:null,pid:null,view:'dash',tok:0,run:null,buf:{},tiles:[],timer:0,box:null,pending:null,sel:new Set(),max:16,rec:true};
+/* a part can be in a project more than once: the first copy keeps its id, later copies are id~2, id~3 */
+const pjBase=id=>String(id).split('~')[0];
+const pjInstN=id=>{const m=/~(\d+)$/.exec(String(id));return m?+m[1]:1};
+const PJ_INST={};
+function pjPart(id){
+  const b=pjBase(id),p=PARTS.find(x=>x.id===b);
+  if(!p||b===id)return p;
+  if(!PJ_INST[id]||Object.getPrototypeOf(PJ_INST[id])!==p)PJ_INST[id]=Object.assign(Object.create(p),{id,base:b,n:String(p.n).replace(/^(.*?)(\s*(?:[,(].*)?)$/,(m,a,b)=>a+' '+pjInstN(id)+b)});
+  return PJ_INST[id];
+}
+/* how many copies of each part, and the next free copy id */
+const pjCount=(ids,base)=>ids.filter(i=>pjBase(i)===base).length;
+function pjNextId(ids,base){let k=2;while(ids.includes(base+'~'+k))k++;return base+'~'+k}
+/* servos in a project that has a PCA9685 hang on its channels, in the order they were added */
+const PJ_DRIVEN=new Set(['servo','mg996r']);
+/* a project can have several breadboards, each with its own ESP32. pr.sets lists them, pr.where says which one a part is on (0 when absent). */
+const pjSetOf=id=>((PJ.where&&PJ.where[id])|0);
+function pjSets(pr){
+  const cur=(typeof BRD!=='undefined'&&BRD.cur)||'devkit';
+  return Array.isArray(pr.sets)&&pr.sets.length?pr.sets.slice(0,4).map(s=>({board:(s&&s.board)||cur})):[{board:cur}];
+}
+const pjSetParts=(pr,k)=>pr.parts.filter(id=>((pr.where&&pr.where[id])|0)===k);
+function pjCleanWhere(pr){
+  const n=pjSets(pr).length,w={};
+  if(pr.where&&typeof pr.where==='object')for(const id of Object.keys(pr.where)){const v=pr.where[id]|0;if(v>0&&v<n&&pr.parts.includes(id))w[id]=v}
+  pr.where=w;return w;
+}
+const pjSetTag=id=>(PJ.sets&&PJ.sets.length>1)?' (breadboard '+(pjSetOf(id)+1)+')':'';
+/* servos on a breadboard that has a PCA9685 hang on its channels, in the order they were added */
+function pjDriven(ids){
+  const m={},by={};
+  for(const id of ids){const s=pjSetOf(id);(by[s]=by[s]||[]).push(id)}
+  for(const s in by){
+    const g=by[s];if(!g.some(i=>pjBase(i)==='pca9685'))continue;
+    let k=0;for(const id of g)if(PJ_DRIVEN.has(pjBase(id))&&k<16)m[id]=k++;
+  }
+  return m;
+}
+function pjDrivenRows(id,ids){
+  const m=pjDriven(ids);if(m[id]==null)return null;
+  const k=m[id];
+  return [['PCA9685 CH'+k,'Signal (orange)','orange','sig'],['PCA9685 V+','V+ (servo power, 5 to 6 V)','red','pwr'],['PCA9685 GND','GND','black','gnd']];
+}
 const pjName=id=>{const p=pjPart(id);return p?p.n:id};
-const pjShort=id=>{let n=String(pjName(id)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28);let p;do{p=n;n=n.replace(/[\s+\-\/&]+$/,'').replace(/\s(and|or|with|of|for|the|a|to|in|on|1|2|3)$/i,'')}while(n!==p)}return n};
+const pjShort=id=>{const bs=pjBase(id);let n=String(pjName(bs)).split(/,| \(/)[0].trim();if(n.length>28){n=n.slice(0,28);n=n.slice(0,n.lastIndexOf(' ')>12?n.lastIndexOf(' '):28);let p;do{p=n;n=n.replace(/[\s+\-\/&]+$/,'').replace(/\s(and|or|with|of|for|the|a|to|in|on|1|2|3)$/i,'')}while(n!==p)}return bs===id?n:n+' '+pjInstN(id)};
 const pjUid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const pjSlug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'project';
 const pjZ=n=>String(n).padStart(2,'0');
@@ -11094,7 +11159,7 @@ async function pjNew(name,parts){
   const p={id:pjUid(),name:String(name||'').trim()||'Untitled project',parts:[...new Set(parts||[])].filter(id=>pjPart(id)).slice(0,PJ.max),created:Date.now(),updated:Date.now(),autosave:false};
   await pjDb.put('projects',p);pjAsk();return p;
 }
-const pjSave=async p=>{p.updated=Date.now();await pjDb.put('projects',p);return p};
+const pjSave=async p=>{p.updated=Date.now();pjCleanWhere(p);await pjDb.put('projects',p);if(p.id===PJ.pid){PJ.where=p.where;PJ.sets=pjSets(p)}return p};
 
 /* ---------- numbers: which readings can be charted ---------- */
 function pjNum(v){
@@ -11194,29 +11259,32 @@ function pjWiring(ids){
   const rows=[],used=new Map(),conflicts=[],addrs=new Map(),nowire=[];
   for(const id of ids){
     const p=pjPart(id);if(!p)continue;
+    const B=pjBase(id);
     let w=null;try{w=p.wiring?W(p.wiring):null}catch(e){}
+    const dr=pjDrivenRows(id,ids);if(dr)w={rows:dr};
     if(!w||!w.rows){nowire.push(id);continue}
     for(const r of w.rows){
       const ov=PJ.ovr&&PJ.ovr[id],esp0=String(r[0]),esp=ov?esp0.replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):esp0,pp=String(r[1]),kind=r[3]||'sig';
       rows.push({part:id,esp,pp,wire:r[2]||'',kind,moved:esp!==esp0});
       const m=/^GPIO(\d+)/.exec(esp);
       if(m&&kind!=='pwr'&&kind!=='gnd'){
-        const n=+m[1],o=used.get(n)||{n,owners:[]};
-        if(!o.owners.some(x=>x.part===id))o.owners.push({part:id,pp,bus:pjBus(n,pp,id),opt:kind==='opt'});
-        used.set(n,o);
+        const n=+m[1],sk=pjSetOf(id)+':'+n,o=used.get(sk)||{n,set:pjSetOf(id),owners:[]};
+        if(!o.owners.some(x=>x.part===id))o.owners.push({part:id,pp,bus:pjBus(n,pp,B),opt:kind==='opt'});
+        used.set(sk,o);
       }
     }
-    const A=(typeof SPECS!=='undefined'&&SPECS[id]&&SPECS[id].addrs)||PJ_ADDR[id];
-    if(A&&A.length){const a=A[0];addrs.set(a,[...(addrs.get(a)||[]),id])}
-    if(id==='ds3231')addrs.set(0x57,[...(addrs.get(0x57)||[]),id]);/* ZS-042 boards carry a 24C32 EEPROM at 0x57 */
+    const A=(typeof SPECS!=='undefined'&&SPECS[B]&&SPECS[B].addrs)||PJ_ADDR[B];
+    {const st=pjSetOf(id);
+    if(A&&A.length){const a=A[0],k=st+':'+a;addrs.set(k,{a,st,list:[...((addrs.get(k)||{}).list||[]),id]})}
+    if(B==='ds3231'){const k=st+':'+0x57;addrs.set(k,{a:0x57,st,list:[...((addrs.get(k)||{}).list||[]),id]})}}/* ZS-042 boards carry a 24C32 EEPROM at 0x57 */
   }
-  const pins=[...used.values()].sort((a,b)=>a.n-b.n);
+  const pins=[...used.values()].sort((a,b)=>a.set-b.set||a.n-b.n);
   for(const o of pins){
     o.state='ok';
     /* a NEMA 17 is wired to its driver, and the driver to these pins, so the motor and one driver share them */
-    const drv=o.owners.filter(x=>PJ_DRV.has(x.part)),mot=o.owners.filter(x=>x.part==='nema17'),oth=o.owners.filter(x=>!PJ_DRV.has(x.part)&&x.part!=='nema17');
+    const bs=x=>pjBase(x.part),drv=o.owners.filter(x=>PJ_DRV.has(bs(x))),mot=o.owners.filter(x=>bs(x)==='nema17'),oth=o.owners.filter(x=>!PJ_DRV.has(bs(x))&&bs(x)!=='nema17');
     if(o.owners.length>1&&drv.length&&mot.length&&!oth.length&&drv.length===1){o.state='shared';o.bus='STEP';o.owners.forEach(x=>x.bus='STEP');continue}
-    if(o.owners.length>1&&mot.length&&drv.length>1&&!oth.length)o.owners=o.owners.filter(x=>x.part!=='nema17');
+    if(o.owners.length>1&&mot.length&&drv.length>1&&!oth.length)o.owners=o.owners.filter(x=>pjBase(x.part)!=='nema17');
     if(o.owners.length>1){
       const bus=o.owners[0].bus;
       if(bus&&o.owners.every(x=>x.bus===bus))o.state='shared';
@@ -11224,18 +11292,19 @@ function pjWiring(ids){
       else o.state='maybe';
     }
     o.bus=o.owners[0].bus;
-    if(o.state==='conflict'||o.state==='maybe')conflicts.push({kind:'pin',sev:o.state,pin:o.n,parts:o.owners.map(x=>x.part)});
+    if(o.state==='conflict'||o.state==='maybe')conflicts.push({kind:'pin',sev:o.state,pin:o.n,set:o.set,parts:o.owners.map(x=>x.part)});
   }
-  for(const [a,list] of addrs)if(list.length>1)conflicts.push({kind:'addr',sev:'maybe',addr:a,parts:list});
-  const take=new Set(pins.map(o=>o.n));
+  for(const [k,v] of addrs)if(v.list.length>1)conflicts.push({kind:'addr',sev:'maybe',addr:v.a,set:v.st,parts:v.list});
+  const take=new Set(pins.filter(o=>o.set===0).map(o=>o.n));
   const free=(typeof FW_OUT!=='undefined'?FW_OUT:[]).filter(n=>!take.has(n));
   return {rows,pins,conflicts,free,nowire,hard:conflicts.filter(c=>c.sev==='conflict').length,soft:conflicts.filter(c=>c.sev!=='conflict').length};
 }
 function pjConflictText(c){
   const names=c.parts.map(pjShort);const list=names.length>2?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names.join(' and ');
-  if(c.kind==='addr')return list+' both answer at '+hex(c.addr)+' by default. Change the address pin on one of them.';
+  const on=(PJ.sets&&PJ.sets.length>1)?' on breadboard '+((c.set|0)+1):'';
+  if(c.kind==='addr')return list+' both answer at '+hex(c.addr)+' by default'+on+'. Change the address pin on one of them.';
   const pin=(typeof BRD!=='undefined'&&BRD.label&&BRD.label(c.pin))||('GPIO'+c.pin);
-  return c.sev==='conflict'?pin+' is used by '+list+'. They cannot be tested together on one pin.':pin+' is used by '+list+' (one of them optional). Check you do not wire both.';
+  return c.sev==='conflict'?pin+' is used by '+list+on+'. They cannot be tested together on one pin.':pin+' is used by '+list+on+' (one of them optional). Check you do not wire both.';
 }
 
 /* ---------- charts: plain SVG, so the same markup works in the page and in a saved report ---------- */
@@ -11340,9 +11409,11 @@ async function pjRestore(text){
   if(!o||o.schema!=='esp32-live-tester/project-backup@1'||!o.project)throw new Error('This is not a project backup file.');
   const pr={...o.project,id:pjUid(),created:Date.now(),updated:Date.now(),autosave:false};
   pr.name=String(pr.name==null?'':pr.name).trim().slice(0,60)||'Restored project';
-  pr.parts=[...new Set(Array.isArray(pr.parts)?pr.parts:[])].filter(id=>pjPart(id)).slice(0,PJ.max);
+  pr.parts=[...new Set(Array.isArray(pr.parts)?pr.parts:[])].filter(id=>typeof id==='string'&&pjPart(id)).slice(0,PJ.max);
   if(!pr.pins||typeof pr.pins!=='object'||Array.isArray(pr.pins))pr.pins={};
   pr.boards=Math.max(1,Math.min(4,Math.round(+pr.boards)||1));
+  if(Array.isArray(pr.sets))pr.sets=pr.sets.slice(0,4).filter(s=>s&&typeof s==='object').map(s=>({board:String(s.board||'devkit')}));else delete pr.sets;
+  pjCleanWhere(pr);
   {const lo={};if(pr.layout&&typeof pr.layout==='object'&&!Array.isArray(pr.layout))for(const id of Object.keys(pr.layout)){const q=pr.layout[id];if(pr.parts.includes(id)&&q&&(q.lane==='back'||q.lane==='front')&&Number.isFinite(+q.cs))lo[id]={lane:q.lane,cs:Math.max(1,Math.min(400,Math.round(+q.cs)))}}pr.layout=lo}
   const runs=(Array.isArray(o.runs)?o.runs:[]).filter(r=>r&&typeof r==='object'&&Array.isArray(r.reads));
   /* the project is written last, so a bad file never leaves a half restored project behind */
@@ -11379,10 +11450,32 @@ function pjRewrite(line){
   for(const i of BRD.pinWords(c,a)){const t=a[i];if(t!=null&&/^\d+$/.test(t)&&ov[+t]!=null){a[i]=String(ov[+t]);hit=true}}
   return hit?[w[0],...a].join(' '):line;
 }
+/* a servo that hangs on a PCA9685 channel: SERVO and SERVOOFF from its test become I2C writes to the driver at 0x40 */
+function pjPcaDemo(){
+  if(Link.mode!=='demo'||Demo.i2c[0x40])return;
+  const regs=new Uint8Array(256);regs[0]=0x11;regs[0xFE]=0x1E;
+  Demo.i2c[0x40]=regDev(r=>regs[r&255],(r,d)=>{d.forEach((v,i)=>{regs[(r+i)&255]=v})});
+}
+function pjDrive(line){
+  const ctx=PJ.ctx,ch=ctx&&PJ.drv&&PJ.drv[ctx];
+  if(ch==null)return null;
+  const w=String(line).trim().split(/\s+/),c=w[0].toUpperCase();
+  if(c!=='SERVO'&&c!=='SERVOOFF')return null;
+  return (async()=>{
+    pjPcaDemo();
+    const wr=h=>Link.send('I2C 64 '+h+' 0 0');
+    PJ.pcaP=PJ.pcaP||(async()=>{await wr(hx(0x00,0x10));await wr(hx(0xFE,121));await wr(hx(0x00,0x20));await sleep(6);await wr(hx(0x00,0xA0))})();
+    await PJ.pcaP;
+    if(c==='SERVOOFF'){await wr(hx(0x06+4*ch,0,0,0,0x10));return {c,ok:1,pin:ch}}
+    const deg=Math.max(0,Math.min(180,Math.round(+w[2]))),us=500+deg*1900/180,t=Math.round(us/20000*4096);
+    await wr(hx(0x06+4*ch,0,0,t&255,t>>8));
+    return {c,ok:1,pin:ch,deg};
+  })();
+}
 /* the motor is wired to its driver, so its pins follow the driver (the A4988 page and the TMC2209 page use different ones) */
 function pjSyncStepper(pr){
-  const ids=pr.parts,drv=ids.filter(i=>PJ_DRV.has(i));
-  if(!ids.includes('nema17')||drv.length!==1){if(pr.pins&&pr.pins.nema17){delete pr.pins.nema17;PJ.ovr=pr.pins}return}
+  const ids=pr.parts,drv=ids.filter(i=>PJ_DRV.has(pjBase(i)));
+  if(!ids.includes('nema17')||pjCount(ids,'nema17')!==1||drv.length!==1){if(pr.pins&&pr.pins.nema17){delete pr.pins.nema17;PJ.ovr=pr.pins}return}
   const w=pjWiring(ids),pin=re=>{const r=w.rows.find(r=>r.part===drv[0]&&re.test(r.pp)&&/^GPIO\d+/.test(r.esp));return r?+/^GPIO(\d+)/.exec(r.esp)[1]:null};
   const to=[pin(/^STEP/i),pin(/^DIR/i),pin(/^EN/i)],from=[14,27,32],m={};
   from.forEach((f,i)=>{if(to[i]!=null&&to[i]!==f)m[f]=to[i]});
@@ -11390,10 +11483,10 @@ function pjSyncStepper(pr){
   PJ.ovr=pr.pins;
 }
 /* tests that use a firmware command with built-in pins (SD card, GPS, HC-12/HC-05, battery) cannot follow a pin move */
-const pjFixedPins=id=>((typeof PART_CMDS!=='undefined'&&PART_CMDS[id])||[]).some(c=>/^(SD|SDLS|GPS|HC|HCTX|BATT)$/.test(c));
+const pjFixedPins=id=>((typeof PART_CMDS!=='undefined'&&PART_CMDS[pjBase(id)])||[]).some(c=>/^(SD|SDLS|GPS|HC|HCTX|BATT)$/.test(c));
 function pjAutoPins(pr){
   const ids=pr.parts,before=JSON.stringify(pr.pins||{});
-  pr.pins=pr.pins||{};
+  pr.pins=pr.pins||{};PJ.where=pr.where||{};PJ.sets=pjSets(pr);
   /* moves for parts that left the project mean nothing, and Undo (autopin false) keeps the original pins until the parts change */
   for(const k of Object.keys(pr.pins))if(!ids.includes(k))delete pr.pins[k];
   PJ.ovr=pr.pins;
@@ -11402,11 +11495,11 @@ function pjAutoPins(pr){
     pjSyncStepper(pr);
     const w=pjWiring(ids),c=w.conflicts.find(x=>x.kind==='pin'&&x.sev==='conflict');
     if(!c)break;
-    const o=w.pins.find(p=>p.n===c.pin);if(!o)break;
+    const cs=c.set|0,o=w.pins.find(p=>p.n===c.pin&&p.set===cs);if(!o)break;
     const mover=o.owners.filter(x=>!x.opt&&!x.bus&&!pjFixedPins(x.part)).sort((a,b)=>ids.indexOf(b.part)-ids.indexOf(a.part))[0];
     if(!mover)break;
     const ov=pr.pins[mover.part]||{},orig=+(Object.keys(ov).find(k=>ov[k]===c.pin)||c.pin);
-    const taken=new Set(w.pins.map(p=>p.n)),analog=orig>=34;
+    const taken=new Set(w.pins.filter(p=>p.set===cs).map(p=>p.n)),analog=orig>=34;
     const list=(analog?PJ_PIN_IN:PJ_PIN_PREF).filter(n=>!taken.has(n)&&(analog||FW_OUT.includes(n)));
     if(!list.length)break;
     pr.pins[mover.part]=Object.assign({},ov,{[orig]:list[0]});PJ.ovr=pr.pins;
@@ -11438,7 +11531,16 @@ const PJ_PRESETS=[
 const PJ_TABS=[['parts','Parts'],['build','Build'],['wire','Wiring'],['dash','Dashboard'],['runs','Runs']];
 const pjHead=(t,s)=>{const h=$('.ph h2'),u=$('.ph .sub');if(h)h.textContent=t;if(u)u.textContent=s||''};
 const pjPlural=(n,w)=>n+' '+w+(n===1?'':'s');
-function pjSeed(ids){try{BRD.reset();ids.forEach(id=>BRD.seed(pjPart(id)))}catch(e){}}
+/* a small count control for one part: fewer, how many, more */
+function pjStepper(p,get,set){
+  const minus=el('button',{type:'button',class:'pj-sb','aria-label':'Fewer '+pjShort(p.id)+' in this project',title:'Remove one copy',onclick:()=>set(get()-1)},'−');
+  const plus=el('button',{type:'button',class:'pj-sb','aria-label':'Add another '+pjShort(p.id),title:'Add another copy of this part',onclick:()=>set(get()+1)},'+');
+  const num=el('span',{class:'pj-sn','aria-live':'polite'},String(get()));
+  const box=el('span',{class:'pj-st',role:'group','aria-label':'How many '+pjShort(p.id)}, minus,num,plus);
+  box.hidden=get()===0;
+  return {box,minus,plus,num};
+}
+function pjSeed(ids){PJ.drv=pjDriven(ids);PJ.pcaP=null;try{BRD.reset();ids.forEach(id=>{if(PJ.drv[id]==null)BRD.seed(pjPart(id))})}catch(e){}}
 const pjPin=s=>{try{return BRD.ident()?s:String(s).replace(/GPIO(\d+)/g,(m,n)=>BRD.label(+n)||m)}catch(e){return s}};
 function pjEmpty(title,text,...acts){return el('div',{class:'pj-empty'},el('h3',{},title),el('p',{},text),el('div',{class:'pj-acts'},...acts))}
 function pjTwoStep(label,confirm,fn,cls,what){
@@ -11576,23 +11678,30 @@ function pjParts(body,pr){
   const q=el('input',{type:'search',class:'pj-in',placeholder:'Search parts, such as BME280, servo or GPS','aria-label':'Search parts',autocomplete:'off',oninput:()=>build()});
   const rm=btn('Remove all',async()=>{pr.parts=[];await pjSave(pr);build();paint();pjHead(pr.name,pjPlural(0,'part'))},'sm');
   const chk=el('p',{class:'pj-chk',role:'status'});
-  const boxes=new Map();
+  const boxes=new Map(),steps=new Map();
   const paint=()=>{
     rm.hidden=!pr.parts.length;
     chk.replaceChildren();
     try{const r=pjCheck(pr.parts),c=r.counts,n=c.error+c.warn;if(pr.parts.length&&n)chk.append(el('span',{class:'chip '+(c.error?'fail':'dash')},pjPlural(n,'thing')),' to look at. ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'See the Build tab'))}catch(e){}
     count.textContent=pr.parts.length?pjPlural(pr.parts.length,'part')+' in this project (up to '+PJ.max+')':'No parts yet. Tick the parts below.';
-    chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),title:pjName(id),onclick:()=>toggle(id,false)},pjShort(id)+' ×')));
-    for(const [id,c] of boxes)c.checked=pr.parts.includes(id);
+    chips.replaceChildren(...pr.parts.map(id=>el('button',{type:'button',class:'chip fill pj-x','aria-label':'Remove '+pjName(id),title:pjName(id),onclick:()=>dropOne(id)},pjShort(id)+' ×')));
+    for(const [id,c] of boxes){const n=pjCount(pr.parts,id);c.checked=n>0;const s=steps.get(id);if(s){s.box.hidden=n===0;s.num.textContent=String(n);s.minus.disabled=n<=1;s.plus.disabled=pr.parts.length>=PJ.max}}
     list.querySelectorAll('.pj-gp').forEach(g=>{const n=[...g.querySelectorAll('input')].filter(i=>i.checked).length;g.querySelector('.pj-gn').textContent=n?n+' selected':''});
   };
-  const toggle=async(id,on)=>{
-    const has=pr.parts.includes(id);
-    if(on&&!has){if(pr.parts.length>=PJ.max){toast('A dashboard holds up to '+PJ.max+' parts. Remove one first.');paint();return}pr.parts.push(id)}
-    else if(!on&&has)pr.parts=pr.parts.filter(x=>x!==id);
-    delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
-    await pjSave(pr);paint();pjHead(pr.name,pjPlural(pr.parts.length,'part'));
+  const after=async()=>{delete pr.autopin;try{pjAutoPins(pr)}catch(e){}await pjSave(pr);paint();pjHead(pr.name,pjPlural(pr.parts.length,'part'))};
+  /* one part, any number of copies: the first copy keeps the part id, later copies are id~2, id~3 */
+  const setCount=async(base,n)=>{
+    const cur=pr.parts.filter(i=>pjBase(i)===base);
+    if(n>cur.length){
+      for(let k=cur.length;k<n;k++){
+        if(pr.parts.length>=PJ.max){toast('A dashboard holds up to '+PJ.max+' parts. Remove one first.');break}
+        pr.parts.push(pr.parts.includes(base)?pjNextId(pr.parts,base):base);
+      }
+    }else if(n<cur.length){const drop=cur.slice(Math.max(0,n));pr.parts=pr.parts.filter(x=>!drop.includes(x))}
+    await after();
   };
+  const toggle=(id,on)=>setCount(id,on?Math.max(1,pjCount(pr.parts,id)):0);
+  const dropOne=async id=>{pr.parts=pr.parts.filter(x=>x!==id);await after()};
   function build(){
     boxes.clear();list.replaceChildren();
     const t=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);let any=false;
@@ -11606,7 +11715,8 @@ function pjParts(body,pr){
         const fx=BRD.cur?BRD.fit(p):{ok:true};
         const c=el('input',{type:'checkbox',onchange:()=>toggle(p.id,c.checked)});boxes.set(p.id,c);
         const lab=el('label',{class:'pj-pr'+(fx.ok?'':' nok'),title:fx.ok?null:fx.why},c,el('span',{class:'pj-pn'},p.n),el('span',{class:'pj-ps'},subOfB(p)),fx.ok?null:el('span',{class:'vh'},', does not fit this board'));
-        d.append(lab);
+        const stp=pjStepper(p,()=>pjCount(pr.parts,p.id),n=>setCount(p.id,n));steps.set(p.id,stp);
+        d.append(el('div',{class:'pj-prw'},lab,stp.box));
       }
       list.append(d);
     }
@@ -11634,7 +11744,7 @@ function pjWire(body,pr){
   const st={ok:'Free',shared:'Shared bus',conflict:'Clash',maybe:'Check'};
   if(w.pins.length)body.append(el('h3',{class:'pj-h'},'Pins used'),el('div',{class:'tw'},el('table',{class:'t pj-tb2'},
     el('thead',{},el('tr',{},...['Pin','Used by','State'].map(h=>el('th',{},h)))),
-    el('tbody',{},...w.pins.map(o=>el('tr',{},el('td',{class:'m'},pjPin('GPIO'+o.n)+(o.bus?' ('+o.bus+')':'')),el('td',{},o.owners.map(x=>pjName(x.part)).join(', ')),
+    el('tbody',{},...w.pins.map(o=>el('tr',{},el('td',{class:'m'},pjPin('GPIO'+o.n)+(o.bus?' ('+o.bus+')':'')+((PJ.sets&&PJ.sets.length>1)?', breadboard '+(o.set+1):'')),el('td',{},o.owners.map(x=>pjName(x.part)).join(', ')),
       el('td',{},el('span',{class:'chip '+(o.state==='conflict'?'fail':o.state==='maybe'?'dash':o.state==='shared'?'fill':'pass')},o.owners.length>1?st[o.state]:'One part'))))))));
   /* power rails */
   const rails={};
@@ -11645,7 +11755,7 @@ function pjWire(body,pr){
   /* every wire */
   const by=new Map();for(const r of w.rows){if(!by.has(r.part))by.set(r.part,[]);by.get(r.part).push(r)}
   const trs=[];
-  for(const [id,rs] of by)rs.forEach((r,i)=>trs.push(el('tr',{},el('td',{class:i?'pj-dim':''},i?'':pjName(id)),el('td',{class:'m'},pjPin(r.esp)),el('td',{class:'m'},r.pp),el('td',{},swatch(r.wire),r.wire+(r.kind==='opt'?' (optional)':'')))));
+  for(const [id,rs] of by)rs.forEach((r,i)=>trs.push(el('tr',{},el('td',{class:i?'pj-dim':''},i?'':pjName(id)+pjSetTag(id)),el('td',{class:'m'},pjPin(r.esp)),el('td',{class:'m'},r.pp),el('td',{},swatch(r.wire),r.wire+(r.kind==='opt'?' (optional)':'')))));
   body.append(el('h3',{class:'pj-h'},'Every wire'),
     el('div',{class:'tw'},el('table',{class:'t pj-tb2'},el('thead',{},el('tr',{},...['Part','ESP32 pin','Part pin','Wire'].map(h=>el('th',{},h)))),el('tbody',{},...trs))),
     el('p',{class:'hint'},'Each tile on the dashboard drives the pins listed here. For a full diagram of one part, open it from the sidebar.'));
@@ -11705,7 +11815,7 @@ function pjDash(body,pr,nRuns){
     const p=pjPart(id),own=PJ.owner(pr.id,id);PJ.tiles.push(own);
     const tb=el('div',{class:'pj-tb'}),prev=PJO;PJO=own;
     for(const ev of ['pointerdown','keydown','focusin','change'])tb.addEventListener(ev,()=>{PJ.ctx=id},true);
-    try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
+    try{const r=TESTS[pjBase(id)](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prev}
     own.st=el('span',{class:'chip dash'},'No live mode');own.res=el('span',{class:'pj-res'});
     /* with several parts the tests start folded, so the dashboard is a short list with one result per part. Folded with max-height, not display:none, so the tests still size themselves correctly. */
@@ -11713,7 +11823,7 @@ function pjDash(body,pr,nRuns){
     tb.id='pj-tb-'+id;
     const tog=btn('',()=>{const c=tile.classList.toggle('col');tog.textContent=c?'Open test':'Close test';tog.setAttribute('aria-expanded',String(!c))},'sm');
     tog.setAttribute('aria-controls',tb.id);tog.textContent=pr.parts.length>1?'Open test':'Close test';tog.setAttribute('aria-expanded',String(pr.parts.length<=1));
-    tile.append(el('header',{class:'pj-th'},el('div',{},el('h3',{},pjShort(id)),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'pj-tc'},own.st,own.res,tog)),tb);
+    tile.append(el('header',{class:'pj-th'},el('div',{},el('h3',{},pjShort(id)+pjSetTag(id)),el('p',{class:'pj-ts'},PJ.drv&&PJ.drv[id]!=null?'Driven by PCA9685 channel '+PJ.drv[id]+' over I2C, no GPIO pin':subOfB(p))),el('div',{class:'pj-tc'},own.st,own.res,tog)),tb);
     grid.append(tile);
   }
   body.append(el('h3',{class:'pj-h'},'Parts'),grid);
@@ -11725,8 +11835,8 @@ function pjDash(body,pr,nRuns){
       const n=t.lives.length,on=t.lives.some(l=>l.on);
       const cls=!n?'chip dash':on?'chip fill':'chip',txt=!n?'No live mode':on?'Streaming':'Not streaming';
       if(t.st.textContent!==txt){t.st.className=cls;t.st.textContent=txt}
-      const r=R()[t.part],key=r?r.v:'';
-      if(t.res.dataset.k!==key){t.res.dataset.k=key;t.res.replaceChildren(resultChip(t.part))}
+      const r=R()[pjBase(t.part)],key=r?r.v:'';
+      if(t.res.dataset.k!==key){t.res.dataset.k=key;t.res.replaceChildren(resultChip(pjBase(t.part)))}
     }
   }
   async function toggle(){
@@ -11954,7 +12064,7 @@ const pjSevN={error:0,warn:1,info:2};
 const pjKindLabel={clash:'Clash',missing:'Add',level:'Voltage',power:'Power',tip:'Tip',fit:'Board'};
 
 function pjCheck(ids){
-  const out=[],extras=[],has=new Set(ids),w=pjWiring(ids);
+  const out=[],extras=[],has=new Set(ids.map(pjBase)),w=pjWiring(ids);
   const seen=new Set();
   const add=(o)=>{const k=o.kind+'|'+o.title+'|'+o.parts.join();if(seen.has(k))return;seen.add(k);out.push(o)};
   const addExtra=(part,item,why,between)=>{const k=part+'|'+item;if(seen.has('x|'+k))return;seen.add('x|'+k);extras.push({part,item,why:why||'',between:between||null})};
@@ -11967,7 +12077,7 @@ function pjCheck(ids){
         text:pjConflictText(c),
         fix:c.sev==='conflict'?'The tester firmware uses fixed pins, so test these parts one after the other. In your own sketch, move one of them to a free pin'+(fr?' ('+fr+')':'')+'.':'One of them is optional. Leave that wire off, or move it to a free pin'+(fr?' ('+fr+')':'')+'.'});
     }else{
-      const tip=c.parts.map(p=>PJ_ADDR_FIX[p]).filter(Boolean)[0];
+      const tip=c.parts.map(p=>PJ_ADDR_FIX[pjBase(p)]).filter(Boolean)[0];
       add({sev:'error',kind:'clash',parts:c.parts,title:'Two parts at address '+hex(c.addr),
         text:c.parts.map(pjShort).join(' and ')+' both answer at '+hex(c.addr)+' on the same I2C bus, so one hides the other.',
         fix:(tip?tip+' ':'')+'Otherwise change the address pin (often ADDR, AD0 or SDO) on one of them, or put one on a second I2C bus.'});
@@ -11975,7 +12085,7 @@ function pjCheck(ids){
   }
   /* 2. board fit */
   try{
-    if(typeof BRD!=='undefined'&&BRD.cur)for(const id of ids){
+    if(typeof BRD!=='undefined'&&BRD.cur)for(const id of ids.filter((x,i)=>ids.findIndex(y=>pjBase(y)===pjBase(x))===i)){
       const p=pjPart(id),fx=p&&BRD.fit(p);
       if(fx&&!fx.ok)add({sev:'error',kind:'fit',parts:[id],title:pjShort(id)+' does not fit your board',text:fx.why||'This part needs pins your board does not have.',fix:'Pick another board in the header, or leave this part out of the project.'});
     }
@@ -11985,27 +12095,38 @@ function pjCheck(ids){
     const names=r.any.map(pjShort).join(' or ');
     add({sev:r.sev,kind:'missing',parts:[r.part],title:r.title,text:pjShort(r.part)+': '+r.why,fix:r.fix+' ('+names+' is in the parts list.)',add:r.any.filter(x=>pjPart(x)&&!has.has(x))});
   }
-  /* 4. per-part notes */
-  const lvl=has.has('levelshift');
-  for(const id of ids){
-    for(const n of PJ_NEED[id]||[]){
+  /* 4. per-part notes. Copies of one part share the notes, so each note shows once, naming how many copies there are. */
+  const lvl=has.has('levelshift'),grp=new Map();
+  for(const id of ids){const k=pjBase(id);if(!grp.has(k))grp.set(k,[]);grp.get(k).push(id)}
+  for(const [B,list] of grp){
+    const id=list[0],many=list.length>1,who=pjShort(id)+(many?' ('+list.length+' in this project)':'');
+    for(const n of PJ_NEED[B]||[]){
       const [sev,kind,title,why,fix,item,between]=n;
       let s=sev,f=fix;
-      if(kind==='level'&&lvl&&!/^(irf540n|nrf24)$/.test(id)){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
+      if(kind==='level'&&lvl&&!/^(irf540n|nrf24)$/.test(B)){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
       let addp=null,ok=false;
-      if(kind==='power'&&item&&PJ_SUPPLY[id]){
-        const have=PJ_SUPPLY[id].find(x=>has.has(x));
+      if(kind==='power'&&item&&PJ_SUPPLY[B]){
+        const have=PJ_SUPPLY[B].find(x=>has.has(x));
         if(have){ok=true;s='info';f='The '+pjShort(have)+' in this project covers it. Connect its + to '+(/VMOT|VM\b/.test(why+fix)?'the driver motor-supply pin':'the supply pin')+' and its − to the driver GND and the ESP32 GND.'}
-        else addp=[PJ_SUPPLY[id][0]];
+        else addp=[PJ_SUPPLY[B][0]];
       }else if(kind==='missing'&&item){
         const pid=/capacitor|µF/i.test(item)?'capacitor':/resistor|Ω/i.test(item)?'resistor':null;
         if(pid&&pjPart(pid)&&!has.has(pid))addp=[pid];
       }
-      add({sev:s,kind,parts:[id],title,text:pjShort(id)+': '+why,fix:f,add:addp});
-      if(ok){}
-      else if(item&&kind!=='power')addExtra(id,item,title,between);
-      else if(item)addExtra(id,item,title);
+      add({sev:s,kind,parts:list.slice(),title,text:who+': '+why,fix:f,add:addp});
+      for(const x of list){
+        if(ok){}
+        else if(item&&kind!=='power')addExtra(x,item,title,between);
+        else if(item)addExtra(x,item,title);
+      }
     }
+  }
+  /* several servos: a PCA9685 gives 16 channels on two pins, and the tester firmware only allows five servo pins */
+  const nServo=ids.filter(i=>PJ_DRIVEN.has(pjBase(i))).length;
+  if(nServo>1&&!has.has('pca9685')&&pjPart('pca9685')){
+    add({sev:nServo>5?'error':'info',kind:'tip',parts:ids.filter(i=>PJ_DRIVEN.has(pjBase(i))),title:nServo>5?'Too many servos for direct pins':'Several servos: use a servo driver',
+      text:nServo+' servos'+(nServo>5?' need more pins than the tester firmware offers (13, 14, 27, 32 and 33).':' each take a pin and a power wire. A PCA9685 drives up to 16 servos from two I2C pins.'),
+      fix:'Add a PCA9685 to the project. The servos then move to its channels and the wiring and tests follow.',add:['pca9685']});
   }
   /* 5. an I2C backpack on a 5 V pull-up shares a bus with 3.3 V parts */
   if(has.has('lcd')){
@@ -12029,14 +12150,14 @@ function pjCheck(ids){
   /* 7. what the rails can supply */
   const rail={'3V3':0,'5V':0};
   for(const id of ids){
-    if(PJ_EXT.has(id))continue;
+    if(PJ_EXT.has(pjBase(id)))continue;
     const rs=w.rows.filter(r=>r.part===id&&r.kind==='pwr').map(r=>pjRail(r.esp));
-    const ma=PJ_MA[id]??12;
+    const ma=PJ_MA[pjBase(id)]??12;
     if(rs.includes('5V'))rail['5V']+=ma;else if(rs.includes('3V3'))rail['3V3']+=ma;
   }
-  if(rail['5V']>450)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(i)&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='5V')),title:'The 5 V rail is close to its limit',
+  if(rail['5V']>450)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(pjBase(i))&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='5V')),title:'The 5 V rail is close to its limit',
     text:'These parts draw roughly '+rail['5V']+' mA from the 5 V pin. A USB port gives about 500 mA, and the board itself needs some.',fix:'Power the heavy parts from a separate 5 V supply with a shared ground, or use a powered USB hub.'});
-  if(rail['3V3']>250)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(i)&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='3V3')),title:'The 3V3 rail is close to its limit',
+  if(rail['3V3']>250)add({sev:'warn',kind:'power',parts:ids.filter(i=>!PJ_EXT.has(pjBase(i))&&w.rows.some(r=>r.part===i&&r.kind==='pwr'&&pjRail(r.esp)==='3V3')),title:'The 3V3 rail is close to its limit',
     text:'These parts draw roughly '+rail['3V3']+' mA from the 3V3 pin, which is the same regulator that runs the ESP32 and its radio.',fix:'Move the hungriest part to its own 3.3 V regulator, or to 5V if it accepts it.'});
   out.sort((a,b)=>pjSevN[a.sev]-pjSevN[b.sev]);
   const n={error:0,warn:0,info:0};out.forEach(o=>n[o.sev]++);
@@ -12474,14 +12595,14 @@ function discPart(it,c){
   switch(it.shape){
     case 'led':return ledPart(two,y,'#e0524b');
     case 'rgbled':return ledPart(xs.slice(0,4),y,'#e6e1d4');
-    case 'res':return it.id==='resistor'?resistor(two[0],two[1],y,[1,0,2]):it.id==='ldr'?ldr(two,y):ntc(two,y);
+    case 'res':return (it.base||it.id)==='resistor'?resistor(two[0],two[1],y,[1,0,2]):(it.base||it.id)==='ldr'?ldr(two,y):ntc(two,y);
     case 'cap':return elcap(two,y);
     case 'dio':return diode(two[0],two[1],y);
-    case 'tr':return to92(xs.slice(0,3).length===3?xs.slice(0,3):xs,y,it.id==='lm35'?'LM35':'2N2222');
+    case 'tr':return to92(xs.slice(0,3).length===3?xs.slice(0,3):xs,y,(it.base||it.id)==='lm35'?'LM35':'2N2222');
     case 'to220':return to220(xs,y);
     case 'dip':return dip(two,y,'PC817');
-    case 'sw':return it.id==='gpio'?pinHeader(two,y):tact(two,y);
-    case 'buzz':return it.id==='pbuzz'?piezo(two,y):buzzer(two,y);
+    case 'sw':return (it.base||it.id)==='gpio'?pinHeader(two,y):tact(two,y);
+    case 'buzz':return (it.base||it.id)==='pbuzz'?piezo(two,y):buzzer(two,y);
     case 'pot':return rotaryPot(xs.slice(0,3).length===3?xs.slice(0,3):xs,y);
   }
   return null;
@@ -12499,7 +12620,7 @@ function extraPart(name,x0,x1,y){
 /* ---------- parts that stay on the bench, joined to the board by a cable ---------- */
 const BS=MM*.8;
 const BD={psu5:[54,36,26],psu12:[54,36,26],psuadj:[54,36,26],servo:[36,16,32],mg996r:[56,24,52],motor:[34,18,18],step28:[80,38,34],nema17:[46,46,66],relay:[50,26,19],ssr:[62,45,24],lcd:[80,36,12],neo:[100,12,6],sk6812:[100,12,6],yfs201:[64,26,36],keypad:[54,60,5],ds18b20:[60,10,8],ph:[60,34,14],pmsa003:[50,38,21],mhz19b:[34,20,12],l298n:[43,43,26],sim800l:[26,24,6],a7670c:[40,40,7],lm2596:[44,22,14],mt3608:[38,18,8],tp4056:[28,18,6],ili9341:[86,50,6]};
-const benchDims=it=>{const d=BD[it.id];return d?d.map(v=>v*BS):null};
+const benchDims=it=>{const d=BD[it.base||it.id];return d?d.map(v=>v*BS):null};
 function bf(b,k){
   const s=BS*(k||1),X=u=>b.cx+u*s,Y=v=>b.cy+v*s;
   const f={s,X,Y,
@@ -12779,17 +12900,17 @@ const BENCH={
     return [o];
   },
 };
-const bench=(it,b)=>{const fn=BENCH[it.id];return fn?fn(b):null};
+const bench=(it,b)=>{const fn=BENCH[it.base||it.id];return fn?fn(b):null};
 
 /* any other module: a plain breakout board with a chip, a regulator, a few small parts and its name */
 function generic(it){
   const w=Math.max(15,(it.n-1)*2.54+8),h=14;
   return {w,h,col:it.color||BLUE,draw(m){
     m.chip(w/2-1,h/2+.4,4.2,4.2,.9,'');reg(m,w-4.2,h/2+2);m.smd(4,h-3,'r');m.smd(4,h-5.4,'c');m.smd(w-4,3.6,'c');m.led(w-3.6,h-3,'#d6453d');
-    m.text(w/2,h-2.4,(it.short||it.id).slice(0,10),1.5,'middle','hi');m.hole(1.2,h-1.2,.6);m.hole(w-1.2,h-1.2,.6);
+    m.text(w/2,h-2.4,(it.short||it.base||it.id).slice(0,10),1.5,'middle','hi');m.hole(1.2,h-1.2,.6);m.hole(w-1.2,h-1.2,.6);
   }};
 }
-const specOf=it=>SPEC[it.id]||generic(it);
+const specOf=it=>SPEC[it.base||it.id]||generic(it);
 const has=id=>!!SPEC[id];
 function module(it,c){return stand(it,c,specOf(it))}
 const dimsOf=it=>{const s=specOf(it);return {w:s.w*MM,h:s.h*MM}};
@@ -12837,20 +12958,21 @@ const hashN=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))|0;re
 function planOf(ids){
   const items=[];
   for(const id of ids){
-    if(SKIP.has(id))continue;
+    const B=pjBase(id);
+    if(SKIP.has(B))continue;
     const p=pjPart(id);if(!p)continue;
     let wr=null;try{wr=p.wiring?W(p.wiring):null}catch(e){}
     const ov=(typeof PJ!=='undefined'&&PJ.ovr&&PJ.ovr[id])||null;
-    const rows=((wr&&wr.rows)||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>r.kind!=='opt').filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp)||/\b(via|through|divider)\b|^Source/i.test(r.pp));
+    const rows=((pjDrivenRows(id,ids)||(wr&&wr.rows))||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>r.kind!=='opt').filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp)||/\b(via|through|divider)\b|^Source/i.test(r.pp));
     const n=Math.max(2,Math.min(9,rows.length||2));
-    const kind=OFF[id]?'off':DISC[id]?'disc':'plug';
+    const kind=OFF[B]?'off':DISC[B]?'disc':'plug';
     const need5=rows.some(r=>r.kind==='pwr'&&pjRail(r.esp)==='5V');
-    const dm=kind==='plug'&&BM.dimsOf({id,n,short:pjShort(id),color:PCB[hashN(id)%PCB.length]});
-    items.push({id,name:p.n,short:pjShort(id),rows,n,kind,sp:dm?Math.max(n,Math.ceil(dm.w/PITCH)):n,shape:OFF[id]||DISC[id]||'mod',need5,color:PCB[hashN(id)%PCB.length],extras:[]});
+    const dm=kind==='plug'&&BM.dimsOf({id:B,base:B,n,short:pjShort(id),color:PCB[hashN(B)%PCB.length]});
+    items.push({id,base:B,name:p.n,short:pjShort(id),rows,n,kind,sp:dm?Math.max(n,Math.ceil(dm.w/PITCH)):n,shape:OFF[B]||DISC[B]||'mod',need5,color:PCB[hashN(B)%PCB.length],extras:[]});
   }
   /* build order: power first, then drivers and regulators, then everything else, motors and actuators last */
   const RANK=id=>/^psu/.test(id)?0:/^(a4988|tmc2209|l298n|l9110s|pca9685|lm2596|mt3608|tp4056|levelshift|pc817|irf540n|transistor|max98357|dfplayer)$/.test(id)?1:/^(nema17|step28|motor|servo|mg996r|relay|ssr|abuzz|pbuzz|neo|sk6812)$/.test(id)?3:2;
-  items.map((it,i)=>[it,i]).sort((a,b)=>RANK(a[0].id)-RANK(b[0].id)||a[1]-b[1]).forEach((x,i)=>{items[i]=x[0]});
+  items.map((it,i)=>[it,i]).sort((a,b)=>RANK(a[0].base)-RANK(b[0].base)||a[1]-b[1]).forEach((x,i)=>{items[i]=x[0]});
   /* lane: 5 V parts at the back (top rail is 5 V), everything else in front (bottom rail is 3V3). Balance when one lane gets long. */
   const w={back:0,front:0};
   const width=it=>it.sp+2+it.extras.length*3;
@@ -13274,6 +13396,8 @@ function bbDest(r){
   if(t==='5V')return '5V rail (top red)';
   if(t==='GND')return 'GND rail (blue)';
   if(t==='GPIO')return 'ESP32 '+pjPin(r.esp);
+  if(/^PCA9685 CH/.test(r.esp))return r.esp.replace('PCA9685 CH','PCA9685 channel ')+', signal pin of its 3-pin header';
+  if(/^PCA9685 V\+/.test(r.esp))return 'PCA9685 V+ (servo power from your 5 to 6 V supply)';
   return r.esp+' (outside the ESP32)';
 }
 function bbStepText(it,n,total,res){
@@ -13297,13 +13421,16 @@ function bbStepText(it,n,total,res){
 }
 function pjBuild(body,pr){
   if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
-  pjSeed(pr.parts);BB.setLayout(pr.layout,pr.boards);
+  pjSeed(pr.parts);BB.setLayout(pr.layout,0);
+  /* every breadboard has its own ESP32: this page shows one at a time, and ps is the parts that sit on it */
+  const sets=pjSets(pr),set=Math.min(PJ.bbSet&&PJ.bbSet.pid===pr.id?PJ.bbSet.k|0:0,sets.length-1),ps=pjSetParts(pr,set);
+  const setBoard=k=>{const b=BRD.by(sets[k].board);return b?b.n:sets[k].board};
   const keep=PJ.bbKeep&&PJ.bbKeep.pid===pr.id?PJ.bbKeep:null;PJ.bbKeep=null;
-  const res=pjCheck(pr.parts),sm=pjCheckSummary(res,pr.parts.length);
+  const res=pjCheck(ps),sm=pjCheckSummary(res,ps.length);
   body.append(el('div',{class:'pj-sum '+sm.cls,role:'status'},el('span',{},el('strong',{},sm.head),sm.tail)));
   /* parts that exist in the project but not on the breadboard (test-only pages) */
-  let view={az:BB.AZ,el:BB.EL},sc=BB.scene(pr.parts,res,view),items=sc.items;const zdef=sc.zdef;view.zoom=zdef;sc=BB.scene(pr.parts,res,view);items=sc.items;
-  const skipped=pr.parts.filter(id=>id!=='esp'&&!items.some(i=>i.id===id));
+  let view={az:BB.AZ,el:BB.EL},sc=BB.scene(ps,res,view),items=sc.items;const zdef=sc.zdef;view.zoom=zdef;sc=BB.scene(ps,res,view);items=sc.items;
+  const skipped=ps.filter(id=>id!=='esp'&&!items.some(i=>i.id===id));
   const total=items.length+2;
   const figHelp=el('p',{class:'sr-only',id:'bb-fig-help'},'Arrow keys spin the board. Enter or Space opens the test of the part just added. The same steps are listed as text under the drawing.');
   const fig=el('div',{class:'bb-fig',role:'group','aria-roledescription':'3D breadboard',tabindex:'0','aria-label':'Breadboard with the project parts','aria-describedby':'bb-fig-help'});
@@ -13325,7 +13452,7 @@ function pjBuild(body,pr){
   let raf=0;
   function redraw(){
     raf=0;if(R3){R3.setView(view);return}
-    sc=BB.scene(pr.parts,res,view);items=sc.items;
+    sc=BB.scene(ps,res,view);items=sc.items;
     svg.classList.add('bb-noanim');
     fig.innerHTML=sc.svg;svg=fig.firstChild;svg.classList.add('bb-noanim');
     fit();go(cur,true);
@@ -13411,21 +13538,24 @@ function pjBuild(body,pr){
     info.replaceChildren();
     if(i===0){
       info.append(el('div',{class:'bb-step'},el('h4',{},'Step 1 of '+total+': Board and ESP32'),
-        el('p',{},'Lay the breadboard flat with the red and blue rails along the top and bottom. Press the ESP32 DevKit in at the left, USB end to the left, so its two rows of pins sit on either side of the centre channel.'),
+        el('p',{},'Lay the breadboard flat with the red and blue rails along the top and bottom. Press the '+(sets.length>1||BRD.cur?setBoard(set):'ESP32 DevKit')+' in at the left, USB end to the left, so its two rows of pins sit on either side of the centre channel.'),
         el('p',{},'Then add four short jumpers: VIN to the top red rail (5V), 3V3 to the bottom red rail (3.3 V), and each GND pin to the blue rail beside it.'),
-        el('p',{class:'hint'},'Drag the drawing to spin and tilt it, or use the arrow keys when it is focused. Rows a to e share one strip per column, and so do rows f to j. The centre channel keeps the two halves apart.')));
+        el('p',{class:'hint'},'Drag the drawing to spin and tilt it, or use the arrow keys when it is focused. Rows a to e share one strip per column, and so do rows f to j. The centre channel keeps the two halves apart.'),
+        /^(devkit|mini32)$/.test(sets[set].board)?null:el('p',{class:'hint'},'The drawing uses the DevKit pin order. On your '+setBoard(set)+' use the pin labels printed on the board.'),
+        sets.length>1?el('p',{class:'hint'},'This is breadboard '+(set+1)+' of '+sets.length+'. Each breadboard has its own ESP32, so pins on different breadboards never clash.'):null));
       return;
     }
     if(i===total-1){
       const nw=items.reduce((a,b)=>a+b.rows.filter(r=>pjRail(r.esp)!=='ext').length,0);
       const c=res.counts;
       info.append(el('div',{class:'bb-step'},el('h4',{},'Step '+total+' of '+total+': All together'),
-        el('p',{},pjPlural(items.length,'part')+' and '+pjPlural(nw,'wire')+' on one breadboard.'+(c.error?' Fix the '+pjPlural(c.error,'item')+' marked red above before you power it.':c.warn?' Check the '+pjPlural(c.warn,'item')+' marked amber above.':' Nothing in the checks blocks it. Connect USB and open the Dashboard.')),
+        el('p',{},pjPlural(items.length,'part')+' and '+pjPlural(nw,'wire')+(sets.length>1?' on breadboard '+(set+1)+'.':' on one breadboard.')+(c.error?' Fix the '+pjPlural(c.error,'item')+' marked red above before you power it.':c.warn?' Check the '+pjPlural(c.warn,'item')+' marked amber above.':' Nothing in the checks blocks it. Connect USB and open the Dashboard.')),
         skipped.length?el('p',{class:'hint'},skipped.map(pjShort).join(', ')+(skipped.length>1?' have':' has')+' no pins to wire, so '+(skipped.length>1?'they are':'it is')+' not drawn.'):null,
         el('div',{class:'pj-acts'},btn('Open the dashboard',()=>pjGo({pid:pr.id,view:'dash'}),'primary'),btn('See every wire',()=>pjGo({pid:pr.id,view:'wire'}),'sm'))));
       return;
     }
     info.append(bbStepText(items[i-1],i+1,total,res));
+    if(sets.length>1)info.lastChild.append(moveRow(items[i-1].id));
   }
   function go(i,quiet){
     cur=Math.max(0,Math.min(total-1,i));
@@ -13460,23 +13590,23 @@ function pjBuild(body,pr){
     if(R3&&R3.mark)R3.mark(-1);else if(svg)svg.querySelectorAll('.bbp.sel').forEach(g=>g.classList.remove('sel'));
   }
   function openTest(id,k,sx){
-    const p=(typeof PARTS!=='undefined'&&PARTS.find(x=>x.id===id))||null;
-    if(!p||typeof TESTS==='undefined'||!TESTS[id]){toast((p?p.n:'That part')+' has no live test.');return}
+    const p=pjPart(id)||null,bid=pjBase(id);
+    if(!p||typeof TESTS==='undefined'||!TESTS[bid]){toast((p?p.n:'That part')+' has no live test.');return}
     if(tsel===id&&testFold.classList.contains('on'))return;
     townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=id;
     const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
-    try{const r=TESTS[id](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
+    try{const r=TESTS[bid](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prevO;HL=prevHL}
     townLives=own.lives;PJ.ctx=id;
     const mv=(pr.pins&&pr.pins[id])?Object.keys(pr.pins[id]).map(k=>'GPIO'+k+' is sent as GPIO'+pr.pins[id][k]):[];
     tpanel.replaceChildren(
-      el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},subOfB(p))),el('div',{class:'bb-tc'},resultChip(id),btn('Close',closeTest,'sm'))),
+      el('header',{class:'bb-th'},el('div',{},el('h4',{},p.n),el('p',{class:'pj-ts'},PJ.drv&&PJ.drv[id]!=null?'Driven by PCA9685 channel '+PJ.drv[id]+' over I2C, no GPIO pin':subOfB(p))),el('div',{class:'bb-tc'},resultChip(bid),btn('Add another',()=>addPart(bid),'sm'),btn('Close',closeTest,'sm'))),
       mv.length?el('p',{class:'pj-moved'},el('b',{},'Pin moved in this project: '),mv.join(', ')+'. The test sends the new pin.'):'',
-      tb,typeof verdictBar==='function'?verdictBar(p):'');
+      tb,typeof verdictBar==='function'?verdictBar(PARTS.find(x=>x.id===bid)||p):'');
     clearTimeout(closeT);
     /* the code page for this part goes under the board */
     codeBox.replaceChildren();
-    if(id!=='power'&&typeof codePanel==='function'){try{codeBox.append(el('h3',{class:'pj-h'},'Your code for '+p.n),codePanel(p))}catch(e){console.warn('code panel',e)}}
+    if(bid!=='power'&&typeof codePanel==='function'){try{codeBox.append(el('h3',{class:'pj-h'},'Your code for '+p.n),codePanel(PARTS.find(x=>x.id===bid)||p))}catch(e){console.warn('code panel',e)}}
     showFolds(true);
     /* and the camera moves in on the part */
     if(R3&&R3.steps&&R3.steps[k]&&R3.fly){
@@ -13511,13 +13641,34 @@ function pjBuild(body,pr){
   const arrBtn=btn('Arrange',()=>{arrange=!arrange;arrBtn.setAttribute('aria-pressed',String(arrange));arrBtn.classList.toggle('primary',arrange);fig.classList.toggle('arr',arrange);if(arrange&&cur<total-1)go(total-1,true)},'sm');
   arrBtn.setAttribute('aria-pressed','false');arrBtn.hidden=!want3;arrBtn.title='Drag a part to move it along the board, or into the other half';
   const autoBtn=btn('Auto layout',async()=>{pr.layout={};await pjSave(pr);rebuild(cur)},'sm');autoBtn.hidden=!(pr.layout&&Object.keys(pr.layout).length);
-  /* boards: clip another 830 point board on the right, or take the last empty one off */
-  const nbNow=sc.geo.nb,nbAuto=sc.geo.nbAuto;
-  const setBoards=async n=>{pr.boards=n;await pjSave(pr);rebuild(cur)};
-  const bAdd=btn('Add breadboard',()=>setBoards(nbNow+1),'sm'),bDel=btn('Remove breadboard',()=>setBoards(Math.max(1,nbNow-1)),'sm');
-  bAdd.disabled=nbNow>=4;bDel.disabled=nbNow<=nbAuto;
-  bDel.title=nbNow<=nbAuto?'The parts need every board that is there':'Take the last empty board off';
-  const bCount=el('span',{class:'bb-count'},nbNow===1?'1 breadboard':nbNow+' breadboards');
+  /* breadboards: each one has its own ESP32 (the board chosen in the header when it is added) and its own parts */
+  const pickSet=k=>{PJ.bbSet={pid:pr.id,k};pjGo({pid:pr.id,view:'build'})};
+  const bAdd=btn('Add breadboard',async()=>{
+    pr.sets=sets.concat([{board:BRD.cur||'devkit'}]);await pjSave(pr);pickSet(pr.sets.length-1);
+  },'sm');
+  bAdd.disabled=sets.length>=4;bAdd.title=sets.length>=4?'A project holds up to four breadboards':'Adds a new breadboard with its own '+(BRD.cur&&BRD.by(BRD.cur)?BRD.by(BRD.cur).n:'ESP32')+'. You choose which parts go on it.';
+  const bDel=btn('Remove this breadboard',async()=>{
+    pr.sets=sets.slice(0,-1);await pjSave(pr);pickSet(set-1);
+  },'sm');
+  bDel.disabled=!(set>0&&set===sets.length-1&&ps.length===0);
+  bDel.title=bDel.disabled?(set===0?'The first breadboard stays':'Move its parts to another breadboard first, and only the last breadboard can go'):'Takes this empty breadboard off';
+  bDel.hidden=sets.length<2;
+  const bCount=el('span',{class:'bb-bcount'},sets.length===1?'1 breadboard':'Breadboard '+(set+1)+' of '+sets.length);
+  /* which breadboard a part is on */
+  function moveRow(id){
+    const sel=el('select',{class:'pj-in bb-mvs','aria-label':'Breadboard for '+pjShort(id)},...sets.map((s,k)=>el('option',{value:String(k)},'Breadboard '+(k+1)+' ('+setBoard(k)+')')));
+    sel.value=String(pjSetOf(id));
+    sel.addEventListener('change',async()=>{
+      const k=+sel.value;pr.where=pr.where||{};if(k>0)pr.where[id]=k;else delete pr.where[id];
+      PJ.where=pr.where;delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
+      await pjSave(pr);toast(pjShort(id)+' is now on breadboard '+(k+1));pickSet(k);
+    });
+    return el('label',{class:'bb-mv'},el('span',{class:'lbl'},'On breadboard'),sel);
+  }
+  const setTabs=sets.length>1?el('div',{class:'bb-sets',role:'tablist','aria-label':'Breadboards'},...sets.map((s,k)=>{
+    const t=el('button',{type:'button',role:'tab','aria-selected':String(k===set),class:'bb-set'+(k===set?' on':''),onclick:()=>{if(k!==set)pickSet(k)}},el('b',{},'Breadboard '+(k+1)),el('span',{},setBoard(k)+', '+pjPlural(pjSetParts(pr,k).length,'part')));
+    return t;
+  })):null;
   /* add a part from here, without leaving the build */
   const pop=el('div',{class:'bb-pop',role:'dialog','aria-label':'Add a part to this project'});pop.hidden=true;
   const pq=el('input',{type:'search',class:'pj-in','aria-label':'Search parts',placeholder:'Search parts, such as BME280, servo or GPS',autocomplete:'off',oninput:()=>fillPop()}),plist=el('ul',{class:'bb-pl'});
@@ -13527,19 +13678,20 @@ function pjBuild(body,pr){
     for(const g of GROUPS){
       if(g.n==='Start')continue;
       for(const id of g.ids){
-        const p=pjPart(id);if(!p||id==='esp'||BRD.hidden(p)||p.home||p.overview||p.projects||pr.parts.includes(id))continue;
+        const p=pjPart(id);if(!p||id==='esp'||BRD.hidden(p)||p.home||p.overview||p.projects)continue;
         if(!canDraw(id))continue;
         if(t.length&&!t.every(w=>navHay(p).includes(w)))continue;
         if(n>=80)break;n++;
-        plist.append(el('li',{},el('button',{type:'button',class:'bb-po',onclick:()=>addPart(id)},el('span',{class:'bb-pon'},p.n),el('span',{class:'bb-pog'},g.n))));
+        plist.append(el('li',{},el('button',{type:'button',class:'bb-po',onclick:()=>addPart(id)},el('span',{class:'bb-pon'},p.n),el('span',{class:'bb-pog'},pr.parts.includes(id)?g.n+', add another copy':g.n))));
       }
     }
     if(!n)plist.append(el('li',{class:'pj-dim bb-pnone'},'No matching parts.'));
   }
   async function addPart(id){
     if(pr.parts.length>=PJ.max){toast('A project holds up to '+PJ.max+' parts. Remove one first.');return}
-    pr.parts.push(id);delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
-    await pjSave(pr);toast('Added '+pjName(id));rebuild(999);
+    const nid=pr.parts.includes(id)?pjNextId(pr.parts,id):id;
+    pr.parts.push(nid);if(set>0){pr.where=pr.where||{};pr.where[nid]=set}PJ.where=pr.where||{};delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
+    await pjSave(pr);toast('Added '+pjName(nid));rebuild(999);
   }
   pop.append(pq,plist);
   const addBtn=btn('Add part',()=>{const o=pop.hidden;pop.hidden=!o;addBtn.setAttribute('aria-expanded',String(o));if(o){fillPop();pq.value='';setTimeout(()=>pq.focus(),30)}},'sm');
@@ -13548,7 +13700,7 @@ function pjBuild(body,pr){
   const ctl2=el('div',{class:'bb-ctl bb-ctl2'},addBtn,arrBtn,autoBtn,el('span',{class:'bb-sep','aria-hidden':'true'}),bAdd,bDel,bCount,pop);
   const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip)),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count),ctl2);
   document.addEventListener('pointerdown',function away(e){if(!stage.isConnected){document.removeEventListener('pointerdown',away);return}if(!pop.hidden&&!pop.contains(e.target)&&e.target!==addBtn){pop.hidden=true;addBtn.setAttribute('aria-expanded','false')}});
-  body.append(figHelp,el('h3',{class:'pj-h'},'Build it on a breadboard'),
+  body.append(figHelp,el('h3',{class:'pj-h'},sets.length>1?'Build it on '+sets.length+' breadboards':'Build it on a breadboard'),setTabs,
     bbEl=el('div',{class:'bb'},
       stage,
       el('div',{class:'bb-side'},stepsFold,testFold),
@@ -13558,10 +13710,10 @@ function pjBuild(body,pr){
   /* the flat drawing: used when 3D is not available, and when the browser takes the graphics memory back mid-session */
   const flat=why=>{
     if(R3){try{R3.dispose()}catch(e){}}
-    R3=null;arrange=false;pd=null;arrBtn.hidden=true;fig.classList.remove('gl','arr');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(pr.parts,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
+    R3=null;arrange=false;pd=null;arrBtn.hidden=true;fig.classList.remove('gl','arr');view={az:BB.AZ,el:BB.EL,zoom:zdef};sc=BB.scene(ps,res,view);items=sc.items;fig.innerHTML=sc.svg;svg=fig.firstChild;fit();go(cur,true);
     if(why){const n=el('p',{class:'pj-warn',role:'status'},why+' ',el('button',{type:'button',class:'pj-link',onclick:()=>pjGo({pid:pr.id,view:'build'})},'Try 3D again'));fig.parentNode&&fig.parentNode.insertBefore(n,fig)}
   };
-  if(want3)BB3.mount(fig,pr.parts,res,{onLost:()=>flat('The 3D view stopped because the browser took back the graphics memory. This is the flat drawing.')}).then(r=>{
+  if(want3)BB3.mount(fig,ps,res,{onLost:()=>flat('The 3D view stopped because the browser took back the graphics memory. This is the flat drawing.')}).then(r=>{
     R3=r;fig.classList.add('gl');view=keep&&keep.view?{...keep.view}:{az:BB.AZ,el:BB.EL,zoom:1};R3.setView(view);R3.show(cur,total,true);arrBtn.hidden=false;if(keep&&keep.arr)arrBtn.click();
   }).catch(e=>{
     console.warn('3D view unavailable, using the flat drawing',e);
