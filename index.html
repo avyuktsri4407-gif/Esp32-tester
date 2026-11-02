@@ -1041,8 +1041,8 @@ html.bp-busy{overflow:hidden}
 .bpd-arena{position:relative;height:clamp(520px,calc(100vh - 275px),860px);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
 .bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.bpd-big{position:absolute;left:-4%;right:-4%;top:41%;align-items:baseline;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
-.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);color:#e2c581;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big{position:absolute;left:-4%;right:-4%;top:41%;align-items:center;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
+.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);scale:1 var(--sy,1);color:#e2c581;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:.9;transform:none}}
@@ -10168,7 +10168,7 @@ function pickerDock(b){
     bigEl.style.fontSize=Math.round(Math.min(SH*.62,SW*.86*100/w))+'px';
   }
   /* the middle letters are larger than the outer ones, all on one baseline */
-  const bigScale=(i,n)=>{const m=(n-1)/2,d=m?Math.abs(i-m)/m:0;return (.74+.5*Math.pow(1-d,1.6)).toFixed(3)};
+  const bigScale=(i,n)=>{const m=(n-1)/2,d=m?Math.abs(i-m)/m:0,k=Math.pow(1-d,.85);return (.78+.42*k).toFixed(3)+';--sy:'+(.9+.24*k).toFixed(3)};
   function setBig(txt){
     const old=bigEl;
     bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i+';--s:'+bigScale(i,[...txt].length)},c===' '?' ':c)));
