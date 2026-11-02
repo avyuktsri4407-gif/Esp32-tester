@@ -1804,6 +1804,9 @@ body{overflow-x:clip}
 .hm-big,.bpd-big{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),var(--vmask);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),var(--vmask);-webkit-mask-composite:source-in;mask-composite:intersect}
 .hm-big{--vmask:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
 .bpd-big{--vmask:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.8) 100%)}
+
+/* dep_x101: blur only the far left and right of the big type, as a masked backdrop blur over the text */
+.hm-big::after,.bpd-big::after{content:'';position:absolute;inset:0;pointer-events:none;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);-webkit-mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.6) 7%,transparent 17%,transparent 83%,rgba(0,0,0,.6) 93%,#000 100%);mask-image:linear-gradient(90deg,#000 0,rgba(0,0,0,.6) 7%,transparent 17%,transparent 83%,rgba(0,0,0,.6) 93%,#000 100%)}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -9840,15 +9843,15 @@ function homeMount(root,S,FG,HM_CH){
       bigEl.style.perspective='';
       /* perspective: letters turn away from the middle on their own vanishing points, edge letters a touch smaller, packed edge to edge */
       const L=sp.map(c=>{
-        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,.75)*.85,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.min(.8,Math.pow(u,.5)*.9),w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
         const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
-        return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
+        return {c,xc,w,u,sx,th,d,left,right,sy:1.1-.3*u};
       });
       const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
       L.forEach(o=>{
         const mid=x-o.left;x+=o.right-o.left;
         o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
-        o.c.style.setProperty('--bl',(Math.pow(o.u,4)*fs*.007).toFixed(2)+'px');
+        o.c.style.setProperty('--bl','0px');
       });
       return T;
     };
@@ -10225,15 +10228,15 @@ function pickerDock(b){
     sp.forEach(c=>{c.style.transform='';c.style.scale=''});
     const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
     const L=sp.map(c=>{
-      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,.75)*.85,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.min(.8,Math.pow(u,.5)*.9),w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
       const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
-      return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
+      return {c,xc,w,u,sx,th,d,left,right,sy:1.1-.3*u};
     });
     const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
     L.forEach(o=>{const mid=x-o.left;x+=o.right-o.left;
       o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scaleX('+o.sx.toFixed(4)+')';
       o.c.style.scale='1 '+o.sy.toFixed(4);
-      o.c.style.setProperty('--bl',(Math.pow(o.u,4)*(parseFloat(bigEl.style.fontSize)||200)*.007).toFixed(2)+'px')});
+      o.c.style.setProperty('--bl','0px')});
   }
   function fitWarp(){
     if(!bigEl)return;
