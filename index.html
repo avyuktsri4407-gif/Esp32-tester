@@ -1778,6 +1778,11 @@ details[open]::details-content{height:auto}
 /* dep_x88: the step pills must scroll inside the page on a phone, not widen it */
 .bb,.bb>*,.bb-side,.bb-stage{min-width:0}
 .bb-pills{max-width:100%;min-width:0}
+
+/* dep_x89: the board wheel runs edge to edge of the window, so boards slide off the screen instead of being cut at the content margin */
+.bpd-arena{width:100vw;max-width:100vw;margin-inline:calc(50% - 50vw)}
+.bpd-nav.l{left:max(8px,2vw)}.bpd-nav.r{right:max(8px,2vw)}
+body{overflow-x:clip}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
