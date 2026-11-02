@@ -10365,7 +10365,7 @@ function pickerDock(b){
   }
   /* scroll wheel: a notch is one step, a trackpad swipe turns it continuously and settles on the nearest board */
   arena.addEventListener('wheel',e=>{
-    if(e.ctrlKey||e.metaKey)return;
+    if(e.ctrlKey||e.metaKey||!window.wheelIn||!wheelIn(arena))return;
     e.preventDefault();
     const dd=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY,now=performance.now();
     if(e.deltaMode===1||Math.abs(dd)>=70){if(now-lastStep<140)return;lastStep=now;step(dd>0?1:-1);return}
@@ -13531,7 +13531,7 @@ function pjBuild(body,pr){
   });
   fig.addEventListener('pointercancel',()=>{const p=pd;pd=null;fig.classList.remove('grab');if(p&&R3){R3.lift(p.k);R3.ghost(null)}});
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
-  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt)return;e.preventDefault();cancelAnimationFrame(twRaf);view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
+  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt||!window.wheelIn||!wheelIn(fig))return;e.preventDefault();cancelAnimationFrame(twRaf);view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
   names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i+1)),nm))));
   function text(i){
@@ -13700,7 +13700,7 @@ function pjBuild(body,pr){
   const ctl2=el('div',{class:'bb-ctl bb-ctl2'},addBtn,arrBtn,autoBtn,el('span',{class:'bb-sep','aria-hidden':'true'}),bAdd,bDel,bCount,pop);
   const stage=el('div',{class:'bb-stage'},el('div',{class:'bb-view'},fig,el('div',{class:'bb-ih'},ibtn,tip)),el('div',{class:'bb-ctl'},prev,next,el('span',{class:'bb-sep','aria-hidden':'true'}),spinL,spinR,zin,zout,moveBtn,reset,count),ctl2);
   document.addEventListener('pointerdown',function away(e){if(!stage.isConnected){document.removeEventListener('pointerdown',away);return}if(!pop.hidden&&!pop.contains(e.target)&&e.target!==addBtn){pop.hidden=true;addBtn.setAttribute('aria-expanded','false')}});
-  body.append(figHelp,el('h3',{class:'pj-h'},sets.length>1?'Build it on '+sets.length+' breadboards':'Build it on a breadboard'),setTabs,
+  body.append(figHelp,el('h3',{class:'pj-h'},sets.length>1?'Build it on '+sets.length+' breadboards':'Build it on a breadboard'),...(setTabs?[setTabs]:[]),
     bbEl=el('div',{class:'bb'},
       stage,
       el('div',{class:'bb-side'},stepsFold,testFold),
@@ -14369,6 +14369,14 @@ NEWTESTS.hc12=function(b){
   pHc(b);
   b.append(hcLinkBlock());
 };
+/* Who owns a wheel gesture: the element under the pointer when it began. A new gesture starts after a short pause, so a scroll that begins
+   outside a zoomable box and drifts over it keeps scrolling the page, and one that begins inside the box keeps zooming it. */
+(function(){
+  if(window.wheelIn)return;
+  let last=0,tg=null;
+  addEventListener('wheel',e=>{const n=performance.now();if(n-last>180)tg=e.target;last=n},{capture:true,passive:true});
+  window.wheelIn=el=>!!(tg&&el&&el.contains(tg));
+})();
 /* Smooth page scrolling: wheel notches glide with inertia instead of jumping. Skips touch, reduced motion, pinch zoom,
    scrollable inner panels and anything that already handles the wheel itself. */
 (function(){
@@ -14383,7 +14391,7 @@ NEWTESTS.hc12=function(b){
         if(dy<0&&el.scrollTop>0)return true;
         if(dy>0&&el.scrollTop+el.clientHeight<el.scrollHeight-1)return true;
       }
-      if(el.tagName==='TEXTAREA'||el.isContentEditable||el.classList&&(el.classList.contains('bb-gl')||el.classList.contains('bpd-arena')))return true;
+      if(el.tagName==='TEXTAREA'||el.isContentEditable)return true;
     }
     return false;
   };
