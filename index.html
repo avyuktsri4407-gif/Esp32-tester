@@ -10811,9 +10811,11 @@ function tipHide(){clearTimeout(tipT);tipT=0;if(tipFor){tipFor.removeAttribute('
 function tipShow(b,txt){
   if(!tipEl){tipEl=el('div',{class:'tip',id:'tip',role:'tooltip',hidden:true});document.body.append(tipEl)}
   tipEl.textContent=txt;tipEl.hidden=false;tipFor=b;b.setAttribute('aria-describedby','tip');
+  tipEl.style.left='0px';tipEl.style.top='0px';
+  const vw=document.documentElement.clientWidth||innerWidth,vh=document.documentElement.clientHeight||innerHeight;
   const r=b.getBoundingClientRect(),w=tipEl.offsetWidth,h=tipEl.offsetHeight;
-  let x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.bottom+10;
-  if(y+h>innerHeight-8)y=Math.max(8,r.top-h-10);
+  let x=Math.max(8,Math.min(vw-w-8,r.left+r.width/2-w/2)),y=r.bottom+10;
+  if(y+h>vh-8)y=Math.max(8,r.top-h-10);
   tipEl.style.left=x+'px';tipEl.style.top=y+'px';
 }
 function tipInit(){
