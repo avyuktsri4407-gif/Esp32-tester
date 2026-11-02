@@ -1799,6 +1799,11 @@ body{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){.bpd-nav,.bpd-hint{transition:none}}
 
 .hm-big span{filter:blur(var(--bl,0px))}
+
+/* dep_x100: soft horizontal fade on the far left and right of the big type */
+.hm-big,.bpd-big{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),var(--vmask);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),var(--vmask);-webkit-mask-composite:source-in;mask-composite:intersect}
+.hm-big{--vmask:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
+.bpd-big{--vmask:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.8) 100%)}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -9835,7 +9840,7 @@ function homeMount(root,S,FG,HM_CH){
       bigEl.style.perspective='';
       /* perspective: letters turn away from the middle on their own vanishing points, edge letters a touch smaller, packed edge to edge */
       const L=sp.map(c=>{
-        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,1.1)*.66,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,.75)*.85,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
         const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
         return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
       });
@@ -9843,7 +9848,7 @@ function homeMount(root,S,FG,HM_CH){
       L.forEach(o=>{
         const mid=x-o.left;x+=o.right-o.left;
         o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
-        o.c.style.setProperty('--bl',(Math.pow(o.u,2.4)*fs*.006).toFixed(2)+'px');
+        o.c.style.setProperty('--bl',(Math.pow(o.u,4)*fs*.007).toFixed(2)+'px');
       });
       return T;
     };
@@ -10220,7 +10225,7 @@ function pickerDock(b){
     sp.forEach(c=>{c.style.transform='';c.style.scale=''});
     const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
     const L=sp.map(c=>{
-      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,1.1)*.66,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,.75)*.85,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
       const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
       return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
     });
@@ -10228,7 +10233,7 @@ function pickerDock(b){
     L.forEach(o=>{const mid=x-o.left;x+=o.right-o.left;
       o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scaleX('+o.sx.toFixed(4)+')';
       o.c.style.scale='1 '+o.sy.toFixed(4);
-      o.c.style.setProperty('--bl',(Math.pow(o.u,2.4)*(parseFloat(bigEl.style.fontSize)||200)*.006).toFixed(2)+'px')});
+      o.c.style.setProperty('--bl',(Math.pow(o.u,4)*(parseFloat(bigEl.style.fontSize)||200)*.007).toFixed(2)+'px')});
   }
   function fitWarp(){
     if(!bigEl)return;
@@ -10273,13 +10278,13 @@ function pickerDock(b){
       const y=K*x*x,ang=Math.atan(2*K*x)*57.3*.9;
       const bob=0,pop=ph*ph*(3-2*ph)*SH*.05;
       const eg=clamp(1-((SW/2-Math.abs(x))-hw*.12)/(hw*.75),0,1);
-      const op=clamp(1-(ad-3.2)/.9,0,1)*(1-.3*eg);
+      const op=clamp(1-(ad-3.2)/.9,0,1)*(1-.1*eg);
       const fg=o.fig,vis=op>.02;
       const tr='translate3d('+(mid+x-hw/2).toFixed(1)+'px,'+(YB+y+pop-hh-bob).toFixed(1)+'px,0) scale('+sc.toFixed(4)+') rotate('+ang.toFixed(2)+'deg)';
       if(tr!==o._tr){o._tr=tr;fg.style.transform=tr}
       const ops=op.toFixed(3),zs=String(60-Math.round(ad*10)),vs=vis?'visible':'hidden';
       if(ops!==o._op){o._op=ops;fg.style.opacity=ops}
-      const bls=eg>.04?'blur('+(Math.round(eg*eg*10)/2).toFixed(1)+'px)':'';
+      const bls=eg>.2?'blur('+(Math.round(eg*eg*eg*4)/2).toFixed(1)+'px)':'';
       if(bls!==o._bl){o._bl=bls;fg.style.filter=bls}
       if(zs!==o._z){o._z=zs;fg.style.zIndex=zs}
       if(vs!==o._v){o._v=vs;fg.style.visibility=vs}
