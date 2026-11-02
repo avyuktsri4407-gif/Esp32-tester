@@ -1042,7 +1042,7 @@ html.bp-busy{overflow:hidden}
 .bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
 .bpd-big{position:absolute;left:-4%;right:-4%;top:41%;align-items:center;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
-.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);scale:1 var(--sy,1);color:transparent;padding:.1em 0;background:linear-gradient(180deg,hsl(46 95% calc(74% + var(--k,0)*12%)) 0%,hsl(38 72% calc(54% + var(--k,0)*8%)) 46%,hsl(20 62% calc(32% - var(--k,0)*0%)) 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 22px 28px rgba(0,0,0,.6)) drop-shadow(0 0 46px rgba(232,170,80,calc(var(--k,0)*.3)));opacity:1;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);scale:1 var(--sy,1);color:transparent;padding:.1em 0;background:linear-gradient(180deg,oklch(calc(.87 + var(--k,0)*.07) .05 88) 0%,oklch(calc(.71 + var(--k,0)*.05) .052 80) 46%,oklch(.4 .035 62) 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 22px 28px rgba(0,0,0,.6)) drop-shadow(0 0 46px rgba(222,200,150,calc(var(--k,0)*.1)));opacity:1;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:1;transform:none}}
@@ -1789,8 +1789,8 @@ body{overflow-x:clip}
 
 /* dep_x92: livelier board picker */
 .bpd-arena{isolation:isolate}
-.bpd-arena::before{content:'';position:absolute;inset:-6% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 52% 42% at 50% 44%,rgba(232,170,80,.17),transparent 70%),radial-gradient(ellipse 70% 30% at 50% 100%,rgba(90,120,210,.13),transparent 72%),radial-gradient(rgba(255,255,255,.075) 1px,transparent 1.5px) 0 0/26px 26px;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%)}
-.bpd-head h2{background:linear-gradient(180deg,#fff 20%,#e6d29c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bpd-arena::before{content:'';position:absolute;inset:-6% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 52% 42% at 50% 44%,rgba(214,192,150,.085),transparent 70%),radial-gradient(ellipse 70% 30% at 50% 100%,rgba(110,130,190,.06),transparent 72%),radial-gradient(rgba(255,255,255,.055) 1px,transparent 1.5px) 0 0/26px 26px;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%)}
+.bpd-head h2{background:linear-gradient(180deg,#fff 25%,#e4d9bd);-webkit-background-clip:text;background-clip:text;color:transparent}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
