@@ -9779,7 +9779,7 @@ function homeStage(big,bd){
   const plate=el('div',{class:'hm-plate isoc'},gl,svg,ov,call);
   const hit=el('div',{class:'hm-hit',tabindex:'0',role:'group','aria-label':'Board view. Left and right arrow keys turn the board.'});
   const node=el('figure',{class:'hm-stage'},plate,hit,corner('rt','Scroll to turn, drag to spin'),corner('br','',{'data-readout':''}));
-  const letters=[...big].map((c,i)=>el('span',{style:'--i:'+i},c));
+  const letters=[...big].map((c,i)=>el('span',{style:'--i:'+i+(c===' '?';width:.12em;overflow:hidden':'')},c));
   const intro=el('div',{class:'hm-intro','aria-hidden':'true'},
     el('p',{class:'hm-big',style:'font-size:calc(clamp(96px,'+Math.min(28,140/big.length).toFixed(1)+'vw,'+Math.round(Math.min(480,2400/big.length))+'px)*var(--wf,1))'},...letters),
     el('p',{class:'hm-scrollcue'},el('span',{}),'Scroll'));
@@ -9842,8 +9842,9 @@ function homeMount(root,S,FG,HM_CH){
       const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1,fs=parseFloat(getComputedStyle(bigEl).fontSize)||300;
       bigEl.style.perspective='';
       /* smooth curve: every letter turns away from the middle on an eased angle, shrinks on the same curve, and is packed against its neighbour by its projected edges */
+      const UL=Math.max(.3,...sp.filter(c=>c.textContent.trim()&&c.offsetLeft+c.offsetWidth/2<Wd/2).map(c=>Math.abs(c.offsetLeft+c.offsetWidth/2-Wd/2)/half)),UR=Math.max(.3,...sp.filter(c=>c.textContent.trim()&&c.offsetLeft+c.offsetWidth/2>=Wd/2).map(c=>Math.abs(c.offsetLeft+c.offsetWidth/2-Wd/2)/half));
       const L=sp.map(c=>{
-        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=w*sx*2.2,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)*.8/(xc<0?UL:UR)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=Math.max(w*sx*2.2,tot*.32),sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
         const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
         return {c,xc,w,u,sx,sy:sc,th,d,left,right};
     });
@@ -10229,8 +10230,9 @@ function pickerDock(b){
     sp.forEach(c=>{c.style.transform='';c.style.scale=''});
     const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
     /* smooth curve: every letter turns away from the middle on an eased angle, shrinks on the same curve, and is packed against its neighbour by its projected edges */
+    const UL=Math.max(.3,...sp.filter(c=>c.textContent.trim()&&c.offsetLeft+c.offsetWidth/2<Wd/2).map(c=>Math.abs(c.offsetLeft+c.offsetWidth/2-Wd/2)/half)),UR=Math.max(.3,...sp.filter(c=>c.textContent.trim()&&c.offsetLeft+c.offsetWidth/2>=Wd/2).map(c=>Math.abs(c.offsetLeft+c.offsetWidth/2-Wd/2)/half));
     const L=sp.map(c=>{
-      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=w*sx*2.2,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)*.8/(xc<0?UL:UR)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=Math.max(w*sx*2.2,tot*.32),sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
       const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
       return {c,xc,w,u,sx,sy:sc,th,d,left,right};
     });
@@ -10242,12 +10244,12 @@ function pickerDock(b){
   }
   function fitWarp(){
     if(!bigEl)return;
-    for(let pass=0;pass<3;pass++){
+    for(let pass=0;pass<5;pass++){
       warpBig();
       const wr=bigw.getBoundingClientRect(),H=wr.height;if(!H||!wr.width)return;
       let l=1e9,r=-1e9,t=1e9,bt=-1e9;
       [...bigEl.children].forEach(c=>{const q=c.getBoundingClientRect(),k=q.height*.12;l=Math.min(l,q.left);r=Math.max(r,q.right);t=Math.min(t,q.top+k);bt=Math.max(bt,q.bottom-k)});
-      const cx=(l+r)/2,cy=(t+bt)/2,hw2=Math.min(cx-(wr.left+10),wr.right-10-cx),hh2=Math.min(cy-(wr.top+SH*.09),wr.top+H*.7-cy);
+      const cx=(l+r)/2,cy=(t+bt)/2,mg=Math.max(10,wr.width*.07),hw2=Math.min(cx-(wr.left+mg),wr.right-mg-cx),hh2=Math.min(cy-(wr.top+SH*.09),wr.top+H*.7-cy);
       const f=Math.max(.3,Math.min(1.6,hw2/((r-l)/2),hh2/((bt-t)/2)));
       if(Math.abs(f-1)<.015)break;
       bigEl.style.fontSize=(parseFloat(bigEl.style.fontSize)*f).toFixed(1)+'px';
