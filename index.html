@@ -850,7 +850,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 .hm.in-intro .hm-ihit{display:block}
 .hm-bang{will-change:transform,opacity;position:fixed;left:50%;top:55%;width:120vmax;height:120vmax;margin:-60vmax 0 0 -60vmax;border-radius:50%;pointer-events:none;z-index:3;opacity:0;background:radial-gradient(circle,transparent 57%,rgba(243,221,160,.55) 59.5%,rgba(216,184,119,.12) 63%,transparent 68%);animation:hmbang 1.15s .3s cubic-bezier(.12,.7,.2,1) forwards}
 .hm-bang::after{content:'';position:absolute;left:50%;top:50%;width:46vmin;height:46vmin;margin:-23vmin 0 0 -23vmin;border-radius:50%;background:radial-gradient(circle,rgba(243,221,160,.5),transparent 68%);opacity:0;animation:hmflash .7s .3s ease-out forwards}
-@keyframes hmslam{0%{opacity:0;transform:translate3d(0,9vh,0) scale(1.8)}55%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes hmslam{0%{opacity:0;translate:0 9vh;scale:1.8}55%{opacity:1}100%{opacity:1;translate:0 0;scale:1}}
 @keyframes hmfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes hmcue{0%,100%{transform:scaleY(.25);opacity:.5}50%{transform:scaleY(1);opacity:1}}
 @keyframes hmbang{0%{opacity:1;transform:scale(.02)}100%{opacity:0;transform:scale(1)}}
@@ -1791,6 +1791,12 @@ body{overflow-x:clip}
 .bpd-arena{isolation:isolate}
 .bpd-arena::before{content:'';position:absolute;inset:-6% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 52% 42% at 50% 44%,rgba(214,192,150,.085),transparent 70%),radial-gradient(ellipse 70% 30% at 50% 100%,rgba(110,130,190,.06),transparent 72%),radial-gradient(rgba(255,255,255,.055) 1px,transparent 1.5px) 0 0/26px 26px;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 28%,transparent 100%)}
 .bpd-head h2{background:linear-gradient(180deg,#fff 25%,#e4d9bd);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* dep_x97: arrows and hint rest out of sight */
+.bpd-nav,.bpd-hint{transition:opacity .45s ease,transform .16s cubic-bezier(.23,1,.32,1),background .16s}
+.bpd-arena.idle .bpd-nav{opacity:0;pointer-events:none}
+.bpd-arena.used .bpd-hint{opacity:0}
+@media (prefers-reduced-motion:reduce){.bpd-nav,.bpd-hint{transition:none}}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -9765,7 +9771,7 @@ function homeStage(big,bd){
   const node=el('figure',{class:'hm-stage'},plate,hit,corner('rt','Scroll to turn, drag to spin'),corner('br','',{'data-readout':''}));
   const letters=[...big].map((c,i)=>el('span',{style:'--i:'+i},c));
   const intro=el('div',{class:'hm-intro','aria-hidden':'true'},
-    el('p',{class:'hm-big',style:'font-size:clamp(96px,'+Math.min(28,140/big.length).toFixed(1)+'vw,'+Math.round(Math.min(480,2400/big.length))+'px)'},...letters),
+    el('p',{class:'hm-big',style:'font-size:calc(clamp(96px,'+Math.min(28,140/big.length).toFixed(1)+'vw,'+Math.round(Math.min(480,2400/big.length))+'px)*var(--wf,1))'},...letters),
     el('p',{class:'hm-scrollcue'},el('span',{}),'Scroll'));
   const ihit=el('div',{class:'hm-ihit','aria-hidden':'true'});
   return {node,plate,svg,ov,call,hit,intro,ihit,gl,extra:[intro,ihit]};
@@ -9807,6 +9813,7 @@ function homeMount(root,S,FG,HM_CH){
   const geo=()=>{const r=slot.getBoundingClientRect();return {l:r.left,t:r.top,w:r.width,h:r.height}};
   const prog=()=>mq.matches&&scrollY<2?0:hmEase(hmClamp(scrollY/(innerHeight*.6),0,1));
   const bigEl=intro.querySelector('.hm-big');
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(bigEl&&bigEl.isConnected)warpHome()});
   /* phones: park the big type under the header instead of behind the buttons */
   function park(){
     if(!bigEl)return;
@@ -9815,7 +9822,30 @@ function homeMount(root,S,FG,HM_CH){
     ihit.style.top=Math.max(Math.round(innerHeight*.16),hb+6)+'px';
     bigEl.style.top=Math.round(hb+22+(bigEl.offsetHeight-.7*parseFloat(getComputedStyle(bigEl).fontSize))/2)+'px';
   }
-  function size(){W=document.documentElement.clientWidth;H=innerHeight;park();svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
+  /* big type is stretched hard toward the sides on a tilted plane: the outer letters turn away, shrink in height, converge and grow wide */
+  function warpHome(){
+    if(!bigEl)return;
+    const sp=[...bigEl.children];if(!sp.length)return;
+    if(innerWidth<700||innerHeight<500){sp.forEach(c=>{c.style.transform=''});bigEl.style.perspective='';bigEl.style.removeProperty('--wf');return}
+    const place=()=>{
+      const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
+      bigEl.style.perspective='';
+      sp.forEach(c=>{
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.max(-1,Math.min(1,xc/half)),th=u*.98,sx=(1+.3*Math.abs(u))/Math.cos(th);
+        /* each letter gets its own vanishing point so the far edge shrinks and the near edge grows without sliding */
+        c.style.transform='translateX('+(xc*.3).toFixed(1)+'px) perspective('+Math.round(c.offsetWidth*sx*1.0)+'px) rotateY('+th.toFixed(4)+'rad) scaleX('+sx.toFixed(4)+')';
+      });
+    };
+    bigEl.style.setProperty('--wf','1');
+    for(let pass=0;pass<3;pass++){
+      place();
+      let l=1e9,r=-1e9;sp.forEach(c=>{const q=c.getBoundingClientRect();l=Math.min(l,q.left);r=Math.max(r,q.right)});
+      const f=Math.min(1,(innerWidth-28)/Math.max(1,r-l)),cur=parseFloat(bigEl.style.getPropertyValue('--wf'))||1;
+      if(f>.985)break;
+      bigEl.style.setProperty('--wf',(cur*f).toFixed(3));
+    }
+  }
+  function size(){W=document.documentElement.clientWidth;H=innerHeight;park();warpHome();svg.setAttribute('viewBox','0 0 '+W+' '+H);ov.setAttribute('viewBox','0 0 '+W+' '+H);dirty=true}
   function target(){
     const narrow=!hmWide(),mid=innerHeight/2;
     const cs=secs.map(s=>{const r=s.getBoundingClientRect();return r.top+r.height/2});
@@ -10171,21 +10201,34 @@ function pickerDock(b){
     bigEl.style.fontSize='100px';
     const w=[...bigEl.children].reduce((a,c)=>a+c.offsetWidth,0)||bigEl.textContent.length*60;
     bigEl.style.fontSize=Math.round(Math.min(SH*.74,SW*1.08*100/w))+'px';
-    warpBig();
+    fitWarp();
   }
-  /* the word sits on a barrel: edge letters turn away and recede, so they shrink, narrow and converge toward the middle line */
+  /* the word is stretched toward the sides on a flat, tilted plane: edge letters turn away (so they get shorter and converge)
+     but are widened back, not narrowed. Then the whole word is sized to fit the free space so nothing is clipped. */
   function warpBig(){
-    if(!bigEl)return;
     const sp=[...bigEl.children];if(!sp.length)return;
-    const W=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1,R=half*1.05;
-    bigEl.style.perspective=Math.round(tot*1.35)+'px';
+    const W=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
+    bigEl.style.perspective=Math.round(tot*.8)+'px';
     sp.forEach(c=>{
-      const xc=c.offsetLeft+c.offsetWidth/2-W/2,th=Math.max(-1.25,Math.min(1.25,xc/R));
-      c.style.transform='translate3d('+(R*Math.sin(th)-xc).toFixed(1)+'px,0,'+(R*(Math.cos(th)-1)).toFixed(1)+'px) rotateY('+th.toFixed(4)+'rad)';
+      const xc=c.offsetLeft+c.offsetWidth/2-W/2,u=Math.max(-1,Math.min(1,xc/half)),th=u*.7;
+      c.style.transform='translateX('+(xc*.2).toFixed(1)+'px) rotateY('+th.toFixed(4)+'rad) scaleX('+((1+.14*Math.abs(u))/Math.cos(th)).toFixed(4)+')';
     });
   }
+  function fitWarp(){
+    if(!bigEl)return;
+    for(let pass=0;pass<3;pass++){
+      warpBig();
+      const wr=bigw.getBoundingClientRect(),H=wr.height;if(!H||!wr.width)return;
+      let l=1e9,r=-1e9,t=1e9,bt=-1e9;
+      [...bigEl.children].forEach(c=>{const q=c.getBoundingClientRect(),k=q.height*.12;l=Math.min(l,q.left);r=Math.max(r,q.right);t=Math.min(t,q.top+k);bt=Math.max(bt,q.bottom-k)});
+      const cx=(l+r)/2,cy=(t+bt)/2,hw2=Math.min(cx-(wr.left+10),wr.right-10-cx),hh2=Math.min(cy-(wr.top+8),wr.top+H*.7-cy);
+      const f=Math.max(.3,Math.min(1.6,hw2/((r-l)/2),hh2/((bt-t)/2)));
+      if(Math.abs(f-1)<.015)break;
+      bigEl.style.fontSize=(parseFloat(bigEl.style.fontSize)*f).toFixed(1)+'px';
+    }
+  }
   /* the middle letters are larger than the outer ones, all on one baseline */
-  const bigScale=(i,n)=>{const m=(n-1)/2,d=m?Math.abs(i-m)/m:0,k=Math.pow(1-d,.85);return (.95+.12*k).toFixed(3)+';--sy:'+(.97+.08*k).toFixed(3)+';--k:'+k.toFixed(3)+';--z:'+Math.round(k*10)};
+  const bigScale=(i,n)=>{const m=(n-1)/2,d=m?Math.abs(i-m)/m:0,k=Math.pow(1-d,.85);return (.97+.08*k).toFixed(3)+';--sy:'+(.97+.08*k).toFixed(3)+';--k:'+k.toFixed(3)+';--z:'+Math.round(k*10)};
   function setBig(txt){
     const old=bigEl;
     bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i+';--s:'+bigScale(i,[...txt].length)},c===' '?' ':c)));
@@ -10293,6 +10336,12 @@ function pickerDock(b){
       el('li',{},el('b',{},'Look at the shape.'),' The ESP32-CAM has a camera. XIAO and SuperMini boards are about the size of a thumb.'),
       el('li',{},el('b',{},'None match?'),' Pick the one with the same chip. The chip name is printed on the metal can.')));
   arena.append(bigw,stage,navb('l',-1,'Previous board'),navb('r',1,'Next board'),el('p',{class:'bpd-hint','aria-hidden':'true'},'Scroll, drag or use the arrow keys'),cap,status);
+  /* the arrows rest out of sight on a desktop after a moment, and the hint goes after the first use */
+  let idleT=0;
+  const wake=()=>{arena.classList.remove('idle');clearTimeout(idleT);if(matchMedia('(hover:none)').matches)return;idleT=setTimeout(()=>{const a=document.activeElement;if(a&&arena.contains(a)&&a.matches(':focus-visible'))return;arena.classList.add('idle')},2600)};
+  ['pointermove','pointerdown','wheel','keydown','focusin'].forEach(t=>arena.addEventListener(t,wake,{passive:true}));
+  ['pointerdown','wheel','keydown'].forEach(t=>arena.addEventListener(t,()=>arena.classList.add('used'),{once:true,passive:true}));
+  wake();
   const root=el('div',{class:'bpk bpd'},defs,
     el('div',{class:'bp-head bpd-head'},
       el('h2',{},'Which board are you testing with?'),
