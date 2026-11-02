@@ -1,6 +1,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ESP32 Live Tester</title>
+<title>ESP32 Live Tester: test sensors and modules in your browser</title>
+<meta name="description" content="Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#0C0D10">
+<meta name="keywords" content="ESP32 tester, ESP32 sensor test, test I2C sensor, ESP32 component tester, ESP32 web serial, ESP32 module checker, BME280, MPU6050, DHT22, OLED, ESP32 wiring">
+<link rel="canonical" href="https://esp32-live-tester.vercel.app/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230C0D10'/%3E%3Cpath d='M7 16h5l3-7 4 14 3-7h3' fill='none' stroke='%23D8B877' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ESP32 Live Tester">
+<meta property="og:title" content="ESP32 Live Tester">
+<meta property="og:description" content="Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.">
+<meta property="og:url" content="https://esp32-live-tester.vercel.app/">
+<meta property="og:image" content="https://esp32-live-tester.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ESP32 Live Tester">
+<meta name="twitter:description" content="Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.">
+<meta name="twitter:image" content="https://esp32-live-tester.vercel.app/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"ESP32 Live Tester","url":"https://esp32-live-tester.vercel.app/","description":"Test ESP32 sensors, modules and parts in your browser. Pick a part, wire it as shown, and get a live pass or fail reading. No code, no install, no account. Works with Chrome and Edge.","applicationCategory":"DeveloperApplication","operatingSystem":"Any with Chrome or Edge","browserRequirements":"Requires Web Serial (Chrome or Edge on desktop)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <script>document.documentElement.lang='en'</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2127,6 +2146,7 @@ body{overflow-x:clip}
     <div class="logbar"><button id="bLogClear" class="btn sm" type="button">Clear log</button></div>
   </details>
 </div>
+<noscript><main style="max-width:44rem;margin:3rem auto;padding:0 1rem;color:#ece8df;font:16px/1.6 system-ui,sans-serif"><h1>ESP32 Live Tester</h1><p>Test ESP32 sensors, modules and electronic parts in your browser without writing test code. Pick a part, wire it as shown, and the page reads it live and tells you pass or fail.</p><ul><li>More than 100 parts: temperature, pressure, motion, distance, gas, light, motors, displays, radio, storage and power.</li><li>Wiring diagram, pass criteria and a plain-language explanation for every reading.</li><li>Demo mode with simulated readings, so you can try every part without a board.</li><li>Flashes the tester firmware from the page. Needs Chrome or Edge on desktop.</li></ul><p>This page needs JavaScript. Turn it on to use the tester.</p></main></noscript>
 <div id="toast" hidden></div>
 <div id="srLive" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
