@@ -1041,8 +1041,8 @@ html.bp-busy{overflow:hidden}
 .bpd-arena{position:relative;height:clamp(520px,calc(100vh - 275px),860px);touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
 .bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.bpd-big{position:absolute;left:-4%;right:-4%;top:36%;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
-.bpd-big span{flex:none;display:inline-block;color:#e2c581;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big{position:absolute;left:-4%;right:-4%;top:41%;align-items:baseline;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.5) 100%)}
+.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);color:#e2c581;opacity:.9;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;transform:translateY(6%) scale(1.04)}to{opacity:.9;transform:none}}
@@ -1783,6 +1783,9 @@ details[open]::details-content{height:auto}
 .bpd-arena{width:100vw;max-width:100vw;margin-inline:calc(50% - 50vw)}
 .bpd-nav.l{left:max(8px,2vw)}.bpd-nav.r{right:max(8px,2vw)}
 body{overflow-x:clip}
+
+/* dep_x90: hover descriptions readable on every surface */
+.tip{z-index:400;max-width:290px;padding:8px 12px;border-radius:9px;background:#2d3139;border:1px solid rgba(255,255,255,.2);color:#efede7;font:400 12.5px/1.45 var(--f-body);box-shadow:0 8px 24px rgba(0,0,0,.55);backdrop-filter:none}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -10164,9 +10167,11 @@ function pickerDock(b){
     const w=[...bigEl.children].reduce((a,c)=>a+c.offsetWidth,0)||bigEl.textContent.length*60;
     bigEl.style.fontSize=Math.round(Math.min(SH*.62,SW*.86*100/w))+'px';
   }
+  /* the middle letters are larger than the outer ones, all on one baseline */
+  const bigScale=(i,n)=>{const m=(n-1)/2,d=m?Math.abs(i-m)/m:0;return (.74+.5*Math.pow(1-d,1.6)).toFixed(3)};
   function setBig(txt){
     const old=bigEl;
-    bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i},c===' '?' ':c)));
+    bigEl=el('p',{class:'bpd-big'},...[...txt].map((c,i)=>el('span',{style:'--i:'+i+';--s:'+bigScale(i,[...txt].length)},c===' '?' ':c)));
     bigw.append(bigEl);fitBig();
     if(old){old.classList.add('out');setTimeout(()=>old.remove(),reduce?0:220)}
   }
@@ -10544,7 +10549,7 @@ const Rec={
 function tipped(e,t){e.dataset.tip=t;return e}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>Rec.init());else Rec.init();
 /* ---- Hover tips: rest the mouse on a button for a few seconds to see what it does ---- */
-const TIP_DELAY=5000;
+const TIP_DELAY=450;
 const TIPS={
   'Run check':'Runs the full automatic check for this part and sets its pass or fail result.',
   'Stream live':'Reads the part again and again and draws it on the graph. Press it again to stop.',
@@ -10703,14 +10708,96 @@ const TIPRX=[
   [/^Break channel/,()=>'Breaks one wire on purpose to show how a fault looks.']
 ];
 let tipEl=null,tipT=0,tipFor=null;
+Object.assign(TIPS,{
+  'Examples':'Opens a list of ready-made code examples for this part. Pick one to load it into the box.',
+  'No examples':'This part has no ready-made code examples.',
+  'Quick test a part':'Goes to the start page so you can pick one part and test it on its own.',
+  'Restore a backup':'Loads your projects from a backup file you saved earlier.',
+  'New project':'Starts an empty project. You then pick the parts to include.',
+  'Previous board':'Shows the previous board in the list.',
+  'Next board':'Shows the next board in the list.',
+  'Use this board':'Picks the highlighted board. Pins, wiring and flashing steps change to match it.',
+  'Erase flash and reset':'Wipes everything stored on the ESP32, including the tester firmware, then restarts it. Install the firmware again afterwards.',
+  'Hold test 2x':'Moves the servo to 0 then 90 degrees, twice, and holds each position.',
+  'Release':'Stops driving the servo so it goes slack.',
+  'Kick start':'Runs the motor at full power for a moment, then drops to 60 %. Helps a motor that will not start.',
+  'Ramp up and down':'Raises the speed from 0 to full in steps, then back down.',
+  'Click three times':'Switches the relay on and off three times so you can hear it click.',
+  'Set factor':'Saves the ratio between the multimeter reading and the raw reading, so later readings show the real voltage.',
+  'Reset':'Puts this back to its starting value.',
+  'Open receiver port':'Opens this computer\'s serial port to the receiving HC-12 so it can read messages.',
+  'Close receiver port':'Closes the serial port to the receiving HC-12.',
+  'Send from laptop':'Sends the text you typed through the HC-12 on this computer.',
+  'AT':'Checks that the module answers. It should reply OK.',
+  'AT+V':'Asks the module for its firmware version.',
+  'AT+RX':'Reads all current settings.',
+  'AT+B9600':'Sets the serial speed to 9600 baud.',
+  'AT+C001':'Sets radio channel 1.',
+  'AT+FU3':'Sets transmission mode FU3, the default.',
+  'AT+P8':'Sets transmit power to the maximum, level 8.',
+  'AT+DEFAULT':'Restores the factory settings.',
+  'Send AT':'Sends the AT command you typed.',
+  'Bare board + FTDI':'Shows the wiring for a bare ESP32-CAM flashed through a USB serial (FTDI) adapter.',
+  'On the MB base':'Shows the steps for the ESP32-CAM-MB base board, which has its own USB port.',
+  'Gravity check':'Checks that the three axes together read about 9.8 m/s² while the board is still.',
+  'Field strength check':'Checks that the magnetic field strength is in the normal range for Earth.',
+  'All parts':'Shows the pins of every part together.',
+  'Clear log':'Empties this log.',
+  'Sweep channel':'Moves one PWM channel from 1 ms to 2 ms and back, so a servo on it sweeps.',
+  'Measure with gate on 5 V':'Repeats the check with the gate wire moved to 5 V, to see whether the MOSFET switches fully on.',
+  'Same strip':'Reads the resistance between two holes in the same strip. A good strip reads under 100 \u03a9.',
+  'Different strips':'Reads the resistance between holes in different strips. They should read as open.',
+  'Scan 2.4 GHz':'Listens on each radio channel and shows which ones are busy.'
+});
+TIPRX.push(
+  [/^Use the (.+) template$/,m=>'Creates a new project from the '+m[1]+' template with its parts already picked.'],
+  [/check$/i,()=>'Runs this check and shows whether the reading is as expected.']
+);
+const TIPSIM=/^(Motion in view|Intermittent wire|Spin about Z|Flip the diode|Hold the button down|Press the stick down|Obstacle in front|Gate wire moved|Finger on the pad|Movement nearby|Vibration|Liquid at the tip|Press the knob)/;
+const TIPID={
+  bBoard:'Choose which ESP32 board you have. The pin map, wiring and flashing steps change to match it.',
+  bProj:'Combine several parts into one project, record their readings and compare runs.',
+  bConnect:'Opens the port list so you can pick the ESP32 and connect over USB.',
+  bDemo:'Uses a simulated board with made-up readings. No hardware needed. Press again to go back to a real board.',
+  bLogClear:'Empties the serial log.',
+  brandHome:'Goes to the start page where you choose your board.',
+  bCopy:'Copies every result so far as text you can paste.',
+  bClear:'Forgets every saved result.'
+};
+const tipIsBack=b=>b.id==='bBack'||b.classList.contains('back')||/^(go )?back\b/i.test((b.getAttribute('aria-label')||b.textContent||'').trim())||/^[←<‹]\s*back\b/i.test((b.textContent||'').trim());
+function tipFallback(b,t){
+  const c=b.classList,lab=(b.getAttribute('aria-label')||'').replace(/^Simulated:\s*/,'');
+  if(b.id&&TIPID[b.id])return TIPID[b.id];
+  if(b.matches('a.skip'))return '';
+  if(c.contains('ni')){const nn=b.querySelector('.nn'),ns=b.querySelector('.ns');const n=nn?nn.textContent.trim():t;const d=ns?ns.textContent.trim().replace(/\.$/,''):'';return 'Opens '+n+(d?': '+d+'.':'.')}
+  if(c.contains('cut-tab')){const k=(b.dataset.k||'').trim();return k?'Shows the code the page runs for the '+k+' command. The number is how many times it has run.':'Shows this part of the code under test.'}
+  if(c.contains('gc'))return 'Turns this dot on or off in the character.';
+  if(c.contains('switch'))return 'Switches '+(lab.replace(/ power$/i,'')||'the part')+' on or off.';
+  if(c.contains('bpd-tf'))return 'Selects '+(lab.split(',')[0]||'this board')+'. Press Use this board to confirm.';
+  if(TIPSIM.test(t))return 'Simulated only: acts out this event so you can see how the test reacts without any hardware.';
+  if(typeof PICK!=='undefined'&&PICK.some(x=>x.n===t))return 'Shows the pin map and wiring for '+t+'.';
+  if(b.matches('summary'))return t?'Shows or hides this section: '+t.replace(/[.?!]$/,'')+'.':'Shows or hides this section.';
+  if(b.matches('input[type=range]'))return lab?'Drag to change '+lab.toLowerCase()+'. It only changes the simulated reading.':'Drag to change the value.';
+  if(b.matches('input[type=checkbox]')){const l=b.closest('label');const x=l?l.textContent.replace(/\s+/g,' ').trim():lab;return x&&x!=='on'?'Tick to turn on, untick to turn off: '+x+'.':'Tick to turn this on, untick to turn it off.'}
+  if(b.matches('select'))return lab&&!/^[a-z]_?[a-z]*$/i.test(lab)?'Pick an option for: '+lab.toLowerCase()+'.':'Pick one option from the list.';
+  if(b.getAttribute('role')==='tab')return 'Switches to the '+t+' tab.';
+  if(c.contains('stthumb'))return 'Shows this frame on the canvas so you can edit it.';
+  if(c.contains('sw'))return 'Picks this colour.';
+  return '';
+}
 function tipText(b){
+  if(tipIsBack(b))return '';
   if(b.dataset&&b.dataset.tip)return b.dataset.tip;
   if(b.id==='bSearch'||b.id==='navQ'||b.classList.contains('hm-fab'))return 'Search every part by name, pin or kind. Shortcut from anywhere: '+(typeof palKey==='function'?palKey():'Ctrl K')+', or / when you are not typing in a box. Esc closes it.';
-  const t=(b.textContent||'').replace(/\s+/g,' ').trim();
-  if(!t||t.length>48)return '';
-  if(TIPS[t])return TIPS[t];
-  for(const [rx,f] of TIPRX){const m=t.match(rx);if(m)return f(m)}
-  return '';
+  const t=(b.textContent||'').replace(/\s+/g,' ').trim().replace(/hover or click$/,'');
+  if(b.id&&TIPID[b.id])return TIPID[b.id];
+  if(t&&t.length<=48){
+    if(TIPS[t])return TIPS[t];
+    for(const [rx,f] of TIPRX){const m=t.match(rx);if(m)return f(m)}
+  }
+  const al=(b.getAttribute('aria-label')||'').trim();
+  if(al&&al!==t){if(TIPS[al])return TIPS[al];for(const [rx,f] of TIPRX){const m=al.match(rx);if(m)return f(m)}}
+  return tipFallback(b,t);
 }
 function tipHide(){clearTimeout(tipT);tipT=0;if(tipFor){tipFor.removeAttribute('aria-describedby');tipFor=null}if(tipEl)tipEl.hidden=true}
 function tipShow(b,txt){
@@ -10723,7 +10810,7 @@ function tipShow(b,txt){
 }
 function tipInit(){
   if(window.matchMedia&&matchMedia('(hover:none)').matches)return;
-  const sel='button,[role=button],[data-tip],#navQ';
+  const sel='button,[role=button],[role=tab],summary,select,input[type=range],input[type=checkbox],a[href],[data-tip],#navQ';
   document.addEventListener('mouseover',e=>{
     const b=e.target.closest&&e.target.closest(sel);
     if(!b||b===tipFor||b===tipInit.cand)return;
