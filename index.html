@@ -840,7 +840,7 @@ body.is-home main{background:transparent;border:0;box-shadow:none;padding:0;bord
 @media (max-width:899.98px) and (orientation:portrait),(max-width:639.98px){.hm-stage{z-index:4}}
 /* ---- Home intro: the board first, big type behind it ---- */
 .hm-intro{position:fixed;inset:0;z-index:0;pointer-events:none;text-align:center;will-change:transform,opacity}
-.hm-big{position:absolute;left:0;right:0;top:31%;margin:0;padding:.35em 0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
+.hm-big{position:absolute;left:0;right:0;top:40%;margin:0;padding:.35em 0;display:flex;justify-content:center;font:800 clamp(96px,28vw,480px)/.8 'Inter',var(--f-disp);letter-spacing:-.045em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 30%,rgba(0,0,0,.6) 52%,rgba(0,0,0,.22) 74%,rgba(0,0,0,.14) 100%)}
 .hm-big span{flex:none;white-space:nowrap}
 .hm-big span{display:inline-block;color:#e4c887;animation:hmslam .95s calc(.05s + var(--i)*.075s) cubic-bezier(.2,.9,.15,1) both}
 .hm-sub{display:none;position:absolute;left:0;right:0;bottom:4.5vh;margin:0 auto;max-width:20em;font:700 clamp(22px,3.6vw,50px)/1.05 var(--f-disp);letter-spacing:-.025em;color:var(--fg);text-wrap:balance;animation:hmfade .8s .95s both}
@@ -1042,7 +1042,7 @@ html.bp-busy{overflow:hidden}
 .bpd-arena.drag{cursor:grabbing}
 .bpd-bigw{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
 .bpd-big{position:absolute;left:-4%;right:-4%;top:41%;align-items:center;margin:0;padding:.3em 0;display:flex;justify-content:center;white-space:nowrap;font:800 200px/.8 'Inter',var(--f-disp);letter-spacing:-.06em;transform:translateY(-50%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.8) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,rgba(0,0,0,.8) 100%)}
-.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);scale:1 var(--sy,1);color:transparent;padding:.1em .07em .1em 0;margin-right:-.07em;position:relative;z-index:var(--z,0);background:linear-gradient(180deg,oklch(calc(.9 + var(--k,0)*.05) .105 92) 0%,oklch(calc(.77 + var(--k,0)*.05) .12 80) 50%,oklch(.56 .1 58) 100%);-webkit-background-clip:text;background-clip:text;filter:blur(var(--bl,0px)) drop-shadow(0 22px 28px rgba(0,0,0,.6)) drop-shadow(0 0 46px rgba(236,190,110,calc(var(--k,0)*.17)));opacity:1;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
+.bpd-big span{flex:none;display:inline-block;font-size:calc(var(--s,1)*1em);scale:1 var(--sy,1);color:transparent;padding:.1em .07em .1em 0;margin-right:-.07em;position:relative;z-index:var(--z,0);background:linear-gradient(180deg,oklch(calc(.9 + var(--k,0)*.05) .088 92) 0%,oklch(calc(.77 + var(--k,0)*.05) .1 80) 50%,oklch(.56 .085 58) 100%);-webkit-background-clip:text;background-clip:text;filter:blur(var(--bl,0px));opacity:1;animation:bpdletter .22s calc(var(--i)*.012s) cubic-bezier(.23,1,.32,1) both}
 .bpd-big.out{animation:bpdout .2s ease-out both}
 .bpd-big.out span{animation:none}
 @keyframes bpdletter{from{opacity:0;translate:0 6%}to{opacity:1;translate:0 0}}
@@ -9833,16 +9833,17 @@ function homeMount(root,S,FG,HM_CH){
       sp.forEach(c=>{c.style.transform='';c.style.removeProperty('--bl')});
       const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1,fs=parseFloat(getComputedStyle(bigEl).fontSize)||300;
       bigEl.style.perspective='';
-      /* upright and symmetric: letters widen and shrink toward the sides, packed edge to edge */
+      /* perspective: letters turn away from the middle on their own vanishing points, edge letters a touch smaller, packed edge to edge */
       const L=sp.map(c=>{
-        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half));
-        return {c,xc,w:c.offsetWidth,u,sx:1+.4*Math.pow(u,1.3),sy:1-.26*Math.pow(u,1.2)};
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,1.1)*.66,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+        const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
+        return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
       });
-      const T=L.reduce((a,o)=>a+o.w*o.sx,0);let x=-T/2;
+      const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
       L.forEach(o=>{
-        const mid=x+o.w*o.sx/2;x+=o.w*o.sx;
-        o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
-        o.c.style.setProperty('--bl',(Math.pow(o.u,2.4)*fs*.005).toFixed(2)+'px');
+        const mid=x-o.left;x+=o.right-o.left;
+        o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
+        o.c.style.setProperty('--bl',(Math.pow(o.u,2.4)*fs*.006).toFixed(2)+'px');
       });
       return T;
     };
@@ -10218,9 +10219,16 @@ function pickerDock(b){
     bigEl.style.perspective='';
     sp.forEach(c=>{c.style.transform='';c.style.scale=''});
     const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
-    const L=sp.map(c=>{const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half));return {c,xc,w:c.offsetWidth,sx:1+.62*Math.pow(u,1.25),sy:1.1-.42*Math.pow(u,1.15)}});
-    const T=L.reduce((a,o)=>a+o.w*o.sx,0);let x=-T/2;
-    L.forEach(o=>{const mid=x+o.w*o.sx/2;x+=o.w*o.sx;o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) scaleX('+o.sx.toFixed(4)+')';o.c.style.scale='1 '+o.sy.toFixed(4);o.c.style.setProperty('--bl',(Math.pow(Math.min(1,Math.abs(o.xc/half)),2.2)*(parseFloat(bigEl.style.fontSize)||200)*.008).toFixed(2)+'px')});
+    const L=sp.map(c=>{
+      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*Math.pow(u,1.1)*.66,w=c.offsetWidth,sx=(1+.2*u)/Math.cos(th),a=w*sx/2,d=w*sx*1.1,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+      const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
+      return {c,xc,w,u,sx,th,d,left,right,sy:1.04-.2*Math.pow(u,1.2)};
+    });
+    const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
+    L.forEach(o=>{const mid=x-o.left;x+=o.right-o.left;
+      o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scaleX('+o.sx.toFixed(4)+')';
+      o.c.style.scale='1 '+o.sy.toFixed(4);
+      o.c.style.setProperty('--bl',(Math.pow(o.u,2.4)*(parseFloat(bigEl.style.fontSize)||200)*.006).toFixed(2)+'px')});
   }
   function fitWarp(){
     if(!bigEl)return;
