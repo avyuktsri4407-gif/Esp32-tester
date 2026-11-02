@@ -13534,7 +13534,21 @@ function pjBuild(body,pr){
   });
   fig.addEventListener('pointercancel',()=>{const p=pd;pd=null;fig.classList.remove('grab');if(p&&R3){R3.lift(p.k);R3.ghost(null)}});
   fig.addEventListener('pointerup',endDrag);fig.addEventListener('pointercancel',endDrag);
-  fig.addEventListener('wheel',e=>{if(!R3||!R3.zoomAt||!window.wheelIn||!wheelIn(fig))return;e.preventDefault();cancelAnimationFrame(twRaf);view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.0016),e.clientX,e.clientY)},{passive:false});
+  /* wheel: a pinch on a trackpad (ctrl+wheel) or a mouse wheel zooms, a two-finger swipe slides the board. The kind of device is judged once per gesture. */
+  let wMode='',wLast=0;
+  fig.addEventListener('wheel',e=>{
+    if(!R3||!R3.zoomAt||!window.wheelIn||!wheelIn(fig))return;
+    e.preventDefault();cancelAnimationFrame(twRaf);
+    const n=performance.now();
+    if(n-wLast>180){
+      const dy=Math.abs(e.deltaY);
+      wMode=e.ctrlKey||e.metaKey?'zoom':e.deltaMode!==0?'zoom':(e.deltaX===0&&dy>=100&&dy%100===0)||(e.deltaX===0&&dy>=120&&dy%120===0)?'zoom':'pan';
+    }
+    wLast=n;
+    if(e.ctrlKey||e.metaKey||wMode==='zoom'){view=R3.zoomAt(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*(e.ctrlKey?.01:.0016)),e.clientX,e.clientY);return}
+    const k=e.deltaMode===1?16:1;
+    view=R3.panBy(-e.deltaX*k,-e.deltaY*k);
+  },{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
   names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i+1)),nm))));
   function text(i){
@@ -13638,7 +13652,7 @@ function pjBuild(body,pr){
     const id=partAt(k);if(id)openTest(id,k,e.clientX);
   });
   fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const id=partAt(cur);if(id){e.preventDefault();openTest(id,cur)}}});
-  const tipId='bb-tip'+String(pr.id).slice(-4),tip=el('span',{class:'bb-tip',id:tipId,role:'tooltip'},'Click a part on the board to open its live test beside it. Drag to turn, scroll to zoom, shift-drag or Move to slide the board.'),
+  const tipId='bb-tip'+String(pr.id).slice(-4),tip=el('span',{class:'bb-tip',id:tipId,role:'tooltip'},'Click a part on the board to open its live test beside it. Drag to turn, swipe with two fingers to slide the board, pinch or use the mouse wheel to zoom.'),
     ibtn=el('button',{type:'button',class:'bb-i','aria-label':'How to use the board','aria-describedby':tipId,'aria-expanded':'false',onclick:()=>{const o=!tip.classList.contains('open');tip.classList.toggle('open',o);ibtn.setAttribute('aria-expanded',String(o))}},'i');
   ibtn.addEventListener('blur',()=>{tip.classList.remove('open');ibtn.setAttribute('aria-expanded','false')});
   const arrBtn=btn('Arrange',()=>{arrange=!arrange;arrBtn.setAttribute('aria-pressed',String(arrange));arrBtn.classList.toggle('primary',arrange);fig.classList.toggle('arr',arrange);if(arrange&&cur<total-1)go(total-1,true)},'sm');
