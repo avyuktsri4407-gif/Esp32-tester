@@ -9841,15 +9841,16 @@ function homeMount(root,S,FG,HM_CH){
       sp.forEach(c=>{c.style.transform='';c.style.removeProperty('--bl')});
       const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1,fs=parseFloat(getComputedStyle(bigEl).fontSize)||300;
       bigEl.style.perspective='';
-      /* one smooth curve: letters shrink toward both sides, symmetric about the centre, packed edge to edge */
+      /* smooth curve: every letter turns away from the middle on an eased angle, shrinks on the same curve, and is packed against its neighbour by its projected edges */
       const L=sp.map(c=>{
-        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sc=1-.3*u*u;
-        return {c,xc,w:c.offsetWidth,sx:sc*1.06,sy:sc};
-      });
-      const T=L.reduce((a,o)=>a+o.w*o.sx,0);let x=-T/2;
+        const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=w*sx*2.2,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+        const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
+        return {c,xc,w,u,sx,sy:sc,th,d,left,right};
+    });
+    const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
       L.forEach(o=>{
-        const mid=x+o.w*o.sx/2;x+=o.w*o.sx;
-        o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
+        const mid=x-o.left;x+=o.right-o.left;
+        o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scale('+o.sx.toFixed(4)+','+o.sy.toFixed(4)+')';
         o.c.style.setProperty('--bl','0px');
       });
       return T;
@@ -10227,14 +10228,15 @@ function pickerDock(b){
     bigEl.style.perspective='';
     sp.forEach(c=>{c.style.transform='';c.style.scale=''});
     const Wd=bigEl.clientWidth,tot=sp.reduce((a,c)=>a+c.offsetWidth,0),half=tot/2||1;
-    /* one smooth curve: letters shrink toward both sides, symmetric about the centre, packed edge to edge */
+    /* smooth curve: every letter turns away from the middle on an eased angle, shrinks on the same curve, and is packed against its neighbour by its projected edges */
     const L=sp.map(c=>{
-      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sc=1-.3*u*u;
-      return {c,xc,w:c.offsetWidth,sx:sc*1.06,sy:sc};
+      const xc=c.offsetLeft+c.offsetWidth/2-Wd/2,u=Math.min(1,Math.abs(xc/half)),sg=xc<0?-1:1,th=sg*.6*Math.pow(u,1.35),sc=1-.26*u*u,w=c.offsetWidth,sx=sc*1.04/Math.cos(th),a=w*sx/2,d=w*sx*2.2,sn=Math.abs(Math.sin(th)),cs=Math.cos(th);
+      const nearR=a*cs*d/(d-a*sn),farR=a*cs*d/(d+a*sn),left=sg<0?-farR:-nearR,right=sg<0?nearR:farR;
+      return {c,xc,w,u,sx,sy:sc,th,d,left,right};
     });
-    const T=L.reduce((a,o)=>a+o.w*o.sx,0);let x=-T/2;
-    L.forEach(o=>{const mid=x+o.w*o.sx/2;x+=o.w*o.sx;
-      o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) scaleX('+o.sx.toFixed(4)+')';
+    const T=L.reduce((a,o)=>a+(o.right-o.left),0);let x=-T/2;
+    L.forEach(o=>{const mid=x-o.left;x+=o.right-o.left;
+      o.c.style.transform='translateX('+(mid-o.xc).toFixed(1)+'px) perspective('+Math.round(o.d)+'px) rotateY('+o.th.toFixed(4)+'rad) scaleX('+o.sx.toFixed(4)+')';
       o.c.style.scale='1 '+o.sy.toFixed(4);
       o.c.style.setProperty('--bl','0px')});
   }
