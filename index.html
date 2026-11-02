@@ -12111,9 +12111,12 @@ function pjCheck(ids){
         else addp=[PJ_SUPPLY[B][0]];
       }else if(kind==='missing'&&item){
         const pid=/capacitor|µF/i.test(item)?'capacitor':/resistor|Ω/i.test(item)?'resistor':null;
-        if(pid&&pjPart(pid)&&!has.has(pid))addp=[pid];
+        if(pid&&pjPart(pid)){
+          if(!has.has(pid))addp=[pid];
+          else{ok=true;s='info';f='The '+pjShort(ids.find(x=>pjBase(x)===pid))+' in this project can do this. '+fix+' Check its value matches.'}
+        }
       }
-      add({sev:s,kind,parts:list.slice(),title,text:who+': '+why,fix:f,add:addp});
+      add({sev:s,kind:ok&&kind==='missing'?'tip':kind,parts:list.slice(),title,text:who+': '+why,fix:f,add:addp});
       for(const x of list){
         if(ok){}
         else if(item&&kind!=='power')addExtra(x,item,title,between);
