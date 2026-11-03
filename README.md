@@ -2,7 +2,7 @@
 
 A browser tool for testing electronic parts on an ESP32 without writing test code. Plug in a board, pick a part, wire it as shown, and the page reads it live and tells you pass or fail.
 
-**Use it:** [open the live website](https://avyuktsri4407-gif.github.io/Esp32-tester/) in Chrome or Edge. Nothing to install.
+**Use it:** [esp32-live-tester.vercel.app](https://esp32-live-tester.vercel.app/) in Chrome or Edge. Nothing to install. (Mirror: [GitHub Pages](https://avyuktsri4407-gif.github.io/Esp32-tester/).)
 
 ## What it does
 
