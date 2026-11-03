@@ -1849,6 +1849,39 @@ body{overflow-x:clip}
 .bb-mv{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
 .bb-mv .lbl{font:500 13px var(--f-body);color:var(--muted)}
 .bb-mvs{min-height:36px;padding:6px 10px;font-size:14px}
+
+/* dep_x116: search box over the parts table on the overview page */
+.st-q{display:block;width:100%;max-width:520px;margin:0 0 16px}
+.t tr[hidden]{display:none!important}
+.pgl{margin:22px 0 12px;padding-left:2px;line-height:1.3}
+.pgl:first-child{margin-top:0}
+
+/* dep_x116: parts as picture cards (steps list and the Add part tray) */
+.bb-pills{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;overflow:visible;padding:2px 0 10px}
+.bb-pills li{min-width:0}
+.bb-pill.bb-card{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%;height:100%;min-height:0;padding:8px 8px 10px;border-radius:12px;text-align:left;white-space:normal;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.bb-card .bb-pn{position:absolute;top:6px;left:8px;z-index:1}
+.bb-ct{display:block;height:84px;border-radius:8px;background:var(--panel,rgba(255,255,255,.03));overflow:hidden}
+.bb-ct svg{display:block;width:100%;height:100%}
+.bb-ct.none{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--hair) 6px 7px)}
+.bb-cn{font:500 13px/1.3 var(--f-body);color:inherit;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bb-card.on .bb-ct{background:rgba(255,255,255,.06)}
+.bb-card:not(.done):not(.on) .bb-ct svg{opacity:.55;filter:saturate(.7)}
+.bb-ghostcard{position:fixed;left:0;top:0;z-index:99999;pointer-events:none;opacity:.92;box-shadow:0 10px 30px rgba(0,0,0,.45);border:1px solid var(--accent);border-radius:12px;background:var(--raise,#1b1e24);padding:8px;display:flex;flex-direction:column;gap:6px;color:var(--fg)}
+.bb-ghostcard .bb-pn{display:none}
+.bb-fig.dropping{outline:2px dashed var(--hair2);outline-offset:-4px}
+.bb-fig.dropping.dropok{outline:2px solid var(--accent)}
+/* the Add part tray: a grid of pictures */
+.bb-pop{width:min(560px,calc(100vw - 32px))}
+.bb-pl{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.bb-pl>li{min-width:0}
+.bb-pl .bb-po.bb-pc{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;height:100%;padding:8px;border:1px solid var(--hair);border-radius:12px;white-space:normal;user-select:none;-webkit-user-select:none}
+.bb-pl .bb-po.bb-pc:hover,.bb-pl .bb-po.bb-pc:focus-visible{background:var(--hair);border-color:var(--accent-line)}
+.bb-pc .bb-pon{font:500 13px/1.3 var(--f-body);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.bb-pc .bb-pog{white-space:normal;line-height:1.25}
+.bb-pl>li.bb-pnone{grid-column:1/-1}
+
+.bb-dragging .bb-pop{opacity:0;pointer-events:none;transition:opacity .12s}
 /*NEWCSS:end*/
 /* firmware download and flash steps */
 .fw-get{display:flex;flex-direction:column;gap:12px;margin-top:4px}
@@ -3820,7 +3853,11 @@ function overview(b){
     el('p',{class:'hint'},'Simulated results are never saved. Real results are kept in this browser and can be copied with the Copy results button.')));
   const stRows=PARTS.filter(p=>!noRes(p)).map(p=>el('tr',{},el('td',{},p.n),el('td',{},subOf(p)),el('td',{},(p.criteria||[])[0]||'')));
   b.append(mapBlock());
-  b.append(blk('Parts this tester covers',el('div',{class:'tw'},el('table',{class:'t t3'},el('thead',{},el('tr',{},...['Part','Module and pins','Passes when'].map(h=>el('th',{},h)))),el('tbody',{},stRows))),
+  const stHay=PARTS.filter(p=>!noRes(p)).map(p=>(p.n+' '+subOf(p)+' '+((p.criteria||[])[0]||'')).toLowerCase());
+  const stNone=el('p',{class:'hint',role:'status',hidden:true},'No part matches that search.');
+  const stQ=el('input',{type:'search',class:'pj-in st-q','aria-label':'Search the parts this tester covers',placeholder:'Search parts, such as BME280, servo, GPS or relay',autocomplete:'off'});
+  stQ.addEventListener('input',()=>{const t=stQ.value.trim().toLowerCase().split(/\s+/).filter(Boolean);let n=0;stRows.forEach((r,i)=>{const ok=!t.length||t.every(w=>stHay[i].includes(w));r.hidden=!ok;if(ok)n++});stNone.hidden=n>0});
+  b.append(blk('Parts this tester covers',stQ,stNone,el('div',{class:'tw'},el('table',{class:'t t3'},el('thead',{},el('tr',{},...['Part','Module and pins','Passes when'].map(h=>el('th',{},h)))),el('tbody',{},stRows))),
     el('p',{class:'hint'},'To add a part, see CONTEXT.md in the project folder.')));
 }
 
@@ -11637,7 +11674,7 @@ async function pjList(b,tok){
     const ok=ids.filter(i=>have.has(i));if(ok.length<2)continue;
     tpl.append(el('article',{class:'pj-card'},el('h3',{},n),el('p',{class:'pj-meta'},d),
       el('div',{class:'pj-chips'},...ok.map(i=>el('span',{class:'chip'},pjShort(i)))),
-      el('div',{class:'pj-acts'},Object.assign(btn('Use this template',async function(){if(this.disabled)return;this.disabled=true;const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})},'sm'),{ariaLabel:'Use the '+n+' template'}))));
+      el('div',{class:'pj-acts'},(()=>{const ub=btn('Use this template',async()=>{if(ub.disabled)return;ub.disabled=true;try{const p=await pjNew(n,ok);pjGo({pid:p.id,view:'dash'})}catch(e){ub.disabled=false;throw e}},'sm');ub.setAttribute('aria-label','Use the '+n+' template');return ub})())));
   }
   b.append(el('h3',{class:'pj-h'},prs.length?'Start from a template':'Start with a template or a blank project'),
     el('p',{class:'hint'},'A project is a set of parts that run together. You can change the parts afterwards.'),tpl);
@@ -13422,6 +13459,29 @@ function bbStepText(it,n,total,res){
   if(list)box.append(list);
   return box;
 }
+/* part pictures: each part is cut out of a drawing of it on the board and kept as small svg markup */
+const PJ_THUMB=new Map();
+function pjThumbFrom(svgText,want){
+  const out=new Map(),tmp=document.createElement('div');
+  tmp.className='bb-fig';tmp.setAttribute('aria-hidden','true');tmp.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;width:1600px;height:900px;overflow:hidden';
+  tmp.innerHTML=svgText;document.body.append(tmp);
+  try{
+    for(const g of tmp.querySelectorAll('.bbp')){
+      const i=+g.dataset.i;if(want&&!want.includes(i))continue;
+      const bb=g.getBBox();if(!(bb.width>0&&bb.height>0))continue;
+      const pad=Math.max(bb.width,bb.height)*.08+4;
+      out.set(i,'<svg class="isoc bb-th" viewBox="'+[bb.x-pad,bb.y-pad,bb.width+2*pad,bb.height+2*pad].map(v=>v.toFixed(1)).join(' ')+'" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><g class="bbp on" style="opacity:1;transform:none;pointer-events:none">'+g.innerHTML+'</g></svg>');
+    }
+    if(want&&want.includes(-1)){const r=tmp.firstElementChild;if(r){const c=r.cloneNode(true);c.classList.add('bb-all','bb-th');c.removeAttribute('width');c.removeAttribute('height');c.style.minWidth='0';c.setAttribute('aria-hidden','true');out.set(-1,c.outerHTML)}}
+  }catch(e){}
+  tmp.remove();return out;
+}
+function pjThumbOf(id){
+  if(PJ_THUMB.has(id))return PJ_THUMB.get(id);
+  let m='';
+  try{const sc=BB.scene([id],pjCheck([id]),{});m=pjThumbFrom(sc.svg,[1]).get(1)||''}catch(e){}
+  PJ_THUMB.set(id,m);return m;
+}
 function pjBuild(body,pr){
   if(!pr.parts.length){body.append(pjEmpty('Nothing to build yet','Pick the parts for this project. This page then shows how to put them on one breadboard, one step at a time, and checks that they work together.',btn('Pick parts',()=>pjGo({pid:pr.id,view:'parts'}),'primary')));return}
   pjSeed(pr.parts);BB.setLayout(pr.layout,0);
@@ -13554,7 +13614,41 @@ function pjBuild(body,pr){
     view=R3.panBy(-e.deltaX*k,-e.deltaY*k);
   },{passive:false});
   fig.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowLeft'){turn(-15,0)}else if(k==='ArrowRight'){turn(15,0)}else if(k==='ArrowUp'){turn(0,-6)}else if(k==='ArrowDown'){turn(0,6)}else return;e.preventDefault()});
-  names.forEach((nm,i)=>pills.append(el('li',{},el('button',{type:'button',class:'bb-pill',id:'bb-p'+i,onclick:()=>go(i)},el('span',{class:'bb-pn'},String(i+1)),nm))));
+  /* the steps as picture cards: press one to add the parts up to it, or drag a part's card onto the board to put it where you drop it */
+  const stepThumbs=pjThumbFrom(sc.svg,[...items.map((_,k)=>k+1),0,-1]);
+  let noClick=false;
+  const cardDrag=(card,onDrop)=>{
+    card.addEventListener('click',e=>{if(noClick){e.stopImmediatePropagation();e.preventDefault()}},true);
+    card.addEventListener('pointerdown',e=>{
+      if(e.button!==0||e.pointerType==='touch'||!R3||!R3.ground)return;
+      const sx=e.clientX,sy=e.clientY;let ghost=null,moved=false;
+      const over=(x,y)=>{const r=fig.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom};
+      const mv=ev=>{
+        if(!moved){if(Math.hypot(ev.clientX-sx,ev.clientY-sy)<6)return;moved=true;ghost=card.cloneNode(true);ghost.removeAttribute('id');ghost.className='bb-ghostcard';ghost.style.width=card.offsetWidth+'px';document.body.append(ghost);document.body.classList.add('bb-dragging');fig.classList.add('dropping')}
+        ghost.style.transform='translate('+(ev.clientX-card.offsetWidth/2)+'px,'+(ev.clientY-24)+'px)';fig.classList.toggle('dropok',over(ev.clientX,ev.clientY));
+      };
+      const end=ev=>{
+        removeEventListener('pointermove',mv);removeEventListener('pointerup',end);removeEventListener('pointercancel',end);
+        if(ghost)ghost.remove();document.body.classList.remove('bb-dragging');fig.classList.remove('dropping','dropok');
+        if(moved){noClick=true;setTimeout(()=>{noClick=false},0);if(ev.type==='pointerup'&&over(ev.clientX,ev.clientY))onDrop(ev.clientX,ev.clientY)}
+      };
+      addEventListener('pointermove',mv);addEventListener('pointerup',end);addEventListener('pointercancel',end);
+    });
+  };
+  names.forEach((nm,i)=>{
+    const tm=stepThumbs.get(i<=items.length?i:-1),pic=el('span',{class:'bb-ct'});if(tm)pic.innerHTML=tm;
+    const card=el('button',{type:'button',class:'bb-pill bb-card',id:'bb-p'+i,onclick:()=>go(i),title:i>0&&i<=items.length?'Press to add it to the board, or drag it onto the board':''},el('span',{class:'bb-pn'},String(i+1)),pic,el('span',{class:'bb-cn'},nm));
+    if(i>=1&&i<=items.length)cardDrag(card,(x,y)=>dropPart(items[i-1],x,y,i));
+    pills.append(el('li',{},card));
+  });
+  /* put a part where it was dropped: the nearest free columns in the half of the board under the pointer */
+  async function dropPart(it,x,y,reveal){
+    const g=R3&&R3.ground?R3.ground(x,y):null;if(!g)return;
+    const lane=g[1]<BB.TC?'back':'front',want=Math.round((g[0]-BB.colX(0))/BB.PITCH)-Math.floor(foot(it)/2);
+    const cs=freeSpot(it,lane,want);
+    if(cs==null){toast('No free space for '+it.short+' there.');return}
+    pr.layout={...(pr.layout||{}),[it.id]:{lane,cs}};await pjSave(pr);rebuild(reveal);
+  }
   function text(i){
     info.replaceChildren();
     if(i===0){
@@ -13703,14 +13797,40 @@ function pjBuild(body,pr){
         if(!canDraw(id))continue;
         if(t.length&&!t.every(w=>navHay(p).includes(w)))continue;
         if(n>=80)break;n++;
-        plist.append(el('li',{},el('button',{type:'button',class:'bb-po',onclick:()=>addPart(id)},el('span',{class:'bb-pon'},p.n),el('span',{class:'bb-pog'},pr.parts.includes(id)?g.n+', add another copy':g.n))));
+        const pic=el('span',{class:'bb-ct'});pic.dataset.id=id;
+        const card=el('button',{type:'button',class:'bb-po bb-pc',onclick:()=>addPart(id),title:'Press to add it, or drag it onto the board'},pic,el('span',{class:'bb-pon'},p.n),el('span',{class:'bb-pog'},pr.parts.includes(id)?g.n+', add another copy':g.n));
+        cardDrag(card,(x,y)=>addPart(id,{x,y}));
+        plist.append(el('li',{},card));
       }
     }
     if(!n)plist.append(el('li',{class:'pj-dim bb-pnone'},'No matching parts.'));
+    lazyThumbs();
   }
-  async function addPart(id){
+  /* pictures are drawn a few at a time, as the cards scroll into view */
+  let thIO=null,thQ=[],thBusy=false;
+  function lazyThumbs(){
+    const run=()=>{
+      thBusy=true;const c=thQ.shift();
+      if(!c){thBusy=false;return}
+      if(c.isConnected&&!c.firstChild){const m=pjThumbOf(c.dataset.id);if(m)c.innerHTML=m;else c.classList.add('none')}
+      requestAnimationFrame(run);
+    };
+    if(!thIO&&typeof IntersectionObserver!=='undefined')thIO=new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting){thIO.unobserve(e.target);thQ.push(e.target)}if(thQ.length&&!thBusy)requestAnimationFrame(run)},{root:plist,rootMargin:'120px'});
+    plist.querySelectorAll('.bb-ct').forEach(c=>thIO?thIO.observe(c):thQ.push(c));
+    if(!thIO&&!thBusy)requestAnimationFrame(run);
+  }
+  async function addPart(id,drop){
     if(pr.parts.length>=PJ.max){toast('A project holds up to '+PJ.max+' parts. Remove one first.');return}
     const nid=pr.parts.includes(id)?pjNextId(pr.parts,id):id;
+    if(drop&&R3&&R3.ground){
+      const g=R3.ground(drop.x,drop.y);
+      if(g){
+        let pi=null;try{pi=BB.planOf([nid]).items[0]}catch(e){}
+        if(pi){pi.extras=[];const lane=g[1]<BB.TC?'back':'front',cs=freeSpot(pi,lane,Math.round((g[0]-BB.colX(0))/BB.PITCH)-Math.floor(foot(pi)/2));
+          if(cs==null){toast('No free space for '+pjName(nid)+' there.');return}
+          pr.layout={...(pr.layout||{}),[nid]:{lane,cs}}}
+      }
+    }
     pr.parts.push(nid);if(set>0){pr.where=pr.where||{};pr.where[nid]=set}PJ.where=pr.where||{};delete pr.autopin;try{pjAutoPins(pr)}catch(e){}
     await pjSave(pr);toast('Added '+pjName(nid));rebuild(999);
   }
