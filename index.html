@@ -2330,7 +2330,7 @@ const Link={
     if(o.c==='NMEA'){Traffic.emit({d:'rx',line,kind:'async'});for(const f of this.listeners)f(o);return}
     log('rx',line);
     if(o.c==='HCRX'){Traffic.emit({d:'rx',line,kind:'async'});for(const f of this.listeners)f(o);return}
-    if(o.c==='BOOT'){Traffic.emit({d:'rx',line,kind:'async'});return}
+    if(o.c==='BOOT'){Traffic.emit({d:'rx',line,kind:'async'});if(this.mode==='serial'&&this.fw){try{BRD.forgetSent()}catch(e){}try{toast('The ESP32 restarted by itself. Servos or motors on USB power often cause this. Use a separate supply and join the grounds.')}catch(e){}}return}
     /* a reply that comes after its command timed out must not be taken as the answer to the next command of the same name */
     const lt=this.late||(this.late=[]),now=Date.now(),li=lt.findIndex(l=>l.name===o.c&&now-l.t<12000);
     if(li>=0){lt.splice(li,1);Traffic.emit({d:'rx',line,kind:'late'});return}
@@ -2435,7 +2435,7 @@ function demoReply(line){
     case 'INFO':return {c,ok:1,fw:'tester-1.4 (simulated)',chip:'ESP32-D0WD-V3',rev:301,cpu:240,heap:212000,up:Date.now()-Demo.t0};
     case 'OUT':if(!FW_OUT.includes(a[0]))return {c,ok:0,err:'pin not allowed. Use 2, 4, 5, 13 to 19, 21 to 23, 25 to 27, 32, 33'};Demo.out[a[0]]=a[1]?1:0;return {c,ok:1,pin:a[0],v:a[1]?1:0};
     case 'IN':if(![...FW_OUT,...IN_ONLY].includes(a[0]))return {c,ok:0,err:'pin not allowed'};return {c,ok:1,pin:a[0],v:a[0] in Demo.din?Demo.din[a[0]]:(Math.random()>.5?1:0)};
-    case 'SERVO':if(!svPins().includes(a[0]))return {c,ok:0,err:'pin must be 13, 14, 27, 32 or 33'};return {c,ok:1,pin:a[0],deg:a[1]};
+    case 'SERVO':if(!FW_OUT.includes(a[0]))return {c,ok:0,err:'pin not allowed. Use 2, 4, 5, 13 to 19, 21 to 23, 25 to 27, 32, 33'};return {c,ok:1,pin:a[0],deg:a[1]};
     case 'SERVOOFF':return {c,ok:1,pin:a[0]};
     case 'SCAN':return {c,ok:1,a:[...new Set([44,104,118,119,...Demo.sim.i2c,...Object.keys(Demo.i2c||{}).map(Number)])].sort((x,y)=>x-y)};
     case 'IMU':{const S=Demo.sim||{},th=(S.pitch||0)*Math.PI/180,ph=(S.roll||0)*Math.PI/180,g=9.78;return {c,ok:1,who:104,ax:r3(-g*Math.sin(th)+.12+n()*.06),ay:r3(g*Math.cos(th)*Math.sin(ph)-.08+n()*.06),az:r3(g*Math.cos(th)*Math.cos(ph)+n()*.08),gx:r2(-10.2+n()*.4),gy:r2(-15.1+n()*.4),gz:r2(.6+n()*.3+(S.spin?90:0)),t:27.4}}
@@ -2756,20 +2756,24 @@ function servoSVG(kind){
     applied(a){horn.style.transform=`translate(${cx}px,${cy}px) rotate(${a-90}deg)`},
     angleAt(e){const p=svgPt(s,e),dx=p.x-cx,dy=cy-p.y;let a=180-Math.atan2(Math.max(dy,0),dx)*180/Math.PI;if(dy<0)a=dx<0?0:180;return Math.max(0,Math.min(180,Math.round(a)))}};
 }
+const SV_MEM={};
 function pServo(b,kind){
-  let pin=CFG.sv0,ang=90,applied=null,busy=false,pend=null;
+  const myCtx=(typeof PJ!=='undefined'&&PJ.ctx)||null,mkey=(myCtx||'_')+'|'+kind,mem=SV_MEM[mkey]||(SV_MEM[mkey]={pin:CFG.sv0,ang:90});
+  const eff=p=>{const o=myCtx&&typeof PJ!=='undefined'&&PJ.ovr&&PJ.ovr[myCtx];return o&&o[p]!=null?o[p]:p};
+  const D=(l,t)=>{if(typeof PJ==='undefined')return dev(l,t);const prev=PJ.ctx;PJ.ctx=myCtx;try{return dev(l,t)}finally{PJ.ctx=prev}};
+  let pin=mem.pin,ang=mem.ang,applied=null,busy=false,pend=null;
   const V=servoSVG(kind);
   const selR=readout('Selected angle',{accent:true,init:'90°'}),appR=readout('Applied angle',{right:true,init:'n/a',note:'reported by the ESP32'});
   const pulse=el('span',{class:'mono'},'');
   const rng=el('input',{type:'range',min:0,max:180,value:ang,id:'ang','aria-label':'Servo angle'});
-  function draw(a){V.sel(a);selR.set(a+'°',`GPIO${pin}`);rng.value=a;pulse.textContent=`pulse ${Math.round(500+a*1900/180)} µs`}
+  function draw(a){V.sel(a);selR.set(a+'°',`GPIO${eff(pin)}`);rng.value=a;pulse.textContent=`pulse ${Math.round(500+a*1900/180)} µs`}
   function showApplied(){if(applied==null){appR.set('n/a',Link.mode==='none'?'connect or start Simulated mode':'no reply yet');V.applied(ang)}else{appR.set(applied+'°','reported by the ESP32');V.applied(applied)}}
   async function push(a){
-    a=Math.max(0,Math.min(180,Math.round(a)));ang=a;draw(a);
+    a=Math.max(0,Math.min(180,Math.round(a)));ang=a;mem.ang=a;draw(a);
     if(Link.mode==='none'){showApplied();return}
     if(busy){pend=a;return}
     busy=true;
-    try{const o=await dev(`SERVO ${pin} ${a}`);applied=o.deg;showApplied()}catch(e){toast(e.message)}
+    try{const o=await D(`SERVO ${pin} ${a}`,1800);applied=o.deg;showApplied()}catch(e){applied=null;showApplied();toast(/timeout/.test(e.message)?'The ESP32 stopped answering. With servos on USB power the board can brown out and restart. Power the servos from a separate 5 V supply and join the grounds.':e.message)}
     busy=false;
     if(pend!=null){const p=pend;pend=null;push(p)}
   }
@@ -2791,10 +2795,11 @@ function pServo(b,kind){
   b.append(stage({reads:[selR,appR],visual:V.el,caption:'Top view, single-arm horn. Drag the gold handle or the arm, or use the arrow keys on the handle.',title:'Adjust position',
     controls:[row(rng),row(btn('−1°',()=>{live.stop();return push(ang-1)}),btn('Centre 90°',()=>{live.stop();return push(90)},'primary'),btn('+1°',()=>{live.stop();return push(ang+1)}),pulse),
       row(...[0,30,60,120,180].map(a=>btn(a+'°',()=>{live.stop();return push(a)},'sm'))),
-      row(sweepB,btn('Hold test 2x',latch),btn('Release',async()=>{live.stop();await dev(`SERVOOFF ${pin}`);applied=null;showApplied()})),
-      row(el('span',{class:'lbl'},'Pin'),sel('svPin',svOpts(),pin,v=>{live.stop();pin=+v;applied=null;draw(ang);showApplied()})),
+      row(sweepB,btn('Hold test 2x',latch),btn('Release',async()=>{live.stop();await D(`SERVOOFF ${pin}`);applied=null;showApplied()})),
+      row(el('span',{class:'lbl'},'Pin'),sel('svPin',svPins().map((p,i)=>[p,`GPIO${eff(p)} servo ${i+1}`]),pin,v=>{live.stop();pin=+v;mem.pin=pin;applied=null;draw(ang);showApplied()})),
       el('p',{class:'hint'},'The sweep button moves only from 0 to 90 degrees. Use the angle buttons for 120 and 180. '+(kind==='mg'?'MG996R pulse range is 500 to 2500 µs, and this page uses 500 to 2400 µs. ':'SG90 pulse range is 500 to 2400 µs. ')+'On USB power use this for an unloaded sweep only. Release detaches the signal so the horn stops holding. The first move after Connect snaps to the angle you send, so start with the horn free.')]}));
-  cleanups.push(()=>{if(Link.mode!=='none')return dev(`SERVOOFF ${pin}`).catch(()=>{})});
+  cleanups.push(()=>{if(Link.mode!=='none')return D(`SERVOOFF ${pin}`).catch(()=>{})});
+  if(Link.mode!=='none'&&mem.ang!==90)push(mem.ang);
 }
 
 function attSVG(){
@@ -11928,8 +11933,9 @@ function pjDash(body,pr,nRuns){
     const p=pjPart(id),own=PJ.owner(pr.id,id);PJ.tiles.push(own);
     const tb=el('div',{class:'pj-tb'}),prev=PJO;PJO=own;
     for(const ev of ['pointerdown','keydown','focusin','change'])tb.addEventListener(ev,()=>{PJ.ctx=id},true);
+    PJ.ctx=id;
     try{const r=TESTS[pjBase(id)](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
-    finally{PJO=prev}
+    finally{PJO=prev;PJ.ctx=null}
     own.st=el('span',{class:'chip dash'},'No live mode');own.res=el('span',{class:'pj-res'});
     /* with several parts the tests start folded, so the dashboard is a short list with one result per part. Folded with max-height, not display:none, so the tests still size themselves correctly. */
     const tile=el('section',{class:'pj-tile'+(pr.parts.length>1?' col':''),'aria-label':p.n});
@@ -13596,6 +13602,7 @@ function pjBuild(body,pr){
   const total=items.length+2;
   const figHelp=el('p',{class:'sr-only',id:'bb-fig-help'},'Arrow keys spin the board. Enter or Space opens the test of the part just added. The same steps are listed as text under the drawing.');
   const fig=el('div',{class:'bb-fig',role:'group','aria-roledescription':'3D breadboard',tabindex:'0','aria-label':'Breadboard with the project parts','aria-describedby':'bb-fig-help'});
+  for(const ev of ['mousedown','pointerdown','auxclick','mouseup'])fig.addEventListener(ev,e=>{if(e.button===1)e.preventDefault()});
   fig.innerHTML=sc.svg;
   let svg=fig.firstChild;
   /* real 3D when WebGL is there: the flat drawing is the fallback */
@@ -13809,6 +13816,7 @@ function pjBuild(body,pr){
     if(tsel===id&&testFold.classList.contains('on'))return;
     townLives.forEach(l=>{try{l.stop()}catch(e){}});townLives=[];tsel=id;
     const own=PJ.owner(pr.id,id),tb=el('div',{class:'bb-tb2'}),prevO=PJO,prevHL=HL;PJO=own;HL='h4';
+    PJ.ctx=id;
     try{const r=TESTS[bid](tb);if(r&&r.catch)r.catch(()=>{})}catch(e){tb.replaceChildren(el('p',{class:'hint'},'This part could not load here: '+(e.message||e)))}
     finally{PJO=prevO;HL=prevHL}
     townLives=own.lives;PJ.ctx=id;
