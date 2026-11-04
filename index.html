@@ -2440,7 +2440,7 @@ function demoReply(line){
     case 'SCAN':return {c,ok:1,a:[...new Set([44,104,118,119,...Demo.sim.i2c,...Object.keys(Demo.i2c||{}).map(Number)])].sort((x,y)=>x-y)};
     case 'IMU':{const S=Demo.sim||{},th=(S.pitch||0)*Math.PI/180,ph=(S.roll||0)*Math.PI/180,g=9.78;return {c,ok:1,who:104,ax:r3(-g*Math.sin(th)+.12+n()*.06),ay:r3(g*Math.cos(th)*Math.sin(ph)-.08+n()*.06),az:r3(g*Math.cos(th)*Math.cos(ph)+n()*.08),gx:r2(-10.2+n()*.4),gy:r2(-15.1+n()*.4),gz:r2(.6+n()*.3+(S.spin?90:0)),t:27.4}}
     case 'MAG':{const g=Demo.sim&&Demo.sim.head!=null?Demo.sim.head*Math.PI/180:(Date.now()/4000)%(2*Math.PI),r4=v=>+v.toFixed(4);return {c,ok:1,type:'QMC5883P',x:r4(.38*Math.cos(g)),y:r4(.38*Math.sin(g)),z:r4(-.29+n()*.01)}}
-    case 'BARO':return {c,ok:1,d:[{a:118,id:88,chip:'BMP280',t:+(27.1+n()*.05).toFixed(2),p:+(1006.4+n()*.12).toFixed(2)},{a:119,id:85,chip:'BMP180',t:27.4,p:+(1006.1+n()*.3).toFixed(2)}]};
+    case 'BARO':return {c,ok:1,d:[{a:118,id:88,chip:'BMP280',t:+(27.1+n()*.05).toFixed(2),p:+(1006.4+n()*.12).toFixed(2)},{a:119,id:85,chip:'BMP180',t:27.4,p:+(1006.1+n()*.05).toFixed(2)}]};
     case 'SD':return {c,ok:1,type:'SDHC',mb:15193,bytes:31,match:1,ms:410};
     case 'SDLS':return {c,ok:1,f:[{n:'tester.txt',s:31,d:0},{n:'LOG001.CSV',s:184320,d:0}]};
     case 'BATT':return {c,ok:1,pin_mv:1985+Math.round(n()*6),batt_mv:3970+Math.round(n()*12)};
@@ -2495,7 +2495,7 @@ function resultChip(id){
 
 /* ---------- component data ---------- */
 const I2C_ROWS=[['3V3','VCC / VIN','red','pwr'],['GND','GND','black','gnd'],['GPIO21','SDA','green','sig'],['GPIO22','SCL','yellow','sig']];
-const KNOWN={0x68:'MPU6050 (AD0 low)',0x69:'MPU6050 (AD0 high)',0x2C:'QMC5883P compass (GY-87 / HW-290)',0x0D:'QMC5883L compass',0x1E:'HMC5883L compass',0x76:'BMP280 / BME280 (SDO low)',0x77:'BMP180, or BMP280 with SDO high',0x3C:'SSD1306 OLED 0.96"',0x3D:'SSD1306 OLED 0.96" (alt address)',0x27:'PCF8574 LCD 1602 backpack',0x3F:'PCF8574A LCD 1602 backpack',0x29:'VL53L0X',0x48:'ADS1115',0x57:'EEPROM / MAX30102'};
+const KNOWN={0x68:'MPU-6050, MPU-9250 or DS3231 (AD0 low)',0x69:'MPU-6050 or MPU-9250 (AD0 high)',0x2C:'QMC5883P compass (GY-87 / HW-290)',0x0D:'QMC5883L compass',0x1E:'HMC5883L compass',0x76:'BMP280 / BME280 (SDO low)',0x77:'BMP180, or BMP280 with SDO high',0x3C:'SSD1306 OLED 0.96"',0x3D:'SSD1306 OLED 0.96" (alt address)',0x27:'PCF8574 LCD 1602 backpack',0x3F:'PCF8574A LCD 1602 backpack',0x29:'VL53L0X',0x48:'ADS1115',0x57:'EEPROM / MAX30102'};
 
 const PARTS=[
 {id:'home',n:'Home',s:'What this is, and how to start',home:true},
@@ -3172,11 +3172,11 @@ const PBDATA={
     note:'Sellers print this 4-pin strip in different orders. Flux lists VCC, RX, TX, GND. Cirkit lists VCC, GND, TX, RX. Match by the printed label. Module TX goes to ESP32 RX2, module RX to ESP32 TX2. Supply is 3.3 to 5 V.',refs:[REF.gpsA,REF.gpsB]},
   'HC-12':{n:'HC-12',pins:['VCC','GND','RXD','TXD','SET','ANT'],alias:{},src:'v',
     note:'Pins 1 to 6 from the HC-12 manual (pins 7 and 8 are extra GND, pin 9 is NC). Supply is 3.2 to 5.5 V. Above 4.5 V the manual suggests a 1N4007 in series on VCC for long transmits. Solder the spring antenna to ANT.',refs:[REF.hc12]},
-  'SG90 servo':{n:'SG90 servo lead',pins:['GND (brown)','V+ (red)','Signal (orange)'],alias:{},src:'v',
+  'SG90 servo':{n:'SG90 servo lead',pins:['GND (brown)','V+ (red)','Signal (orange)'],alias:{'GND (brown or black)':'GND (brown)'},src:'v',
     note:'Servo lead order and colours from Components101. Supply is 4.8 to 6.5 V, normally 5 V.',refs:[REF.sg]},
   '4 x SG90':{n:'Four SG90 servos',pins:['Servo 2 signal','Servo 3 signal','Servo 4 signal','Servo 5 signal','V+ of all four','GND of all four'],alias:{},src:'v',
     note:'Each servo lead is brown (GND), red (V+), orange (signal). The four V+ leads share one rail and the four GND leads share ground.',refs:[REF.sg]},
-  'LED + 220 Ω':{n:'LED + 220 Ω',pins:['220 Ω, end A','220 Ω, end B','LED anode (long)','LED cathode (short)'],alias:{'220 Ω resistor':'220 Ω, end A','LED cathode (short leg)':'LED cathode (short)'},joins:[['220 Ω, end B','LED anode (long)']],src:'v',
+  'LED + 220 Ω':{n:'LED + 220 Ω',pins:['220 Ω, end A','220 Ω, end B','LED anode (long)','LED cathode (short)'],alias:{'220 Ω resistor':'220 Ω, end A','LED anode (long leg), via 220 Ω resistor':'220 Ω, end A','LED cathode (short leg)':'LED cathode (short)'},joins:[['220 Ω, end B','LED anode (long)']],src:'v',
     note:'Resistor and LED are separate parts. Join resistor end B to the LED long leg on the breadboard (dotted line). The resistor can sit on either side of the LED.',refs:[]},
   'Push button':{n:'Push button',pins:['Leg 1','Leg 2'],alias:{'Button leg 1':'Leg 1','Button leg 2':'Leg 2'},src:'v',
     note:'A 4-leg tactile switch has two legs joined internally on each side. Use diagonal legs.',refs:[]},
@@ -4233,7 +4233,7 @@ function pDiode(b){
         btn('Measure reverse',async()=>{const a=[];for(let i=0;i<8;i++){a.push(await take());await sleep(30)}rev=Math.round(mean(a));rR.set(rev+' mV',rev>=2800?'blocks, good':'leaks, bad')}),
         btn('Run check',()=>{
           if(fwd==null||rev==null){status.textContent='Press Measure forward, flip the diode, then Measure reverse. Then run the check.';return}
-          const ok=fwd>=100&&fwd<2800&&rev>=2800;setResult('diode',ok?'pass':'fail',`forward ${fwd} mV (${classify(fwd)}), reverse ${rev} mV`);
+          const ok=fwd>=100&&fwd<3100&&rev>=2800;setResult('diode',ok?'pass':'fail',`forward ${fwd} mV (${classify(fwd)}), reverse ${rev} mV`);
           status.textContent=(ok?'Pass: ':'Fail: ')+`forward ${fwd} mV, reverse ${rev} mV. `+(ok?'':'A good diode conducts one way and blocks the other.');
         })),
       simRow('Forward drop of the diode',150,3000,10,700,'mV',v=>{simD.vf=v}),
@@ -4455,7 +4455,7 @@ const BASIC_PARTS=[
   wiring:{title:'DHT on GPIO15',part:'DHT11 / DHT22',rows:[['3V3','VCC (+)','red','pwr'],['GPIO15','DATA (OUT)','green','sig'],['GND','GND (−)','black','gnd'],['3V3','10 kΩ to DATA (bare 4-pin sensor only)','red','opt']],notes:['The 3-pin module already has the pull-up resistor. A bare 4-pin sensor needs 10 kΩ from DATA to 3V3, and pin 3 is not connected.']},
   criteria:['At least 4 of 5 reads good.','Temperature 0 to 50 °C and humidity 10 to 95 %, stable within 2 °C.'],notes:['DHT11 reads whole numbers only, ±2 °C and ±5 %RH. DHT22 is 0.1 resolution, ±0.5 °C and ±2 %RH.']},
 {id:'sr04',n:'HC-SR04 ultrasonic distance sensor',s:'Trigger GPIO4, echo GPIO39 through a divider',
-  wiring:{title:'HC-SR04 on GPIO4 and GPIO39',part:'HC-SR04',rows:[['5V (VIN)','VCC','red','pwr'],['GPIO4','Trig','orange','sig'],['GPIO39','Echo (via 1 kΩ + 2 kΩ divider)','green','sig'],['GND','GND','black','gnd']],notes:['Echo is a 5 V output. Echo to a 1 kΩ, the other end of the 1 kΩ to GPIO39, and a 2 kΩ from GPIO39 to GND.','HC-SR04P and RCWL-1601 are 3.3 V parts: connect Echo directly.']},
+  wiring:{title:'HC-SR04 on GPIO4 and GPIO39',part:'HC-SR04',rows:[['5V (VIN)','VCC','red','pwr'],['GPIO4','Trig','orange','sig'],['GPIO39','Echo (via 1 kΩ + 2 kΩ divider)','green','sig'],['GND','GND','black','gnd']],notes:['Echo is a 5 V output. Echo to a 1 kΩ, the other end of the 1 kΩ to GPIO39, and a 2 kΩ from GPIO39 to GND.','HC-SR04P and RCWL-1601 are 3.3 V parts: move VCC to 3V3, then Echo can go straight to the pin.']},
   criteria:['At least 8 of 10 echoes returned.','Spread under 0.6 cm. Within 3 % of a known distance if you enter one.'],notes:['Range 2 to 400 cm. Soft or angled objects give no echo.']},
 {id:'abuzz',n:'Active buzzer (5 V, built-in oscillator)',s:'GPIO4, beeps on DC',
   wiring:{title:'Active buzzer on GPIO4',part:'Active buzzer',rows:[['GPIO4','+ (long leg or marked +)','orange','sig'],['GND','− (short leg)','black','gnd']],notes:['A 3-pin module: S to GPIO4, the middle pin to 5 V, − to GND.','If it is quiet, use the 2N2222 stage from the DC motor page.']},
@@ -4852,7 +4852,7 @@ defPart({id:'tsl2561',grp:'Light and colour',n:'TSL2561 luminosity sensor',s:'I2
 
 /* ---- TCS34725 ---- */
 defPart({id:'tcs34725',grp:'Light and colour',n:'TCS34725 RGB colour sensor',s:'I2C 0x29, red, green, blue and clear filters',alias:'color colour rgb adafruit white led',addrs:[0x29],
-  wiring:i2cWiring('TCS34725 on I2C','TCS34725',[['GPIO4','LED (optional, lights the target)','orange','sig']],['LED pin high switches the white LED on, low turns it off. The board LED needs about 20 mA, tie it to 3V3 if you do not need to switch it.','The INT pin stays unconnected.']),
+  wiring:i2cWiring('TCS34725 on I2C','TCS34725',[['GPIO4','LED (optional, lights the target)','orange','opt']],['LED pin high switches the white LED on, low turns it off. The board LED needs about 20 mA, tie it to 3V3 if you do not need to switch it.','The INT pin stays unconnected.']),
   criteria:['Answers at 0x29 with ID 0x44 (TCS34725) or 0x4D (TCS34727).','The clear channel rises when you hold a white card in front of it.','A red object gives red > green and blue, a green object gives green higher, and so on.'],
   notes:['Hold the object 5 to 10 mm away with the LED on for the most repeatable colours.','Integration 50 ms, gain 4x. A very bright light saturates the clear channel at 65535.'],
   fields:[{k:'clear',label:'Clear',u:'',d:0,lo:0,hi:65535,main:true,span:50},{k:'rgb',label:'Colour (R, G, B)',text:true,note:'normalised to the clear channel'}],cap:'Reads clear, red, green and blue counts and shows the colour it sees.',hint:'Hold a coloured card in front of it. White paper should give R, G and B of nearly equal size.',
@@ -4903,7 +4903,7 @@ const as7262={
 };
 const AS_CH=[['Violet 450 nm','v',0x08],['Blue 500 nm','b',0x0A],['Green 550 nm','g',0x0C],['Yellow 570 nm','y',0x0E],['Orange 600 nm','o',0x10],['Red 650 nm','r',0x12]];
 defPart({id:'as7262',grp:'Light and colour',n:'AS7262 6-channel visible spectrometer',s:'I2C 0x49, 450 to 650 nm in six bands',alias:'spectral spectrum colour color ams as7263 as7265',addrs:[0x49],
-  wiring:i2cWiring('AS7262 on I2C','AS7262',[['GPIO4','LED (optional, white LED on the board)','orange','sig']],['The board has its own white LED; the LED pin is optional. The AS7262 talks UART if the select pin is low; leave it floating for I2C on a SparkFun or Adafruit board.']),
+  wiring:i2cWiring('AS7262 on I2C','AS7262',[['GPIO4','LED (optional, white LED on the board)','orange','opt']],['The board has its own white LED; the LED pin is optional. The AS7262 talks UART if the select pin is low; leave it floating for I2C on a SparkFun or Adafruit board.']),
   criteria:['Answers at 0x49 and the hardware version register reads 0x40.','All six channels respond to light.','A red object raises the 650 nm band most, a blue object the 500 nm band.'],
   notes:['Reads the six raw channel counts. The chip also gives calibrated floats, which need 24 more reads and are not used here.','Integration 140 ms, gain 16x. Bright light saturates at 65535.'],
   fields:[...AS_CH.map(([l,k],i)=>({k,label:l,u:'',d:0,lo:0,hi:65535,main:i===2,span:100})),{k:'peak',label:'Brightest band',text:true}],ms:700,
@@ -4930,7 +4930,7 @@ function ppgRate(ir,hz){
   return 60/iv[Math.floor(iv.length/2)];
 }
 defPart({id:'max30102',grp:'Light and colour',n:'MAX30102 pulse oximeter and heart-rate sensor',s:'I2C 0x57, red and infrared LEDs',alias:'heart rate pulse spo2 oxygen ppg max30100 max30105',addrs:[0x57],
-  wiring:i2cWiring('MAX30102 on I2C','MAX30102',[['GPIO15','INT (optional)','orange','sig']],['Power the board from 3.3 V. Some red boards have 1.8 V and 3.3 V LED rails with solder jumpers; leave them as shipped.','INT is not used here, the page polls the FIFO.']),
+  wiring:i2cWiring('MAX30102 on I2C','MAX30102',[['GPIO15','INT (optional)','orange','opt']],['Power the board from 3.3 V. Some red boards have 1.8 V and 3.3 V LED rails with solder jumpers; leave them as shipped.','INT is not used here, the page polls the FIFO.']),
   criteria:['Answers at 0x57 and the part ID register reads 0x15.','Infrared count above 50 000 with a fingertip on the sensor, near 0 to 10 000 without.','A steady pulse trace and a heart rate between 40 and 180 bpm.'],
   notes:['Press lightly. Too much pressure squeezes the blood out and the pulse disappears.','The heart rate and SpO2 here are indicative and for checking the sensor only. They are not a medical measurement.','Red LED on, but no light on the finger? The board is probably a MAX30100 or the LED current is zero.'],
   fields:[{k:'ir',label:'Infrared',u:'',d:0,lo:0,hi:262143,main:true,span:2000},{k:'red',label:'Red',u:'',d:0,lo:0,hi:262143},{k:'bpm',label:'Heart rate (indicative)',u:'bpm',d:0,opt:true},{k:'spo2',label:'SpO2 (indicative)',u:'%',d:0,opt:true},{k:'finger',label:'Finger',text:true}],ms:250,
@@ -5169,7 +5169,7 @@ Object.assign(AN,{
     chk:{prompt:'Breathe out on the sensor from 5 cm, or hold an alcohol wipe close by.',secs:15,eval:s=>{const {lo,hi}=ioSt(s,'val'),stuck=hi<0.05||lo>4.8;return{ok:!stuck&&hi-lo>=0.2,note:`${lo.toFixed(2)} to ${hi.toFixed(2)} V at AO`+(stuck?', output stuck at a rail':'')}}},
     sim:{label:'Gas level',min:0,max:100,step:1,val:10,unit:'%',mv:v=>(0.5+v/100*3.2)*1000/1.5},
     hint:'Same wiring as the MQ-2: 5 V supply, and a 10 kΩ + 20 kΩ divider between AO and the pin. Let it warm up for 3 minutes (24 h the first time). It cannot give an accurate CO2 reading, it is a general air quality sensor.'},
-  tcrt5000:{pin:35,name:'Reflection',unit:'% of 3.3 V',dec:0,min:0,max:100,conv:mv=>clamp(mv/3300*100,0,100),note:mv=>mv+' mV on AO',
+  tcrt5000:{pin:35,name:'Reflection',unit:'% of 3.3 V',dec:0,min:0,max:100,conv:mv=>clamp(100-mv/3300*100,0,100),note:mv=>mv+' mV on AO',
     cap:'An infrared LED and a phototransistor side by side. A light surface close to the front reflects the beam and changes the AO voltage.',
     chk:{prompt:'Hold a white card 2 to 10 mm in front of the sensor, then take it away.',secs:10,eval:s=>{const {lo,hi}=ioSt(s,'val');return{ok:hi-lo>=25,note:`${lo.toFixed(0)} to ${hi.toFixed(0)} %, swing ${(hi-lo).toFixed(0)} points`}}},
     sim:{label:'Surface close to the sensor',min:0,max:100,step:1,val:10,unit:'%',mv:v=>3200-v/100*2900},
@@ -5187,7 +5187,7 @@ Object.assign(AN,{
     controls:(c,redo,last)=>[row(btn('Set dry',()=>{if(last())c.dry=last().mv;store.set('cts.wl',c);redo()}),btn('Set full',()=>{if(last())c.wet=last().mv;store.set('cts.wl',c);redo()}),btn('Reset',()=>{c.dry=50;c.wet=2000;store.set('cts.wl',c);redo()}))],
     hint:'Output is a voltage that depends on the water conductivity, so it is a rough level, not millimetres. Distilled water barely conducts. Power it only during readings, the traces corrode. Keep the connector end dry.'},
   ph:{pin:35,name:'pH',unit:'pH',dec:2,min:0,max:14,span:1,ctx:()=>Object.assign({m7:1667,m4:2027},store.get('cts.ph',{})),
-    conv:(mv,c)=>{const sl=(c.m4-c.m7)/(4-7);return Math.abs(sl)<5?7:clamp(7+(mv-c.m7)/sl,0,14)},note:(mv,c)=>mv+' mV, pH 7 at '+c.m7+' mV, pH 4 at '+c.m4+' mV',
+    conv:(mv,c)=>{const sl=(c.m4-c.m7)/(4-7);return (Math.abs(c.m4-c.m7)<150||sl>0)?7:clamp(7+(mv-c.m7)/sl,0,14)},note:(mv,c)=>(Math.abs(c.m4-c.m7)<150||c.m4<=c.m7)?'Calibration not valid: set pH 7 in buffer, then pH 4 in buffer again ('+mv+' mV)':mv+' mV, pH 7 at '+c.m7+' mV, pH 4 at '+c.m4+' mV',
     cap:'The probe makes about 59 mV per pH unit. The board amplifies it around 2.5 V (pH 7). Two buffer solutions calibrate the page.',
     chk:{prompt:'Rinse the probe, put it in pH 7 buffer for 10 s, rinse, then in pH 4 buffer.',secs:30,eval:s=>{const sw=ioSwing(s,'mv');return{ok:sw>=100,note:`${sw} mV between the two buffers (expected about 300 to 400 mV on the pin)`}}},
     sim:{label:'Solution pH',min:0,max:14,step:.1,val:7,unit:'pH',mv:(v,c)=>c.m7+(v-7)*(c.m4-c.m7)/(-3)},
@@ -5507,7 +5507,7 @@ ioA('mt3608','Power','MT3608 boost converter module','Output read through a divi
   'boost step up converter dc-dc voltage regulator adjustable mt3608',IO_ADC_WIRE('MT3608 boost module','MT3608 module',[['5V (VIN)','IN+','red','pwr'],['GND','IN− and OUT− (joined)','black','gnd'],['GPIO35','OUT+, via the divider shown on the page','green','sig']],['Divider: OUT+ to a resistor to the pin, and a second resistor from the pin to GND. 10 kΩ + 10 kΩ for up to 6 V, 100 kΩ + 10 kΩ for up to 36 V.','Never connect OUT+ straight to a pin.']),
   ['The output turns by 0.5 V or more over a few turns of the trimmer.'],['The output voltage is always higher than the input. It cannot regulate down.']);
 ioA('lm2596','Power','LM2596 buck converter module','Output read through a divider on GPIO35, external supply',
-  'buck step down converter dc-dc voltage regulator adjustable lm2596',IO_ADC_WIRE('LM2596 buck module','LM2596 module',[['GND','IN− and OUT− (joined) with the supply −','black','gnd'],['GPIO35','OUT+, via the divider shown on the page','green','sig']],['IN+ goes to an external 7 to 35 V supply (not the ESP32), its − to the ESP32 GND.','Never connect OUT+ straight to a pin.']),
+  'buck step down converter dc-dc voltage regulator adjustable lm2596',IO_ADC_WIRE('LM2596 buck module','LM2596 module',[['GND','IN− and OUT− (joined) with the supply −','black','gnd'],['GPIO35','OUT+, via the divider shown on the page','green','sig']],['IN+ goes to an external 4.5 to 35 V supply (at least 2 V above the output) (not the ESP32), its − to the ESP32 GND.','Never connect OUT+ straight to a pin.']),
   ['The output turns by 0.5 V or more over a few turns of the trimmer.'],['The output is always lower than the input by at least 1.5 to 2 V. The power must come from outside.']);
 ioA('tp4056','Power','TP4056 Li-ion charger module (with or without protection)','Battery voltage on GPIO35 through a divider, 5 V input',
   'lithium charger lipo li-ion battery charger usb tp4056 18650',IO_ADC_WIRE('TP4056 module','TP4056 module',[['5V (VIN)','IN+','red','pwr'],['GND','IN− (with the cell −)','black','gnd'],['GPIO35','B+, via 10 kΩ and 10 kΩ to GND','green','sig']],['A single Li-ion cell goes on B+ and B−, observing polarity. The OUT+ and OUT− pads (protected version) power a load.','The cell voltage is up to 4.2 V: the divider keeps the pin below 3.3 V.']),
@@ -5536,7 +5536,8 @@ defPart({id:'ssr',grp:'Relays and lamps',n:'Solid state relay SSR-25DA (3 to 32 
 const uartWiring=(title,part,extra,notes,vcc)=>({title,part,rows:[vcc||['3V3','VCC (3.3 V)','red','pwr'],['GND','GND','black','gnd'],['GPIO16','ESP32 RX2 <- module TX','green','sig'],['GPIO17','ESP32 TX2 -> module RX','yellow','sig'],...(extra||[])],notes:notes||[]});
 const uartEx=(baud,hexTx,title)=>({cmd:{[title||'Send and listen']:`UOPEN ${baud} 16 17\nUTXR ${hexTx} 600 128\n`,'Listen only':`UOPEN ${baud} 16 17\nURX 1500 256\n`},js:{[title||'Send and listen']:`await dev('UOPEN ${baud} 16 17');\nconst r = await dev('UTXR ${hexTx} 600 128', 4000);\nprint(r.r);\n`}});
 const uFind=(rx=16,tx=17,note)=>async c=>{const b=+(c.opt.baud||c.S.baud);await uopen(b,rx,tx);return {ok:true,note:'UART2 open at '+b+' baud, module TX to GPIO'+rx+', module RX to GPIO'+tx+(note?'. '+note:'')}};
-const atq=async(cmd,wait=800)=>asText(await utx(textHex(cmd+'\r'),wait,300));
+let atEol='\r';
+const atq=async(cmd,wait=800)=>asText(await utx(textHex(cmd+atEol),wait,300));
 const sumLow=(b,from,to)=>{let s=0;for(let i=from;i<to;i++)s+=b[i];return s&255};
 const baudOpt=(list,def)=>[{k:'baud',label:'Baud rate',choices:list.map(b=>[b,String(b)]),def}];
 
@@ -5620,8 +5621,8 @@ function atPart(o){
   defPart({id:o.id,grp:'Radio, network and location',n:o.n,s:o.s,alias:o.alias,cmds:['UOPEN','UTXR'],baud:o.baud,
     wiring:uartWiring(o.wt,o.wp,o.wextra||[],o.wnotes,o.wvcc),criteria:o.criteria,notes:o.notes,
     fields:o.fields,reads:1,ms:2500,opts:baudOpt(o.bauds,o.baud),cap:o.cap,hint:o.hint,find:uFind(),
-    async ident(c){let r='';for(let i=0;i<3&&!/OK/.test(r);i++)r=await atq('AT',700);return /OK/.test(r)?{ok:true,note:'AT answered OK'}:{ok:false,note:o.noreply}},
-    read:o.read,sim:o.sim,demo:o.demo,extra:o.extra,ex:{cmd:{'AT test':`UOPEN ${o.baud} 16 17\nUTXR 41540d 700 64\n`,'Signal':`UOPEN ${o.baud} 16 17\nUTXR ${textHex('AT+CSQ\r')} 700 64\n`},js:{'Signal':`await dev('UOPEN ${o.baud} 16 17');\nconst r = await dev('UTXR ${textHex('AT+CSQ\r')} 700 128', 4000);\nprint(r.r);\n`}}});
+    async ident(c){atEol=o.eol||'\r';let r='';for(let i=0;i<3&&!/OK/.test(r);i++)r=await atq('AT',700);return /OK/.test(r)?{ok:true,note:'AT answered OK'}:{ok:false,note:o.noreply}},
+    read:o.read?function(...a){atEol=o.eol||'\r';return o.read.apply(this,a)}:o.read,sim:o.sim,demo:o.demo,extra:o.extra,ex:{cmd:{'AT test':`UOPEN ${o.baud} 16 17\nUTXR 41540d 700 64\n`,'Signal':`UOPEN ${o.baud} 16 17\nUTXR ${textHex('AT+CSQ\r')} 700 64\n`},js:{'Signal':`await dev('UOPEN ${o.baud} 16 17');\nconst r = await dev('UTXR ${textHex('AT+CSQ\r')} 700 128', 4000);\nprint(r.r);\n`}}});
 }
 const csqDbm=n=>n>=0&&n<=31?-113+2*n:NaN;
 const atNum=(t,re)=>{const m=t.match(re);return m?+m[1]:NaN};
@@ -5655,7 +5656,7 @@ atPart({id:'a7670c',n:'A7670C 4G LTE Cat-1 module',s:'UART, 4G data and SMS, 3.4
     return {mv,model:m||'unknown',dbm:q===99?NaN:csqDbm(q),sim:/READY/.test(pin)?'ready':/NOT INSERTED/.test(pin)?'not inserted':'no answer',net:st===1?'registered (home)':st===5?'registered (roaming)':st===2?'searching':st===0?'not registered':'unknown'}},
   sim:[{k:'mv',label:'Supply',min:3000,max:4400,step:10,val:3980,unit:'mV'},{k:'csq',label:'Signal CSQ',min:0,max:31,step:1,val:20,unit:''},{k:'sim',label:'SIM inserted',min:0,max:1,step:1,val:1,unit:'0 no, 1 yes'}],
   demo:sv=>{const d=cellDemo(sv,'A7670C-LASC');return {uart:(tx)=>{const s=asText(tx);if(/CBC/.test(s)){const o='\r\n+CBC: '+(sv.mv/1000).toFixed(3)+'V\r\n\r\nOK\r\n';return Uint8Array.from([...o].map(c=>c.charCodeAt(0)))}return d.uart(tx)}}}});
-atPart({id:'hc05',n:'HC-05 classic Bluetooth serial module',s:'UART, AT mode at 38400 baud, 3.3 V logic',alias:'bluetooth serial bt spp hc-06 wireless',baud:38400,bauds:[38400,9600,115200],
+atPart({id:'hc05',eol:'\r\n',n:'HC-05 classic Bluetooth serial module',s:'UART, AT mode at 38400 baud, 3.3 V logic',alias:'bluetooth serial bt spp hc-06 wireless',baud:38400,bauds:[38400,9600,115200],
   wt:'HC-05 on UART2',wp:'HC-05',wextra:[['GPIO15','KEY / EN (3V3 at power-up for AT mode)','orange','sig']],wvcc:['5V (VIN)','VCC (3.6 to 6 V)','red','pwr'],
   wnotes:['VCC 3.6 to 6 V (the board has a regulator). The data pins are 3.3 V and connect straight to the ESP32.','AT mode: hold the module button, or hold KEY / EN high, while you power it up. The LED then blinks slowly (every 2 s) and the baud is 38400.','In normal mode the LED blinks fast and the module talks at its stored baud (usually 9600).'],
   criteria:['In AT mode AT answers OK.','Version string returned.','Name and address read back.'],
@@ -5741,7 +5742,7 @@ defPart({id:'rc522',grp:'ID and access',n:'RC522 RFID reader (MFRC522, 13.56 MHz
   async ident(c){const v=await rc.rd(0x37);return [0x91,0x92,0x88,0xB2,0x82].includes(v)?{ok:true,note:'VersionReg '+hex(v)+(v===0x92?' (v2.0)':v===0x91?' (v1.0)':v===0x88?' (clone)':'')}:{ok:false,note:'VersionReg '+hex(v)+(v===0||v===0xFF?'. No answer: check 3.3 V, SDA to GPIO5, MISO, MOSI, SCK':', not a known MFRC522 version')}},
   async read(c){const tc=await rc.rd(0x14),o={ver:'0x'+(await rc.rd(0x37)).toString(16).toUpperCase(),ant:(tc&3)===3?'on':'off ('+hex(tc)+')',atqa:'no card',uid:'no card',n:0};
     const a=await rc.trx([0x26],7);if(a.ok&&a.d.length===2){o.atqa=B2H(a.d).toUpperCase();const u=await rc.trx([0x93,0x20],0);
-      if(u.ok&&u.d.length===5){const bcc=u.d[0]^u.d[1]^u.d[2]^u.d[3];o.uid=u.d.slice(0,4).map(x=>x.toString(16).toUpperCase().padStart(2,'0')).join(' ')+(bcc===u.d[4]?'':' (check byte wrong)')+(u.d[0]===0x88?' (7 byte UID, first part)':'');o.n=1}}
+      if(u.ok&&u.d.length===5){const bcc=u.d[0]^u.d[1]^u.d[2]^u.d[3];o.uid=Array.from(u.d.slice(0,4)).map(x=>x.toString(16).toUpperCase().padStart(2,'0')).join(' ')+(bcc===u.d[4]?'':' (check byte wrong)')+(u.d[0]===0x88?' (7 byte UID, first part)':'');o.n=1}}
     return o},
   stim:{prompt:'Hold a card or fob on the antenna.',secs:12,key:'n',rise:1,name:'card',d:0,gap:300,optional:true,btn:'Card test'},
   sim:[{k:'card',label:'Card on the antenna',min:0,max:1,step:1,val:1,unit:'0 no, 1 yes'}],
@@ -5919,7 +5920,7 @@ defPart({id:'step28',grp:'Motors and drivers',n:'28BYJ-48 unipolar stepper motor
 
 /* ---- step and direction drivers: A4988 and NEMA 17 ---- */
 function mvStepDir(cfg){return function(b){
-  let alive=true,stop=false,micro=16,sps=500,hold=false,deg=0,steps=0;const SP=14,DR=27,EN=32,dial=MT.stepper('nema17','NEMA 17 stepper motor, shaft turning');
+  let alive=true,stop=false,micro=1,sps=500,hold=false,deg=0,steps=0;const SP=14,DR=27,EN=32,dial=MT.stepper('nema17','NEMA 17 stepper motor, shaft turning');
   cleanups.push(()=>{alive=false;stop=true;if(Link.mode!=='none')return dev(`OUT ${EN} 1`).catch(()=>{})});onStop(()=>{stop=true});
   const aR=readout('Commanded angle',{accent:true,init:'0°'}),sR=readout('Steps sent',{right:true,init:'0'}),vR=readout('Speed',{right:true,init:'n/a'});
   const status=el('p',{class:'hint chk','aria-live':'polite'},'');
@@ -5939,7 +5940,7 @@ function mvStepDir(cfg){return function(b){
 }}
 const SD_ROWS=[['GPIO14','STEP','orange','sig'],['GPIO27','DIR','yellow','sig'],['GPIO32','EN (enable, active LOW)','purple','sig']];
 defPart({id:'a4988',grp:'Motors and drivers',n:'A4988 stepper motor driver module (1 A, 8 to 35 V)',s:'STEP GPIO14, DIR GPIO27, EN GPIO32, motor supply separate',alias:'stepper driver a4988 drv8825 step dir pololu microstep',cmds:['STEPD','OUT'],
-  wiring:{title:'A4988 step and direction',part:'A4988 driver',rows:[...SD_ROWS,['3V3','VDD (logic) and RESET to SLEEP (joined)','red','pwr'],['GND','GND (logic side)','black','gnd'],['GND','Motor supply − (joined to the ESP32 GND)','black','gnd'],['5V (VIN)','Motor supply + goes on VMOT, NOT here: use 8 to 35 V','red','opt']],notes:['VMOT needs 8 to 35 V and a 100 µF capacitor next to the board. Set the current limit BEFORE you plug a motor in.','RESET and SLEEP must be joined (or both tied to 3V3), or the driver stays off.','MS1 to MS3: all open for full step, all to 3V3 for 1/16 microstep. Microstep selection on this page only changes how it counts steps.','Never connect or unplug the motor while the supply is on: it kills the driver.']},
+  wiring:{title:'A4988 step and direction',part:'A4988 driver',rows:[...SD_ROWS,['3V3','VDD (logic) and RESET to SLEEP (joined)','red','pwr'],['GND','GND (logic side)','black','gnd'],['GND','Motor supply − (joined to the ESP32 GND)','black','gnd']],notes:['The motor supply + goes on VMOT (8 to 35 V), not on the ESP32. Put a 100 µF capacitor next to the board. Set the current limit BEFORE you plug a motor in.','RESET and SLEEP must be joined (or both tied to 3V3), or the driver stays off.','MS1 to MS3: all open for full step, all to 3V3 for 1/16 microstep. Microstep selection on this page only changes how it counts steps.','Never connect or unplug the motor while the supply is on: it kills the driver.']},
   criteria:['The shaft turns one revolution each way.','The motor runs smoothly, not rattling.'],notes:['Typical Vref = 8 x current x sense resistor (the page shows the formula). Turn the little trimmer, measure between the trimmer and GND.','The chip overheats above about 1 A without a heat sink and airflow.'],
   page:mvStepDir({vref:true,cap:'Each pulse on STEP moves the motor one (micro)step, DIR picks the direction, EN switches the output stage. The ESP32 only sends pulses.',hint:'Wire the motor coils to 1A 1B and 2A 2B: find the two coil pairs with a multimeter (a pair reads a few ohms, different pairs read open). If the motor shakes instead of turning, one coil is swapped. The Release motor button turns EN HIGH, the shaft turns freely by hand. A step rate above about 1000 per second needs ramping up.'}),
   ex:{cmd:{'200 steps':'OUT 32 0\nSTEPD 14 27 200 1000\nOUT 32 1\n','Back':'OUT 32 0\nSTEPD 14 27 -200 1000\nOUT 32 1\n'},js:{'One turn at 1/16':"await dev('OUT 32 0');\nawait dev('STEPD 14 27 3200 500', 8000);\nawait dev('OUT 32 1');\n"}}});
@@ -6547,7 +6548,7 @@ function studioMount(host,typeKey,o={}){
       stField('Brightness limit',(()=>{const r=el('input',{type:'range',min:5,max:100,value:Math.round((cfg.limit??.5)*100),'aria-label':'Brightness limit'});r.addEventListener('change',()=>{cfgSet('limit',+r.value/100);changed()});return r})()));
       if(T.bpp===4)rows.push(stChk('Use the white LED for grey',cfg.white,v=>cfgSet('white',v)))}
     cfgBox.append(el('div',{class:'stgrid'},...rows));
-    if(T.kind==='rgb')cfgBox.append(el('p',{class:'hint'},'Power: a lit LED draws up to 20 mA per colour, 60 mA for white. More than about 30 LEDs need their own 5 V supply with the ground joined to the ESP32. The brightness limit keeps USB safe. A 3.3 V data pin works with most strips at short wires; add a 330 ohm resistor in series and a 1000 µF capacitor across the strip supply.'));
+    if(T.kind==='rgb')cfgBox.append(el('p',{class:'hint'},'Power: a lit LED draws up to 20 mA per colour, 60 mA for white (up to 80 mA on RGBW parts such as the SK6812). More than about 10 LEDs at full white can pass what USB gives, so a larger grid needs its own 5 V supply with the ground joined to the ESP32. Lowering the brightness limit cuts the current but is not a guarantee. A 3.3 V data pin works with most strips at short wires; add a 330 ohm resistor in series and a 1000 µF capacitor across the strip supply.'));
     if(T.tft)cfgBox.append(el('p',{class:'hint'},'The panel is drawn in blocks of '+cfg.scale+' x '+cfg.scale+' pixels so that a full animation fits in the board memory. SCK is GPIO18 and MOSI (SDA) is GPIO23, they cannot move. Wrong colours: swap red and blue. Negative colours: invert. Picture offset by a few pixels at the edge: try the other panel size.'));
     if(T.oled)cfgBox.append(el('p',{class:'hint'},'Both addresses are tried when set to Find it. A 0.96 inch SSD1306 and a 1.3 inch SH1106 look the same on the bus, so pick the right panel here: on the wrong chip the picture is shifted by 2 pixels or has a noisy edge.'));
   }
@@ -7422,7 +7423,7 @@ defPart({id:'psu12',grp:'Power',n:'12 V supply (adapter or bench supply, 12 to 2
   cmds:null,wiring:{title:'Supply ground to the ESP32',part:'12 V supply',rows:[['GND','Supply − (join to the ESP32 ground)','black','gnd']],
     notes:['Supply + goes to the driver motor-supply pin (VMOT on the A4988, VM on the TMC2209, +12V on the L298N), never to an ESP32 pin.','Switch the supply off before you connect or unplug a motor.']},
   criteria:['Open-circuit voltage reads 12 V to 24 V, as the driver allows.','Ground is joined to the ESP32 ground.'],
-  page:pPsu([['rate','The label says 12 V to 24 V and at least 2 A for a NEMA 17'],['volt','A multimeter on the plug reads 12 V ±5 % with nothing connected'],['pol','Barrel jack: the centre is usually +. Check it with the meter before you wire it'],['gnd','Supply − is joined to the driver GND and an ESP32 GND pin'],['cap','A 100 µF capacitor sits across the driver supply pins'],['off','The supply is off while you connect or unplug the motor']],{id:'psu12',rows:['Supply + goes to the driver: VMOT (A4988), VM (TMC2209) or +12V (L298N).',PSU_GND]})});
+  page:pPsu([['rate','The label says 12 V to 24 V and at least 2 A for a NEMA 17'],['volt','A multimeter on the plug reads the label voltage ±5 % (12 V to 24 V) with nothing connected'],['pol','Barrel jack: the centre is usually +. Check it with the meter before you wire it'],['gnd','Supply − is joined to the driver GND and an ESP32 GND pin'],['cap','A 100 µF capacitor sits across the driver supply pins'],['off','The supply is off while you connect or unplug the motor']],{id:'psu12',rows:['Supply + goes to the driver: VMOT (A4988), VM (TMC2209) or +12V (L298N).',PSU_GND]})});
 defPart({id:'psuadj',grp:'Power',n:'Adjustable bench supply (0 to 30 V, current limit)',s:'Any voltage for drivers, radios and modems, ground shared with the ESP32',alias:'power supply psu bench adjustable variable lab 30v current limit sim800l a7670c',
   cmds:null,wiring:{title:'Supply ground to the ESP32',part:'Bench supply',rows:[['GND','Supply − (join to the ESP32 ground)','black','gnd']],
     notes:['Set the voltage and the current limit before you connect the load.','Supply + goes to the load, never to an ESP32 pin.']},
@@ -7519,6 +7520,7 @@ function pPreflight(b){
       el('h4',{},'Analog pins (ADC)'),adcTbl);
     const n=held.length+hi.length;
     stat.textContent=n?'Done. '+n+' pin'+(n>1?'s are':' is')+' held by something. Do not drive those pins from a test unless a module is meant to pull them.':'Done. Every digital pin is free.';
+    try{setResult('preflight','pass',n?n+' pin'+(n>1?'s':'')+' held, '+addrs.length+' I2C device'+(addrs.length===1?'':'s'):'every digital pin free, '+addrs.length+' I2C device'+(addrs.length===1?'':'s'))}catch(e){}
   }
   b.append(blk(null,
     el('p',{class:'hint'},'Finds out what is attached before a test drives a pin. It reads the I2C bus, then switches each pin to input with the internal pull-up and then the pull-down. A pin that stays HIGH or LOW with both is held by something: a module pull-up, another output, or a short.'),
@@ -12046,19 +12048,20 @@ const PJ_NEED={
   sim800l:[['error','power','Needs its own supply','It needs 3.4 to 4.4 V and bursts of 2 A. The ESP32 3V3 and 5V pins cannot give that.','Use a LiPo cell or a 4 V supply that can give 2 A. Join its ground to the ESP32 ground.','4 V supply (2 A)'],
        ['error','missing','Supply capacitor','The current bursts crash the supply without a nearby capacitor.','Add a 1000 µF capacitor close to the module supply pins.','1000 µF capacitor'],
        ['warn','level','Module RX level','The module logic is 2.8 V. Most boards accept 3.3 V on RX, a divider is safer.','Put a 1 kΩ resistor in series, then 2 kΩ from the RX pin to GND.','2 kΩ resistor']],
-  a7670c:[['error','power','Needs its own supply','It needs 3.4 to 4.2 V with 2 A bursts, like the SIM800L.','Use a supply or LiPo that can give 2 A. Boards with USB-C take 5 V there. Join its ground to the ESP32 ground.','4 V supply (2 A)']],
+  a7670c:[['error','power','Needs its own supply','It needs 3.4 to 4.2 V with 2 A bursts, like the SIM800L.','Use a supply or LiPo that can give 2 A. Boards with USB-C take 5 V there. Join its ground to the ESP32 ground.','4 V supply (2 A)'],
+       ['warn','level','Bare module UART is 1.8 V','On a bare A7670C module the UART pins are 1.8 V, the ESP32 pins are 3.3 V.','Put a level converter between the module and the ESP32 TX and RX, unless your board already has one.','Level converter (1.8 V to 3.3 V)']],
   lcd:[],
   sr04:[['warn','level','ECHO is a 5 V signal','The ECHO pin swings to 5 V and the ESP32 pins are only rated for 3.3 V.','Put 1 kΩ in series with ECHO and 2 kΩ from the ESP32 pin to GND, or use the 3.3 V HC-SR04P.','2 kΩ resistor',['ECHO','GPIO']]],
   ph:[['error','level','Output up to 5 V','The module output can reach 5 V and the ESP32 ADC stops at 3.3 V.','Always put a voltage divider between the module output and the ESP32 pin.','2 resistors (divider)',['PO|AO|OUT|SIG','GPIO']]],
   mt3608:[['warn','level','Output can exceed 3.3 V','A boost converter can output well above what an ESP32 pin takes.','Measure its output only through a divider. 10 kΩ + 10 kΩ for up to 6 V, 100 kΩ + 10 kΩ for up to 36 V.','2 resistors (divider)']],
   tp4056:[['warn','level','Cell voltage up to 4.2 V','A full Li-ion cell is above the ESP32 pin limit.','Measure the cell through a divider so the pin stays below 3.3 V.','2 resistors (divider)']],
   xkby25:[['warn','level','Output equals the supply','On a 5 V supply the output is 5 V.','Put 1 kΩ in series with the output and 2 kΩ from the ESP32 pin to GND.','2 kΩ resistor',['OUT|SIG','GPIO']]],
-  mq2:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V. The ESP32 ADC stops at 3.3 V.','Use a voltage divider (for example 1 kΩ and 2 kΩ) on the AO wire.','2 kΩ resistor',['AO|A0|OUT','GPIO']],
+  mq2:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V. The ESP32 ADC stops at 3.3 V.','Use a voltage divider (10 kΩ from AO to the pin, 20 kΩ from the pin to GND) on the AO wire.','20 kΩ resistor',['AO|A0|OUT','GPIO']],
        ['info','power','Heater and warm-up','The heater draws about 150 mA and needs about 3 minutes to settle.','Give the sensor time before reading.']],
-  mq135:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V.','Use a voltage divider (for example 1 kΩ and 2 kΩ) on the AO wire.','2 kΩ resistor',['AO|A0|OUT','GPIO']],
+  mq135:[['warn','level','Analog output can reach 5 V','On a 5 V supply the AO pin can swing above 3.3 V.','Use a voltage divider (10 kΩ from AO to the pin, 20 kΩ from the pin to GND) on the AO wire.','20 kΩ resistor',['AO|A0|OUT','GPIO']],
        ['info','power','Heater and warm-up','The heater draws about 150 mA and needs a few minutes to settle.','Give the sensor time before reading.']],
   yfs201:[['warn','level','Pulse output is the supply level','On a 5 V supply the signal wire pulses to 5 V.','Put 1 kΩ in series and 2 kΩ from the ESP32 pin to GND.','2 kΩ resistor',['SIG|OUT|YELLOW|PULSE','GPIO']]],
-  lm2596:[['error','power','Needs an outside supply','IN+ takes 7 to 35 V. It is not powered from the ESP32.','Connect a 7 to 35 V supply to IN+ and IN−. Join its ground to the ESP32 ground.','7 to 35 V supply']],
+  lm2596:[['error','power','Needs an outside supply','IN+ takes 4.5 to 35 V, at least 2 V above the output. It is not powered from the ESP32.','Connect a 4.5 to 35 V supply to IN+ and IN−. Join its ground to the ESP32 ground.','7 to 35 V supply']],
   l298n:[['error','power','Motor supply','The motors run from their own 6 to 35 V supply on the +12V terminal, never from the ESP32 5V pin.','Connect the motor supply and join its minus to the ESP32 ground.','6 to 35 V supply'],
        ['info','tip','Add a motor','The module needs a DC motor on its outputs.','Connect a DC motor to OUT1 and OUT2.']],
   l9110s:[['info','tip','Add a motor','The module needs a DC motor on its outputs.','Connect a small DC motor (3 to 6 V) to the A or B output.']],
@@ -12091,7 +12094,7 @@ const PJ_REQ=[
   {part:'tmc2209',any:['nema17'],sev:'info',title:'No stepper motor in the project',why:'The driver has nothing to drive.',fix:'Add a NEMA 17 (or another bipolar stepper) to the project, or test the driver on its own.'}
 ];
 /* typical running current from the board rails, in mA. Parts with their own supply are left out. */
-const PJ_MA={servo:150,sd:80,gps:45,hc12:40,relay:75,motor:250,neo:120,sk6812:120,lcd:40,mq2:150,mq135:150,step28:240,max98357:100,mhz19b:130,pmsa003:100,hc05:40,ili9341:100,st7789:50,st7735:40,gc9a01:40,oled:20,sh1106:20,scd30:75,tcs34725:20,pir:1,sr04:15,rc522:25,pn532:50,as608:60,dfplayer:30,ad8232:1,max30102:20,tm1637:20,max7219:60};
+const PJ_MA={tp4056:500,servo:150,sd:80,gps:45,hc12:40,relay:75,motor:250,neo:120,sk6812:120,lcd:40,mq2:150,mq135:150,step28:240,max98357:100,mhz19b:130,pmsa003:100,hc05:40,ili9341:100,st7789:50,st7735:40,gc9a01:40,oled:20,sh1106:20,scd30:75,tcs34725:20,pir:1,sr04:15,rc522:25,pn532:50,as608:60,dfplayer:30,ad8232:1,max30102:20,tm1637:20,max7219:60};
 /* an outside supply that satisfies each part's "needs its own supply" note, best fit first */
 const PJ_SUPPLY={nema17:['psu12','psuadj'],a4988:['psu12','psuadj'],tmc2209:['psu12','psuadj'],l298n:['psu12','psuadj'],lm2596:['psu12','psuadj'],mg996r:['psu5','psuadj'],pca9685:['psu5','psuadj'],sim800l:['psuadj'],a7670c:['psuadj']};
 const PJ_EXT=new Set(['mg996r','sim800l','a7670c','pca9685','l298n','a4988','tmc2209','nema17','lm2596']);
@@ -12140,7 +12143,7 @@ function pjCheck(ids){
     for(const n of PJ_NEED[B]||[]){
       const [sev,kind,title,why,fix,item,between]=n;
       let s=sev,f=fix;
-      if(kind==='level'&&lvl&&!/^(irf540n|nrf24)$/.test(B)){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
+      if(kind==='level'&&lvl&&!/^(irf540n|nrf24|mq2|mq135|ph|mt3608|tp4056)$/.test(B)){s='info';f='Run this signal through the level converter in your project (5 V on the high side, 3.3 V on the low side).'}
       let addp=null,ok=false;
       if(kind==='power'&&item&&PJ_SUPPLY[B]){
         const have=PJ_SUPPLY[B].find(x=>has.has(x));
@@ -12964,7 +12967,7 @@ const K=ISO,PITCH=10,X0=22,ZB=8,BDY=218,AZ=60,EL=30,TC=109,OY=12,TR0=101,TR1=117
 const ROW={a:54,b:64,c:74,d:84,e:94,f:124,g:134,h:144,i:154,j:164},RAIL={tp:14,tm:24,bp:194,bm:204};
 const Y=v=>v+OY;
 const colX=c=>X0+(c-1)*PITCH+5;
-const SKIP=new Set(['i2c','studio','breadboard','jumper','esp']);
+const SKIP=new Set(['i2c','studio','breadboard','jumper','esp','esp32cam','preflight','power']);
 const OFF={ili9341:'tft',servo:'servo',mg996r:'servo',motor:'motor',step28:'step',nema17:'step',relay:'relay',ssr:'relay',lcd:'lcd',neo:'strip',sk6812:'strip',yfs201:'flow',keypad:'pad',ds18b20:'probe',ph:'probe',pmsa003:'big',mhz19b:'big',l298n:'big',sim800l:'big',a7670c:'big',lm2596:'big',mt3608:'big',tp4056:'big',psu5:'psu',psu12:'psu',psuadj:'psu'};
 const DISC={led:'led',rgb:'rgbled',gpio:'sw',button:'sw',resistor:'res',ldr:'res',ntc:'res',capacitor:'cap',diode:'dio',transistor:'tr',lm35:'tr',pc817:'dip',irf540n:'to220',abuzz:'buzz',pbuzz:'buzz',pot:'pot'};
 const SIZE={servo:[46,24,44],motor:[34,34,40],step:[44,44,24],relay:[56,40,36],lcd:[84,38,5],strip:[110,12,4],flow:[34,26,34],pad:[64,64,3],probe:[10,10,56],big:[56,38,16],psu:[60,40,28]};
@@ -13003,7 +13006,7 @@ function planOf(ids){
     const p=pjPart(id);if(!p)continue;
     let wr=null;try{wr=p.wiring?W(p.wiring):null}catch(e){}
     const ov=(typeof PJ!=='undefined'&&PJ.ovr&&PJ.ovr[id])||null;
-    const rows=((pjDrivenRows(id,ids)||(wr&&wr.rows))||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>r.kind!=='opt').filter(r=>!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp)||/\b(via|through|divider)\b|^Source/i.test(r.pp));
+    const rows=((pjDrivenRows(id,ids)||(wr&&wr.rows))||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>r.kind!=='opt').filter(r=>B==='resistor'||B==='capacitor'||!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp)||/\b(via|through|divider)\b|^Source/i.test(r.pp)||(r.kind==='sig'&&/ \/ /.test(r.pp)));
     const n=Math.max(2,Math.min(9,rows.length||2));
     const kind=OFF[B]?'off':DISC[B]?'disc':'plug';
     const need5=rows.some(r=>r.kind==='pwr'&&pjRail(r.esp)==='5V');
@@ -14619,7 +14622,7 @@ const GROUP_PLAN=[
   ['Screens and lights',['oled','sh1106','lcd','st7789','st7735','ili9341','gc9a01','max7219','tm1637','neo','sk6812','studio']],
   ['Radio, network and location',['gps','neom8n','hc12','hc05','nrf24','sx1278','sim800l','a7670c']],
   ['Storage and clock',['sd','ds3231']],
-  ['Power',['batt','power','tp4056','mt3608','lm2596','ina219']]
+  ['Power',['batt','power','tp4056','mt3608','lm2596','ina219','psu5','psu12','psuadj']]
 ];
 (function(){
   const have=new Set(PARTS.map(p=>p.id)),used=new Set();
@@ -14667,6 +14670,7 @@ function navReveal(){
 }
 function refreshHead(){
   if(headChip&&!noRes(PARTS.find(x=>x.id===cur))){const n=resultChip(cur);n.id='hc';headChip.replaceWith(n);headChip=n;}
+  const vn=document.querySelector('.verdict .note');if(vn){const r=R()[cur];vn.textContent=r?`${r.v}, ${r.note||'manual'}, ${r.ts}${Link.mode==='demo'?', simulated, not saved':''}`:'Not tested. Auto checks set this, or mark it by hand.'}
 }
 (function(){
   const paint=n=>{const e=(n.nodeType===1?n:n.parentElement);const c=e&&e.closest&&e.closest('.chk');if(!c)return;
