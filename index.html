@@ -2160,6 +2160,87 @@ body{overflow-x:clip}
 .cut-code>pre{margin:0;padding:12px 16px;height:300px;overflow:auto;font:12.5px/1.6 var(--f-mono);white-space:pre;color:var(--fg)}
 .cut-cap{padding:9px 14px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted)}
 .cut-cap code{font-family:var(--f-mono);color:var(--fg)}
+
+/* ===== fixed top bar with the main navigation (always visible) ===== */
+:root{--gb-h:60px;--gb-s:60px}
+html body .wrap{padding-top:calc(var(--gb-h) + 20px)}
+html body header.top{position:fixed;top:0;left:0;right:0;z-index:55;box-sizing:border-box;height:var(--gb-h);margin:0;
+  padding:0 max(18px,env(safe-area-inset-right,0px)) 0 max(18px,env(safe-area-inset-left,0px));
+  display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:10px;
+  background:rgba(11,12,15,.84);-webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25);border-bottom:1px solid var(--hair)}
+html body header.top::after{content:none;display:none}
+html body header.top .lft{display:flex;flex-wrap:nowrap;align-items:center;gap:10px;min-width:0;flex:none}
+html body header.top .conn{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;min-width:0;margin-left:auto;flex:0 1 auto}
+html body header.top .brand{order:0;flex:none;gap:10px;margin:0;padding:4px 6px 4px 2px}
+html body header.top .mark{width:32px;height:32px}
+html body header.top h1{font-size:17px;white-space:nowrap}
+html body header.top .btn{padding:7px 13px;font-size:13.5px;white-space:nowrap;min-height:36px}
+html body header.top #bBack{order:0;display:none;width:36px;padding:0;justify-content:center;flex:none}
+html body header.top #bBack.on{display:inline-flex}
+html body header.top #bBack span{display:none}
+html body header.top #bBoard{order:0;flex:0 1 auto;min-width:0;max-width:13em}
+html body header.top #bBoard>svg{display:inline}
+html body header.top #bSearch{order:0;display:inline-flex;width:36px;padding:0;justify-content:center;flex:none;min-width:0}
+html body header.top #bSearch span,html body header.top #bSearch kbd{display:none}
+html body header.top .stat{order:0;padding:7px 12px;font-size:13px;min-width:0;max-width:13em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:auto;height:auto}
+html body header.top #bConnect,html body header.top #bDemo{order:0;flex:none}
+.gnav{display:flex;align-items:center;gap:2px;min-width:0;margin-left:6px}
+.gnav a{display:inline-flex;align-items:center;min-height:36px;box-sizing:border-box;padding:0 12px;border-radius:999px;font:500 14px var(--f-body);color:var(--muted);text-decoration:none;white-space:nowrap;transition:color .15s,background-color .15s}
+.gnav a:hover{color:var(--fg);background:rgba(255,255,255,.055)}
+.gnav a[aria-current=page]{color:var(--accent-hi);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.gnav .s{display:none}
+/* things that stick or float now sit under the bar */
+@media (min-width:960px){html body .layout>nav{top:calc(var(--gb-s) + 14px);max-height:calc(100vh - var(--gb-s) - 28px)}}
+@media (min-width:641px){html body nav.jump{top:calc(var(--gb-s) + 10px)}}
+html body .pj-tbar{top:calc(var(--gb-s) + 8px)}
+html body .bb-side{top:calc(var(--gb-s) + 12px);max-height:calc(100vh - var(--gb-s) - 24px)}
+@media (min-width:701px) and (pointer:fine){html body .hm-fab{display:none}}
+html{scroll-padding-top:calc(var(--gb-s) + 16px)}
+#toast{pointer-events:none}
+@media (max-width:1500px){html body header.top h1{display:none}}
+@media (max-width:1320px){
+  html body header.top .stat{font-size:0;gap:0;padding:0;width:36px;min-width:36px;height:36px;justify-content:center;flex:none;overflow:visible}
+  html body header.top #bDemo{font-size:0;gap:0;padding:0 8px}
+}
+@media (max-width:1100px){.gnav .l{display:none}.gnav .s{display:inline}}
+@media (max-width:900px){
+  html body header.top #bBoard{width:36px;padding:0;justify-content:center;flex:none}html body header.top #bBoard .bn,html body header.top #bBoard .bs{display:none}
+  .gnav a{padding:0 9px}
+}
+/* phones: links on the first row, board and connection on a second row that folds away while you scroll */
+@media (max-width:760px){
+  :root{--gb-h:106px;--gb-s:50px}
+  html body{padding-top:0}
+  html body .wrap{padding-top:calc(var(--gb-h) + 12px)}
+  html body header.top{height:auto;flex-wrap:wrap;gap:0 6px;padding:calc(env(safe-area-inset-top,0px) + 0px) 10px 0;align-content:flex-start}
+  html body header.top .lft,html body header.top .conn{display:contents}
+  html body header.top .brand{order:1;height:50px;padding:0 4px 0 0}
+  html body header.top .mark{width:28px;height:28px}
+  html body header.top .gnav{order:2;flex:1 1 0;height:50px;margin:0;justify-content:space-between;gap:0}
+  .gnav a{padding:0 9px;font-size:13.5px;min-height:40px}
+  html body header.top::after{content:'';display:block;order:3;flex-basis:100%;height:0}
+  html body header.top #bBack{order:4}
+  html body header.top #bBoard{order:5;flex:1 1 0;width:auto;max-width:none;justify-content:flex-start;padding:7px 12px}html body header.top #bBoard .bs{display:inline}
+  html body header.top .stat{order:6}
+  html body header.top #bSearch{order:7}
+  html body header.top #bConnect{order:8}
+  html body header.top #bDemo{order:9}
+  html body header.top #bBack,html body header.top #bBoard,html body header.top .conn>*{margin-bottom:10px}
+  body.gb-min header.top #bBack,body.gb-min header.top #bBoard,body.gb-min header.top .conn>*{display:none!important}
+  html body.has-tabs.pb-on #pbar{top:calc(50px + env(safe-area-inset-top,0px));z-index:54;min-height:46px;padding-top:0}
+}
+@media (max-width:380px){.gnav a{padding:0 6px;font-size:13px}html body header.top{gap:0 4px}html body header.top #bConnect{padding:7px 9px;font-size:12.5px}html body header.top .stat{display:none}html body header.top #bDemo{padding:0 4px}}
+/* an open project: the editable name is the title, so the page heading above it is kept for screen readers only */
+body.is-projects main:has(.pj-bar)>.ph{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:0;padding:0;border:0}
+body.is-projects main:has(.pj-bar) .pj-bar{margin-top:4px}
+body.is-projects main:has(.pj-bar) .pj-title{font-size:26px;letter-spacing:-.01em}
+.pj-title:hover{border-bottom-color:var(--hair2)}
+@media (max-width:760px){html body .hm-stage,html body .hm.settled .hm-stage{top:calc(var(--gb-s) + 10px)}}
+@media (max-width:480px){html body header.top #bSearch{display:none}}
+:where(main summary){padding-block:5px}
+.pj-lt td:not(:first-child),.pj-lt th{white-space:nowrap}
+html body .skip:focus{z-index:70}
+@media print{html body header.top{position:static}}
 </style>
 
 <a class="skip" href="#panel">Skip to the test panel</a>
@@ -2167,14 +2248,19 @@ body{overflow-x:clip}
   <header class="top">
     <div class="lft">
     <button id="bBack" class="btn back" type="button" aria-label="Go back to the previous page"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back</span></button>
-    <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, choose your board">
+    <a class="brand" id="brandHome" href="#home" aria-label="ESP32 Live Tester, home">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g class="pins"><path d="M17 4v6M24 4v6M31 4v6M17 38v6M24 38v6M31 38v6M4 17h6M4 24h6M4 31h6M38 17h6M38 24h6M38 31h6"/></g><rect class="chip" x="10" y="10" width="28" height="28" rx="6.5"/><path class="wave" d="M15 25.5h4.2l2.6-8.2 4.2 13.4 2.7-8.6 1.6 3.4H33"/><circle class="live" cx="32.5" cy="16" r="2"/></svg>
       <h1>ESP32 Live Tester</h1>
     </a>
-      <button id="bBoard" class="btn brd" type="button" aria-label="Pick a board"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="3" y="5.5" width="14" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 5.5V3.6M10 5.5V3.6M13.5 5.5V3.6M6.5 14.5v1.9M10 14.5v1.9M13.5 14.5v1.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="bn">Pick a board</span></button>
-      <button id="bProj" class="btn proj" type="button" aria-label="Start a project">Start a project</button>
     </div>
+    <nav class="gnav" id="gnav" aria-label="Main">
+      <a href="#home" data-go="home"><span class="l">Home</span><span class="s" aria-hidden="true">Home</span></a>
+      <a href="#overview" data-go="part"><span class="l">Test a part</span><span class="s" aria-hidden="true">Test</span></a>
+      <a href="#projects" data-go="projects"><span class="l">Projects</span><span class="s" aria-hidden="true">Projects</span></a>
+      <a href="#overview" data-go="overview"><span class="l">Pin map and parts</span><span class="s" aria-hidden="true">Pins</span></a>
+    </nav>
     <div class="conn">
+      <button id="bBoard" class="btn brd" type="button" aria-label="Pick a board"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="3" y="5.5" width="14" height="9" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 5.5V3.6M10 5.5V3.6M13.5 5.5V3.6M6.5 14.5v1.9M10 14.5v1.9M13.5 14.5v1.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="bn">Pick a board</span></button>
       <button id="bSearch" class="btn srch" type="button" aria-haspopup="dialog" aria-keyshortcuts="Control+K /"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M13 13l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Search</span><kbd></kbd></button>
       <span id="status" class="stat" role="status">Not connected</span>
       <button id="bConnect" class="btn primary" type="button">Connect ESP32</button>
@@ -11018,7 +11104,7 @@ const TIPID={
   bConnect:'Opens the port list so you can pick the ESP32 and connect over USB.',
   bDemo:'Uses a simulated board with made-up readings. No hardware needed. Press again to go back to a real board.',
   bLogClear:'Empties the serial log.',
-  brandHome:'Goes to the start page where you choose your board.',
+  brandHome:'Goes to the home page.',
   bCopy:'Copies every result so far as text you can paste.',
   bClear:'Forgets every saved result.'
 };
@@ -11074,6 +11160,7 @@ function tipInit(){
   document.addEventListener('mouseover',e=>{
     const b=e.target.closest&&e.target.closest(sel);
     if(!b||b===tipFor||b===tipInit.cand)return;
+    if(tipInit.used&&(b===tipInit.used||!tipInit.used.isConnected&&Date.now()-tipInit.usedT<1200)){tipInit.cand=b;return}
     tipHide();tipInit.cand=b;
     const txt=tipText(b);if(!txt)return;
     const d=b.dataset.tipDelay!=null?+b.dataset.tipDelay:(b.id==='bSearch'||b.id==='navQ'||b.classList.contains('hm-fab')?350:TIP_DELAY);
@@ -11082,9 +11169,9 @@ function tipInit(){
   document.addEventListener('mouseout',e=>{
     const b=e.target.closest&&e.target.closest(sel);if(!b)return;
     if(e.relatedTarget&&b.contains(e.relatedTarget))return;
-    tipInit.cand=null;tipHide();
+    tipInit.cand=null;tipHide();if(b===tipInit.used)tipInit.used=null;
   });
-  for(const t of ['pointerdown','keydown','wheel','touchstart'])document.addEventListener(t,()=>{tipInit.cand=null;tipHide()},{passive:true,capture:true});
+  for(const t of ['pointerdown','keydown','wheel','touchstart'])document.addEventListener(t,e=>{tipInit.cand=null;tipHide();if(t==='pointerdown'){tipInit.used=e.target.closest&&e.target.closest(sel)||null;tipInit.usedT=Date.now()}},{passive:true,capture:true});
   addEventListener('scroll',e=>{const t=e.target;if(tipFor&&(t===document||t===document.documentElement||(t.contains&&t.contains(tipFor))))tipHide()},{passive:true,capture:true});
 }
 tipInit.cand=null;
@@ -12428,7 +12515,7 @@ function stand(it,c,spec){
       if(kind==='r'||kind==='c'){m.box(u-.8,v-.4,u-.55,v+.4,.6,'#c9c6bd');m.box(u+.55,v-.4,u+.8,v+.4,.6,'#c9c6bd')}
     },
     led:(u,v,hex)=>m.box(u-.9,v-.5,u+.9,v+.5,.7,hex||'#d6453d'),
-    pinText:()=>{if(!fvis)return;it.rows.slice(0,it.n).forEach((r,k)=>{const t=PIN_TXT(r.pp),px=H.colX(it.c0+k);if(t&&px>x0+3&&px<x0+w-3)F.push(H.faceText(H.colX(it.c0+k),yf+.05,zb+.9*MM,t,t.length>3?4.1:4.8,'hi','middle'))})},
+    pinText:()=>{if(!fvis)return;it.rows.slice(0,it.n).forEach((r,k)=>{const t=PIN_TXT(r.pp),px=H.colX(it.c0+k);if(t&&px>x0+3&&px<x0+w-3)F.push(H.faceText(H.colX(it.c0+k),yf+.05,zb+.9*MM,t,t.length>3?3.5:t.length>2?4.4:4.8,'hi','middle'))})},
   };
   spec.draw(m,it);
   if(spec.labels!==false)m.pinText();
@@ -12476,7 +12563,6 @@ const SPEC={
   mpu:{w:21.2,h:16,col:BLUE,draw(m){
     qfn(m,9.4,9.1,4,'MPU');reg(m,16.5,10.8);m.smd(14.5,6,'c');m.smd(6,5,'c');m.smd(4.4,10.6,'r');m.smd(14.6,13,'r');m.led(18,6.4,'#d6453d');
     m.text(10.6,13.4,'HW-290',1.9,'middle','hi');m.hole(2,13.6,1.1);m.hole(19.2,13.6,1.1);
-    m.box(5.5,1,15.7,2.4,.2,'#d9d6cb',{tone:'faint',crease:'none'});
   }},
   oled:{w:27.3,h:27.8,col:BLACK,draw(m){
     m.box(0,5.4,27.3,27.8,.9,'#101114',{tone:'lo'});m.box(1.4,7.6,25.9,26.2,1.05,'#07080a',{tone:'faint',crease:'none'});
@@ -12591,7 +12677,7 @@ const SPEC={
   sd:{w:24,h:42,col:BLUE,draw(m){sdslot(m,12,30);m.chip(12,16,5,3.4,.9,'');m.smd(5,20,'c');m.smd(19,20,'r');m.led(5,12,'#3fa86a');m.text(12,8.6,'microSD',1.7,'middle','hi');m.hole(1.8,39.6,.9);m.hole(22.2,39.6,.9)},labels:true},
   gps:{w:36,h:23,col:BLUE,draw(m){m.box(1.5,1,26.5,22,4.2,'#d9c79a',{tone:'lo'});m.box(3.5,3,24.5,20,4.35,'#c5b283',{tone:'faint',crease:'none'});m.box(12,10,16,14,4.5,'#e8e1c3',{tone:'faint',crease:'none'});m.chip(31,13,5.4,5.4,1,'NEO');m.smd(31,6,'r');m.smd(34,19,'c');m.led(33.4,2.6,'#d6453d');m.text(13.5,6,'NEO-6M',1.6,'middle','lo')},labels:true},
   neom8n:{w:36,h:23,col:'#1b1d22',draw(m){m.box(1.5,1,26.5,22,4.2,'#d9c79a',{tone:'lo'});m.box(3.5,3,24.5,20,4.35,'#c5b283',{tone:'faint',crease:'none'});m.box(12,10,16,14,4.5,'#e8e1c3',{tone:'faint',crease:'none'});m.chip(31,13,5.4,5.4,1,'M8N');m.smd(31,6,'r');m.smd(34,19,'c');m.text(13.5,6,'NEO-M8N',1.5,'middle','lo')},labels:true},
-  hc05:{w:27,h:34,col:BLUE,draw(m){m.box(3,12,24,32,3.2,'#b9bdc4',{tone:'lo'});m.text(13.5,24,'HC-05',2.4,'middle','lo');m.text(13.5,19,'BT',2,'middle','lo');m.led(5,34-2.2,'#d6453d');m.smd(5,8,'r');m.smd(22,8,'c');m.box(8,7,19,9,.8,'#15161a');m.hole(1.4,1.8,.8);m.hole(25.6,1.8,.8)},labels:true},
+  hc05:{w:16,h:37,col:BLUE,draw(m){m.box(1.5,9.5,14.5,36.2,2.6,'#b9bdc4',{tone:'lo'});m.box(1.5,29.5,14.5,36.2,.5,'#1d5fa8',{tone:'faint',crease:'none'});m.line([[3,35.4],[13,35.4],[13,33.6],[4.5,33.6],[4.5,31.8],[13,31.8]],.55,'hi');m.text(8,22,'HC-05',1.9,'middle','lo');m.text(8,18.4,'BT',1.6,'middle','lo');m.led(3.4,7.6,'#d6453d');m.smd(12,7.6,'r');m.box(5.4,4.6,10.6,6.4,.8,'#15161a');m.box(12.2,4,14.6,6.4,1.6,'#c9ccd1');m.text(8,2.6,'ZS-040',1.2,'middle','hi')},labels:true},
   sx1278:{w:27,h:25,col:BLUE,draw(m){m.box(3,5.4,20,20,2.2,'#b9bdc4',{tone:'lo'});m.text(11.5,12,'Ra-02',2,'middle','lo');m.text(11.5,16.4,'SX1278',1.6,'middle','lo');m.cyl(24.2,21.4,1.2,0,3,'#cdb064',{n:10,spec:.4});m.smd(22,6,'c');m.smd(22,9,'r')},labels:true},
   rc522:{w:40,h:60,col:BLUE,draw(m){m.box(3,18,37,57,.4,'#e9e6dc',{tone:'faint',crease:'none'});m.line([[6,22],[34,22],[34,54],[6,54],[6,22]],.5,'lo');m.line([[9,25],[31,25],[31,51],[9,51],[9,25]],.5,'lo');m.chip(30,12,7,7,1.2,'RC522');m.box(8,6,18,12,2,'#1b1d22',{tone:'lo'});m.cyl(13.4,40,4.2,.4,.9,'#a9a8a2',{n:20});m.smd(22,6,'c');m.smd(25,6,'r');m.text(20,15.6,'RFID-RC522',1.5,'middle','hi');m.hole(2,58,1);m.hole(38,58,1)},labels:true},
   a4988:{w:20.3,h:15.4,col:RED,draw(m){m.box(6,3.4,14.4,11.4,3.6,'#1b1d22',{tone:'lo'});for(let i=0;i<5;i++)m.box(6.4+i*1.6,3.6,6.9+i*1.6,11.2,4.1,'#9ea2a8',{tone:'faint',crease:'none'});trim(m,16.6,12.4,'#b9bdc4');m.smd(3.2,12,'c');m.smd(3.2,9.4,'r');m.cyl(3.2,4.4,1.8,0,3.2,'#2a2c32',{n:12});m.text(10,13.6,'A4988',1.4,'middle','hi')},labels:true},
@@ -12926,11 +13012,11 @@ const BENCH={
   sk6812(b){return BENCH.neo(b,'sk6812')},
   yfs201(b){
     const f=bf(b,1);let o='';
-    o+=f.box(-13,-10,13,10,0,26,'#e8e6dc',{tone:'lo',r:4});
-    for(const sg of [-1,1]){o+=f.xc(0,12,7.2,sg*13,sg*30,'#e8e6dc',{n:24,spec:.25,band:[sg>0?13:-30,2.4]});o+=f.xc(0,12,5.4,sg*30,sg*30.3,'#101114',{n:18})}
-    o+=f.zc(0,0,7,26,31,'#26272b',{n:24,spec:.2});
+    o+=f.box(-13,-10,13,10,0,26,'#1f2126',{tone:'lo',r:4});
+    for(const sg of [-1,1]){o+=f.xc(0,12,7.2,sg*13,sg*30,'#26282e',{n:24,spec:.25,band:[sg>0?13:-30,2.4]});o+=f.xc(0,12,5.4,sg*30,sg*30.3,'#101114',{n:18})}
+    o+=f.zc(0,0,7,26,31,'#2d2f35',{n:24,spec:.2});
     o+=f.box(-3,-9,3,-6,26,34,'#16171a');
-    o+=f.face(0,10.2,13,'YF-S201',2.6,'lo');
+    o+=f.face(0,10.2,13,'YF-S201',2.6,'hi');
     return [o];
   },
   keypad(b){
@@ -12970,9 +13056,9 @@ const BENCH={
   },
   mhz19b(b){
     const f=bf(b,1);let o='';
-    o+=f.box(-17,-10,17,10,0,9,'#1b1d22',{tone:'lo',r:1.5});
-    o+=f.zc(-3,0,6.8,9,10.4,'#cdb064',{n:28,spec:.6});o+=f.zc(-3,0,5.2,10.4,10.8,'#e4e0d2',{n:26,amb:.9,dif:.1});
-    o+=f.top(10,-4,9,'MH-Z19B',1.9,'hi');o+=f.top(10,2,9,'NDIR CO2',1.5,'hi');
+    o+=f.box(-17,-10,17,10,0,9,'#c9a648',{tone:'lo',r:1.5,spec:.5});
+    for(const u of [-9,3]){o+=f.zc(u,0,4.6,9,9.3,'#a8873a',{n:24,spec:.4});o+=f.zc(u,0,3.8,9.3,9.5,'#ece8dc',{n:22,amb:.9,dif:.1})}
+    o+=f.top(12,-4,9,'MH-Z19B',1.6,'lo');o+=f.top(12,2,9,'CO2',1.5,'lo');
     for(let i=0;i<7;i++)o+=f.box(-15+i*2.54,10,-14.4+i*2.54,10.6,2,10,GOLD);
     return [o];
   },
@@ -13100,6 +13186,47 @@ const faceText=(x,y,z,s,size,tone,anchor)=>K.faceTextSvg(K.sideMatrix([x,y],z,P,
 const SVGH={K,bx,cyl,at,ln,txt,faceText,P:()=>P,ZB,colX};BM.bind(SVGH);
 const hashN=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)};
 /* ---------- what is on the board ---------- */
+/* header pins in the order printed on the common module, with the pins this tester leaves unwired kept in place,
+   so a pin sits in the same breadboard column as on the real board. A name alone matches a wiring row that starts with it. */
+const HDR={
+  mpu:['VCC','3V3','GND','SCL','SDA','FSYNC','INTA','DRDY'],
+  mpu9250:['VCC','GND','SCL','SDA','EDA','ECL','AD0','INT','NCS','FSYNC'],
+  adxl345:['GND','VCC','CS','INT1','INT2','SDO','SDA','SCL'],
+  mag:['VCC','GND','SCL','SDA','DRDY'],hmc5883l:['VCC','GND','SCL','SDA','DRDY'],
+  vl53l0x:['VIN','GND','SCL','SDA','GPIO1','XSHUT'],vl53l1x:['VIN','GND','SCL','SDA','GPIO1','XSHUT'],
+  rcwl:['3V3','GND','OUT','VIN','CDS'],
+  tcrt5000:['VCC','GND','DO','AO'],mq2:['VCC','GND','DO','AO'],mq135:['VCC','GND','DO','AO'],soilr:['VCC','GND','DO','AO'],
+  bmp280:['VCC','GND','SCL','SDA','CSB','SDO'],bmp180:['VCC','GND','SCL','SDA'],
+  sht31:['VIN','GND','SCL','SDA','ADR','ALR'],
+  max30102:['VIN','SCL','SDA','INT','IRD','RD','GND'],
+  ad8232:['GND','3.3V','OUTPUT','LO-','LO+','SDN'],
+  oled:['VCC','GND','SCL','SDA'],
+  gps:['VCC','RX','TX','GND'],neom8n:['VCC','RX','TX','GND'],
+  hc12:['VCC','GND','RXD','TXD','SET'],
+  hc05:['STATE','RXD','TXD','GND','VCC','EN'],
+  rc522:['SDA','SCK','MOSI','MISO','IRQ','GND','RST','3.3V'],
+  ds3231:['32K','SQW','SCL','SDA','VCC','GND'],
+  pca9685:['GND','OE','SCL','SDA','VCC','V+'],
+  max98357:['LRC','BCLK','DIN','GAIN','SD','GND','VIN'],
+  l9110s:['B-IA','B-IB','GND','VCC','A-IA','A-IB'],
+  waterlvl:['-','+','S'],
+};
+const HDR_RE={VCC:/^(vcc|vin|vdd)\b/i,VIN:/^(vcc|vin|vdd)\b/i,'3V3':/^3v3\b/i,'3.3V':/^3\.3 ?v\b/i,GND:/^gnd\b/i,DO:/^d[o0]\b/i,AO:/^(ao|aout)\b/i,XSHUT:/xshut|shdn/i,
+  'LO-':/^lo[−-]/i,'LO+':/^lo\+/i,RX:/^rxd?\b/i,TX:/^txd?\b/i,RXD:/^rxd?\b/i,TXD:/^txd?\b/i,EN:/^(key|en)\b/i,ADR:/^(adr|addr)\b/i,SDO:/^(sdo|do \(sdo)/i,'V+':/^v\+/i,
+  '-':/^[−-]/,'+':/^\+/,S:/^s\b/i,SD:/^sd\b(?! ?a)/i,OUT:/^out\b/i,OUTPUT:/^output\b/i};
+function hdrRows(B,rows){
+  const hd=HDR[B];if(!hd)return rows;
+  const left=rows.slice(),out=[];
+  for(const lab of hd){
+    const re=HDR_RE[lab]||new RegExp('^'+lab.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i');
+    const i=left.findIndex(r=>re.test(r.pp.trim()));
+    if(i>=0)out.push(left.splice(i,1)[0]);else out.push({esp:'',pp:lab,wire:'',kind:'nc',nc:true});
+  }
+  if(left.length)return rows;                       /* a wired pin the list does not know: keep the page order */
+  while(out.length>9){let j=-1;for(let k=out.length-1;k>=0;k--)if(out[k].nc){j=k;break}if(j<0)break;out.splice(j,1)}
+  while(out.length&&out[out.length-1].nc&&out.length>9)out.pop();
+  return out;
+}
 function planOf(ids){
   const items=[];
   for(const id of ids){
@@ -13109,8 +13236,9 @@ function planOf(ids){
     let wr=null;try{wr=p.wiring?W(p.wiring):null}catch(e){}
     const ov=(typeof PJ!=='undefined'&&PJ.ovr&&PJ.ovr[id])||null;
     const rows=((pjDrivenRows(id,ids)||(wr&&wr.rows))||[]).map(r=>({esp:ov?String(r[0]).replace(/^GPIO(\d+)/,(m,n)=>ov[n]!=null?'GPIO'+ov[n]:m):String(r[0]),pp:String(r[1]),wire:r[2]||'',kind:r[3]||'sig'})).filter(r=>r.kind!=='opt').filter(r=>B==='resistor'||B==='capacitor'||!/(^|\s)\d+(\.\d+)?\s?[kM]?Ω|resistor|capacitor|µF/i.test(r.pp)||/\b(via|through|divider)\b|^Source/i.test(r.pp)||(r.kind==='sig'&&/ \/ /.test(r.pp)));
-    const n=Math.max(2,Math.min(9,rows.length||2));
     const kind=OFF[B]?'off':DISC[B]?'disc':'plug';
+    if(kind==='plug'&&!pjDrivenRows(id,ids)){const hr=hdrRows(B,rows);if(hr!==rows){rows.length=0;rows.push(...hr)}}
+    const n=Math.max(2,Math.min(9,rows.length||2));
     const need5=rows.some(r=>r.kind==='pwr'&&pjRail(r.esp)==='5V');
     const dm=kind==='plug'&&BM.dimsOf({id:B,base:B,n,short:pjShort(id),color:PCB[hashN(B)%PCB.length]});
     items.push({id,base:B,name:p.n,short:pjShort(id),rows,n,kind,sp:dm?Math.max(n,Math.ceil(dm.w/PITCH)):n,shape:OFF[B]||DISC[B]||'mod',need5,color:PCB[hashN(B)%PCB.length],extras:[]});
@@ -13553,7 +13681,7 @@ function bbStepText(it,n,total,res){
   else box.append(el('p',{},'Push the '+it.short+' into '+where+', pins down, label facing you.'));
   if(it.rows.length){
     const tb=el('tbody',{});
-    for(const r of it.rows)tb.append(el('tr',{},el('td',{class:'m'},r.pp),el('td',{},bbDest(r)),el('td',{},swatch(r.wire),r.wire||'')));
+    for(const r of it.rows)if(!r.nc)tb.append(el('tr',{},el('td',{class:'m'},r.pp),el('td',{},bbDest(r)),el('td',{},swatch(r.wire),r.wire||'')));
     box.append(el('div',{class:'tw'},el('table',{class:'t pj-tb2 bb-tb'},el('thead',{},el('tr',{},...['Part pin','Wire to','Colour'].map(h=>el('th',{},h)))),tb)));
   }
   const ex=(res.extras||[]).filter(x=>x.part===it.id&&!/supply|antenna|speaker/i.test(x.item));
@@ -13969,7 +14097,7 @@ function pjBuild(body,pr){
   });
   /* the whole project at a glance when the picture cannot animate */
   /* a plain list for anyone who cannot see the drawing */
-  const alt=el('details',{class:'bb-alt'},el('summary',{},'Every step as a list'),el('ol',{},...items.map(it=>el('li',{},it.short+': '+bbWhere(it)+'. Wires: '+it.rows.map(r=>it.short&&r.pp+' to '+bbDest(r)).join('; ')+'.'))));
+  const alt=el('details',{class:'bb-alt'},el('summary',{},'Every step as a list'),el('ol',{},...items.map(it=>el('li',{},it.short+': '+bbWhere(it)+'. Wires: '+it.rows.filter(r=>!r.nc).map(r=>it.short&&r.pp+' to '+bbDest(r)).join('; ')+'.'))));
   body.append(alt);
   if(res.issues.length){
     const blockers=res.issues.filter(o=>o.sev!=='info');
@@ -14823,7 +14951,7 @@ async function show(id){
   const was=cur;id=p.id;cur=id;try{BRD.reset();BRD.seed(p);searchLock()}catch(e){}try{palRemember(id)}catch(e){}try{Rec.visit(id);Rec.page(p)}catch(e){}
   if(!p.projects)navRecord({id,pick:p.home?(!BRD.cur||!!BRD.picking):false});
   const chip=noRes(p)?null:resultChip(id);if(chip)chip.id='hc';
-  const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),p.projects?el('div',{class:'ph-c'},btn('Quick test a part',()=>{show('home');window.scrollTo(0,0)},'sm')):noRes(p)?null:el('div',{class:'ph-c'},chip,null));
+  const head=el('header',{class:'ph'},el('div',{},el('h2',{},p.n),el('p',{class:'sub'},subOf(p))),p.projects?null:noRes(p)?null:el('div',{class:'ph-c'},chip,null));
   panel.replaceChildren(head);
   panel.className=p.overview||p.home||p.projects?'':'w2';
   if(was!==id&&!p.home&&!p.projects){panel.classList.add('pg-in');panel.style.animation='none';void panel.offsetWidth;panel.style.animation=''}
@@ -14832,7 +14960,7 @@ async function show(id){
   document.body.classList.remove('has-tabs');if(spyOff){spyOff();spyOff=null}phoneBar(null);
   headChip=chip;
   if(navQuery&&!navMatch(p)){navQuery='';const q=$('#navQ');if(q)q.value=''}
-  renderNav();navReveal();
+  renderNav();navReveal();try{gnavMark(p)}catch(e){}
   if(p.home){HL='h3';const b=el('div',{class:'home'});homePage(b);panel.replaceChildren(b);return}
   if(p.overview){HL='h3';const b=el('div',{class:'ov'});overview(b);panel.append(b);return}
   if(p.projects){HL='h3';const b=el('div',{class:'pj'});panel.append(b);await projectsPage(b);return}
@@ -14912,10 +15040,21 @@ async function toggleDemo(){
   if(Link.mode==='serial')await Link.disconnect();
   Link.mode='demo';Link.fw='demo';demoResults={};setStatus();toast('Simulated mode: the readings are made up. Runs you record are saved and marked Simulated.');
 }
-$('#bProj').addEventListener('click',()=>{Promise.resolve(show('projects')).then(()=>window.scrollTo(0,0))});
+/* main navigation: always in the fixed bar */
+function gnavPart(){const r=(typeof palRecent==='function'?palRecent():[]).find(id=>PARTS.some(x=>x.id===id&&!x.home&&!x.overview&&!x.projects));if(r)return r;const f=PARTS.find(x=>!x.home&&!x.overview&&!x.projects);return f?f.id:'overview'}
+function gnavMark(p){const k=p.home?'home':p.projects?'projects':p.overview?'overview':'part';for(const a of document.querySelectorAll('#gnav a')){if(a.dataset.go===k)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')}}
+$('#gnav').addEventListener('click',e=>{
+  const a=e.target.closest('a[data-go]');if(!a||e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();
+  const k=a.dataset.go;
+  if(k==='home'){BRD.picking=false}
+  if(k==='projects'&&cur==='projects'&&typeof pjGo==='function'&&document.querySelector('.pj')){Promise.resolve(pjGo({})).then(()=>window.scrollTo(0,0));return}
+  Promise.resolve(show(k==='part'?gnavPart():k)).then(()=>window.scrollTo(0,0));
+});
+{const hd=document.querySelector('header.top'),fit=()=>{if(!document.body.classList.contains('gb-min'))document.documentElement.style.setProperty('--gb-h',Math.round(hd.getBoundingClientRect().height)+'px')};try{new ResizeObserver(fit).observe(hd)}catch(e){}addEventListener('resize',fit);fit()}
+{let m=false;const f=()=>{const on=scrollY>90;if(on!==m){m=on;document.body.classList.toggle('gb-min',on)}};addEventListener('scroll',f,{passive:true});f()}
 $('#bDemo').addEventListener('click',()=>toggleDemo().catch(e=>toast(e.message)));
 $('#navSel').addEventListener('change',e=>show(e.target.value));
-$('#brandHome').addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();pickBoard()});
+$('#brandHome').addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;e.preventDefault();if(BRD.cur){BRD.picking=false;Promise.resolve(show('home')).then(()=>window.scrollTo(0,0))}else pickBoard()});
 {const q=$('#navQ');
  q.addEventListener('input',()=>{navQuery=q.value;renderNav()});
  q.addEventListener('keydown',e=>{
